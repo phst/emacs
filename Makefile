@@ -40,7 +40,7 @@ emacs-test: example.so test.el
 	  --load=ert --load=example.so --load=test.el \
 	  --funcall=ert-run-tests-batch-and-exit
 
-example.so: *.go *.h casts.go
+example.so: *.go *.h
 	go test -c -o $@ -buildmode=c-shared -tags=example
 
 .PHONY: check go-test emacs-test
