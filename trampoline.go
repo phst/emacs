@@ -29,7 +29,7 @@ import (
 // https://golang.org/cmd/cgo/#hdr-C_references_to_Go.
 
 //export go_emacs_trampoline
-func go_emacs_trampoline(env *C.emacs_env, nargs int64, args *C.emacs_value, data uint64) C.emacs_value {
+func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) C.emacs_value {
 	// We can’t use environments from other threads, so make sure that we
 	// don’t switch threads.  See
 	// https://phst.github.io/emacs-modules#threads.
