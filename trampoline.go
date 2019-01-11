@@ -31,8 +31,7 @@ import (
 //export go_emacs_trampoline
 func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) C.emacs_value {
 	// We can’t use environments from other threads, so make sure that we
-	// don’t switch threads.  See
-	// https://phst.github.io/emacs-modules#threads.
+	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	e := Env{env}

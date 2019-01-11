@@ -75,8 +75,7 @@ func (m *initManager) copy() []InitFunc {
 //export emacs_module_init
 func emacs_module_init(rt *C.struct_emacs_runtime) C.int {
 	// We can’t use environments from other threads, so make sure that we
-	// don’t switch threads.  See
-	// https://phst.github.io/emacs-modules#threads.
+	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	if rt.size < C.sizeof_struct_emacs_runtime {
@@ -91,7 +90,7 @@ func emacs_module_init(rt *C.struct_emacs_runtime) C.int {
 	if err := inits.run(e); err != nil {
 		e.signal(err)
 		// We still return 0.  See
-		// https://phst.github.io/emacs-modules#module-loading-and-initialization.
+		// https://phst.eu/emacs-modules#module-loading-and-initialization.
 	}
 	return 0
 }

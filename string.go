@@ -75,7 +75,7 @@ func (s *String) FromEmacs(e Env, v Value) error {
 // named String to avoid confusion with the String method of the Stringer
 // interface.
 func (e Env) Str(v Value) (string, error) {
-	// See https://phst.github.io/emacs-modules#copy_string_contents.
+	// See https://phst.eu/emacs-modules#copy_string_contents.
 	var size C.int64_t
 	if ok := C.copy_string_contents(e.raw(), v.r, nil, &size); !ok {
 		return "", e.check()

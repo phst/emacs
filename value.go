@@ -30,7 +30,7 @@ import (
 // them is valid.  Don’t pass Value values to other goroutines.  Two different
 // Value values may represent the same Emacs value.  Use Env.Eq instead of the
 // == operator to compare values.  See
-// https://phst.github.io/emacs-modules#emacs-values for details.
+// https://phst.eu/emacs-modules#emacs-values for details.
 type Value struct{ r C.emacs_value }
 
 // In is a value that knows how to convert itself into an Emacs object.  You

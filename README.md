@@ -1,7 +1,7 @@
 # Go bindings for the Emacs module API
 
 This package implements [Go](https://golang.org/) bindings for the [GNU Emacs
-module API](https://phst.github.io/emacs-modules).
+module API](https://phst.eu/emacs-modules).
 
 This is not an officially supported Google product.
 

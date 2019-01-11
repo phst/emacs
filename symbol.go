@@ -98,7 +98,7 @@ func (n Name) validate() error {
 // Intern interns the given symbol name in the default obarray and returns the
 // symbol object.
 func (e Env) Intern(s Symbol) (Value, error) {
-	// See https://phst.github.io/emacs-modules#intern.
+	// See https://phst.eu/emacs-modules#intern.
 	if isNonNullASCII(string(s)) {
 		return e.checkValue(e.uncheckedIntern(s))
 	}

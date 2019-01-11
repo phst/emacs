@@ -26,7 +26,7 @@ import "C"
 // module initializer is active.  Env values are only valid in the same
 // goroutine as the exported function or module initializer.  So don’t store
 // them or pass them to other goroutines.  See
-// https://phst.github.io/emacs-modules#environments for details.
+// https://phst.eu/emacs-modules#environments for details.
 type Env struct{ ptr *C.emacs_env }
 
 // Eq returns true if and only if the two values represent the same Emacs
