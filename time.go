@@ -86,15 +86,15 @@ func (d *Duration) FromEmacs(e Env, v Value) error {
 // Picoseconds represents a number of picoseconds.
 type Picoseconds big.Int
 
-func (ps Picoseconds) String() string {
-	i := big.Int(ps)
+func (ps *Picoseconds) String() string {
+	i := (*big.Int)(ps)
 	return fmt.Sprintf("%s ps", i.String())
 }
 
 // Time returns the time at ps picoseconds after the epoch, truncated to
 // nanosecond precision.  If the time value would overflow the Go time type,
 // Time returns an error.
-func (ps Picoseconds) Time() (time.Time, error) {
+func (ps *Picoseconds) Time() (time.Time, error) {
 	var s, ns big.Int
 	ps.pair(&s, &ns)
 	if !s.IsInt64() || !ns.IsInt64() {
@@ -117,7 +117,7 @@ func (ps *Picoseconds) FromTime(t time.Time) {
 // Duration returns the number of picoseconds in ps truncated to nanosecond
 // precision.  If the duration value would overflow the Go duration type,
 // Duration returns an error.
-func (ps Picoseconds) Duration() (time.Duration, error) {
+func (ps *Picoseconds) Duration() (time.Duration, error) {
 	var ns big.Int
 	ps.nanos(&ns)
 	if !ns.IsInt64() {
@@ -133,7 +133,7 @@ func (ps *Picoseconds) FromDuration(d time.Duration) {
 
 // Emacs returns a quadruple (high low μs ps) in the same format as the Emacs
 // function current‑time.
-func (ps Picoseconds) Emacs(e Env) (Value, error) {
+func (ps *Picoseconds) Emacs(e Env) (Value, error) {
 	var high, low, μsec, psec big.Int
 	ps.quad(&high, &low, &μsec, &psec)
 	return e.List(BigInt(high), BigInt(low), BigInt(μsec), BigInt(psec))
@@ -195,12 +195,12 @@ func (ps *Picoseconds) FromEmacs(e Env, v Value) error {
 	return nil
 }
 
-func (ps Picoseconds) nanos(ns *big.Int) {
-	i := big.Int(ps)
-	ns.Div(&i, thousand)
+func (ps *Picoseconds) nanos(ns *big.Int) {
+	i := (*big.Int)(ps)
+	ns.Div(i, thousand)
 }
 
-func (ps Picoseconds) pair(s, ns *big.Int) {
+func (ps *Picoseconds) pair(s, ns *big.Int) {
 	ps.nanos(ns)
 	s.DivMod(ns, billion, ns)
 }
@@ -213,9 +213,9 @@ func (ps *Picoseconds) fromPair(s, ns int64) {
 	a.Mul(a, thousand)
 }
 
-func (ps Picoseconds) quad(high, low, μsec, psec *big.Int) {
-	i := big.Int(ps)
-	μsec.DivMod(&i, million, psec)
+func (ps *Picoseconds) quad(high, low, μsec, psec *big.Int) {
+	i := (*big.Int)(ps)
+	μsec.DivMod(i, million, psec)
 	var sec big.Int
 	sec.DivMod(μsec, million, μsec)
 	low.And(&sec, lowMask)
