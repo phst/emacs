@@ -14,7 +14,7 @@ See the package documentation.
 The package assumes that `ptrdiff_t` and `intmax_t` have the same domain as
 `int64_t`.  It also assumes that `uintptr_t` has the same domain as `uint64_t`.
 The C code uses `static_assert` to check these assumptions.  The C standard
-[guarantess](https://en.cppreference.com/w/c/types/integer) that `int64_t` and
+[guarantees](https://en.cppreference.com/w/c/types/integer) that `int64_t` and
 `uint64_t` have exactly 64 bits without padding bits and that they use two’s
 complement representation.  The corresponding Go types `int64` and `uint64`
 have the same [representation](https://golang.org/ref/spec#Numeric_types).
