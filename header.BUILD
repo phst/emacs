@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SHELL := /bin/bash
+cc_library(
+    name = "header",
+    srcs = ["emacs-module.h"],
+    visibility = ["//visibility:public"],
+)
 
-export CGO_CFLAGS := -pedantic-errors -Werror -Wall -Wextra \
-  -Wno-sign-compare \
-  -Wno-unused-parameter
-
-check: go-test
-
-go-test: *.go *.h
-	go vet
-	golint -set_exit_status -min_confidence=0.3
+# Local Variables:
+# mode: bazel
+# End:

@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package emacs
+// This file only exists for the go_binary rule to work.
 
-func init() {
-	ExampleExport()
-	ExampleImport()
-	ExampleVar()
-	ExampleError()
+package main
+
+import _ "github.com/phst/emacs"
+
+func main() {
+	panic("never called")
 }

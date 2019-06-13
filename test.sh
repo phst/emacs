@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SHELL := /bin/bash
+shopt -s -o errexit noclobber noglob nounset pipefail
+shopt -u -o braceexpand history
+shopt -s failglob
 
-export CGO_CFLAGS := -pedantic-errors -Werror -Wall -Wextra \
-  -Wno-sign-compare \
-  -Wno-unused-parameter
+IFS=''
 
-check: go-test
+if (($# != 2)); then
+  echo "wrong number of arguments, got $#, want two" >&2
+  exit 2
+fi
 
-go-test: *.go *.h
-	go vet
-	golint -set_exit_status -min_confidence=0.3
+declare -r EXAMPLE_MODULE="$1"
+declare -r TEST_EL="$2"
+
+shopt -s -o xtrace
+
+"${EMACS:-emacs}" --quick --batch --module-assertions \
+  --load=ert --load="${EXAMPLE_MODULE:?}" --load="${TEST_EL:?}" \
+  --funcall=ert-run-tests-batch-and-exit
