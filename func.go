@@ -25,7 +25,6 @@ package emacs
 //   return go_emacs_trampoline(env, nargs, args, (uintptr_t) data);
 // }
 // emacs_value make_function(emacs_env *env, int64_t min_arity, int64_t max_arity, _GoString_ documentation, uint64_t data) {
-//   assert(data >= 0);
 //   size_t length = _GoStringLen(documentation);
 //   const char *doc = length == 0 ? NULL : _GoStringPtr(documentation);
 //   return env->make_function(env, min_arity, max_arity, trampoline, doc, (void *) (uintptr_t) data);
