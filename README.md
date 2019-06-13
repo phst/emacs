@@ -7,7 +7,9 @@ This is not an officially supported Google product.
 
 ## Usage
 
-See the package documentation.
+See the [package documentation][].
+
+[package documentation]: https://godoc.org/github.com/phst/emacs
 
 ## Implementation notes
 
