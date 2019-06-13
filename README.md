@@ -38,3 +38,17 @@ addition to the examples, this also needs the file `example_test.go` to
 initialize the examples.  The Emacs Lisp file `test.el` runs the examples as
 [ERT](https://www.gnu.org/software/emacs/manual/html_node/ert/index.html)
 tests.
+
+To build and run all tests, install [Bazel][] and run
+
+```shell
+bazel test //...
+```
+
+To run `go vet` and `golint`, run
+
+```shell
+make check
+```
+
+[Bazel]: https://bazel.build/
