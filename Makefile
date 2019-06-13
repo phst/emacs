@@ -15,17 +15,9 @@
 SHELL := /bin/bash
 EMACS := emacs
 
-export CGO_CFLAGS := -pedantic-errors -Werror -Wall -Wextra -Weverything \
-  -Wno-language-extension-token \
-  -Wno-missing-prototypes \
-  -Wno-missing-variable-declarations \
-  -Wno-packed \
-  -Wno-reserved-id-macro \
-  -Wno-sign-conversion \
-  -Wno-strict-prototypes \
-  -Wno-unused-macros \
-  -Wno-unused-parameter \
-  -Wno-used-but-marked-unused
+export CGO_CFLAGS := -pedantic-errors -Werror -Wall -Wextra \
+  -Wno-sign-compare \
+  -Wno-unused-parameter
 
 check: go-test emacs-test
 
