@@ -21,8 +21,13 @@ COPTS = [
 
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test", "nogo")
 
-go_library(
-    name = "emacs",
+SUFFIXES = [
+    "",
+    "_master",
+]
+
+[go_library(
+    name = "emacs" + suffix,
     srcs = glob(
         ["*.go"],
         exclude = [
@@ -30,47 +35,47 @@ go_library(
             "example_main.go",
         ],
     ) + ["trampoline.h"],
-    cdeps = ["@emacs_module_header//:header"],
+    cdeps = ["@emacs_module_header" + suffix + "//:header"],
     cgo = True,
     copts = COPTS,
     importpath = "github.com/phst/emacs",
-)
+) for suffix in SUFFIXES]
 
-go_test(
-    name = "go_test",
+[go_test(
+    name = "go" + suffix + "_test",
     srcs = glob(
         ["*_test.go"],
         exclude = ["example_test.go"],
     ),
-    embed = [":emacs"],
-)
+    embed = [":emacs" + suffix],
+) for suffix in SUFFIXES]
 
-sh_test(
-    name = "emacs_test",
+[sh_test(
+    name = "emacs" + suffix + "_test",
     srcs = ["test.sh"],
     args = [
-        "$(location :example)",
+        "$(location :example" + suffix + ")",
         "$(location test.el)",
     ],
     data = [
         "test.el",
-        ":example",
+        ":example" + suffix,
     ],
-)
+) for suffix in SUFFIXES]
 
-go_library(
-    name = "example_lib",
+[go_library(
+    name = "example" + suffix + "_lib",
     srcs = glob(["*_test.go"]),
-    embed = [":emacs"],
+    embed = [":emacs" + suffix],
     importpath = "github.com/phst/emacs",
-)
+) for suffix in SUFFIXES]
 
-go_binary(
-    name = "example",
+[go_binary(
+    name = "example" + suffix,
     srcs = ["example/main.go"],
     linkmode = "c-shared",
-    deps = [":example_lib"],
-)
+    deps = [":example" + suffix + "_lib"],
+) for suffix in SUFFIXES]
 
 nogo(
     name = "nogo",

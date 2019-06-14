@@ -25,6 +25,14 @@ http_archive(
 )
 
 http_archive(
+    name = "emacs_module_header_master",
+    build_file = "@//:header_master.BUILD",
+    sha256 = "ecc8f1f0260811c1c82de2c5006aea6d2ed0d9f31b8033437a5a693657d6d63a",
+    strip_prefix = "emacs-622bfdffa8b0c830bc6a979a2e9c114bad1ac114/src",
+    urls = ["https://git.savannah.gnu.org/cgit/emacs.git/snapshot/emacs-622bfdffa8b0c830bc6a979a2e9c114bad1ac114.tar.gz"],
+)
+
+http_archive(
     name = "io_bazel_rules_go",
     sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
     urls = [
