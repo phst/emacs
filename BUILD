@@ -12,12 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# We can’t link against GMP statically because Emacs links against the system
+# GMP dynamically.  Therefore we add -lgmp to the linker options.  On macOS, we
+# furthermore have to work around
+# https://github.com/bazelbuild/bazel/issues/5391 by adding the local include
+# and library directory.  We assume that the user installed GMP using Homebrew
+# or similar, using the prefix /usr/local.
+
 COPTS = [
     "-Werror",
     "-Wall",
     "-Wextra",
     "-Wno-unused-parameter",
-]
+    "-DEMACS_MODULE_GMP",
+] + select({
+    ":linux": [],
+    ":macos": ["-I/usr/local/include"],
+})
+
+LINKOPTS = ["-lgmp"] + select({
+    ":linux": [],
+    ":macos": ["-L/usr/local/lib"],
+})
 
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test", "nogo")
 
@@ -37,6 +53,7 @@ SUFFIXES = [
     ) + ["trampoline.h"],
     cdeps = ["@emacs_module_header" + suffix + "//:header"],
     cgo = True,
+    clinkopts = LINKOPTS,
     copts = COPTS,
     importpath = "github.com/phst/emacs",
 ) for suffix in SUFFIXES]
