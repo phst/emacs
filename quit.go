@@ -14,9 +14,21 @@
 
 package emacs
 
+// #include <assert.h>
 // #include <stdbool.h>
+// #include <stddef.h>
+// #include <stdint.h>
 // #include <emacs-module.h>
 // bool should_quit(emacs_env *env) {
+//   return env->should_quit(env);
+// }
+// int process_input(emacs_env *env) {
+// #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
+//   static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
+//   if ((size_t)env->size > offsetof(emacs_env, process_input)) {
+//     return env->process_input(env);
+//   }
+// #endif
 //   return env->should_quit(env);
 // }
 import "C"
@@ -25,6 +37,32 @@ import "C"
 // returns true, the caller should return to Emacs as soon as possible to allow
 // Emacs to process the quit.  Once Emacs regains control, it will quit and
 // ignore the return value.
+//
+// Deprecated: Use ProcessInput instead.
 func (e Env) ShouldQuit() bool {
 	return bool(C.should_quit(e.raw()))
 }
+
+// ProcessInput processes pending input and returns whether the user has
+// requested a quit.  If ProcessInput returns Quit, the caller should return to
+// Emacs as soon as possible to allow Emacs to process the quit.  Once Emacs
+// regains control, it will quit and ignore the return value.  Note that
+// processing input can run arbitrary Lisp code, so don’t rely on global state
+// staying the same after calling ProcessInput.
+func (e Env) ProcessInput() ProcessInput {
+	return ProcessInput(C.process_input(e.raw()))
+}
+
+// ProcessInput is the possible return values of Env.ProcessInput.
+type ProcessInput int
+
+const (
+	// Keep these constants in sync with emacs-module.h
+
+	// Continue means that the caller may continue.
+	Continue ProcessInput = 0
+
+	// Quit means that the caller should return to Emacs as quickly as
+	// possible.
+	Quit ProcessInput = 1
+)
