@@ -14,6 +14,7 @@
 
 package emacs
 
+// #include <stdbool.h>
 // #include <emacs-module.h>
 // bool should_quit(emacs_env *env) {
 //   return env->should_quit(env);
