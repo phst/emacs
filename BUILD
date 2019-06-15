@@ -73,6 +73,14 @@ SUFFIXES = [
 [go_binary(
     name = "example" + suffix,
     srcs = ["example/main.go"],
+    out = select(
+        {
+            ":linux": None,
+            # Work around https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.
+            ":macos": "example" + suffix + ".so",
+        },
+        no_match_error = "unsupported platform",
+    ),
     linkmode = "c-shared",
     deps = [":example" + suffix + "_lib"],
 ) for suffix in SUFFIXES]
@@ -81,6 +89,16 @@ nogo(
     name = "nogo",
     vet = True,
     visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "linux",
+    constraint_values = ["@bazel_tools//platforms:linux"],
+)
+
+config_setting(
+    name = "macos",
+    constraint_values = ["@bazel_tools//platforms:osx"],
 )
 
 # Local Variables:
