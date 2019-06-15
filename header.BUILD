@@ -14,7 +14,7 @@
 
 cc_library(
     name = "header",
-    srcs = ["emacs-module.h"],
+    hdrs = ["emacs-module.h"],
     visibility = ["//visibility:public"],
 )
 
