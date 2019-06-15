@@ -82,7 +82,7 @@ func emacs_module_init(rt *C.struct_emacs_runtime) C.int {
 		return 1
 	}
 	e := getEnv(rt)
-	if e.ptr.size < C.sizeof_emacs_env {
+	if e.ptr.size < C.sizeof_struct_emacs_env_26 {
 		return 2
 	}
 	// Don’t allow Go panics to crash Emacs.
