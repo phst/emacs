@@ -116,9 +116,20 @@ func (s ErrorSymbol) Emacs(e Env) (Value, error) {
 // evaluated symbol and data value.
 type Signal struct{ Symbol, Data Value }
 
-// Error implements the error interface.
+// Error implements the error interface.  Error returns a static string.  Use
+// Message to return the actual Emacs error message.
 func (Signal) Error() string {
 	return "Emacs signal"
+}
+
+// Message returns the Emacs error message for this signal.  It returns <error>
+// if determining the message failed.
+func (s Signal) Message(e Env) string {
+	var r String
+	if err := e.CallOut("error-message-string", &r, Cons{s.Symbol, s.Data}); err != nil {
+		return "<error>"
+	}
+	return string(r)
 }
 
 // Throw is an error that triggers the Emacs throw function.
