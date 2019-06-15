@@ -29,9 +29,9 @@ genrule(
     srcs = ["emacs-module.h.in"] + ["module-env-{}.h".format(ver) for ver in VERSIONS],
     outs = ["emacs-module.h"],
     cmd = (
-        "sed --regexp-extended --expression='s/@emacs_major_version@/{}/'".format(VERSIONS[-1]) +
+        "sed -E -e 's/@emacs_major_version@/{}/'".format(VERSIONS[-1]) +
         " ".join([
-            " --expression='/@module_env_snippet_{ver}@/{{r $(location module-env-{ver}.h)\nd}}'".format(ver = ver)
+            " -e '/@module_env_snippet_{ver}@/{{r $(location module-env-{ver}.h)\nd\n}}'".format(ver = ver)
             for ver in VERSIONS
         ]) +
         " -- $(location emacs-module.h.in) > $@"
