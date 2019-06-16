@@ -132,6 +132,16 @@ func (s Signal) Message(e Env) string {
 	return string(r)
 }
 
+// Message returns an error message for err.  If err is an Emacs error, it uses
+// error-message-string to obtain the Emacs error message.  Otherwise, it
+// returns err.Error().
+func (e Env) Message(err error) string {
+	if s, ok := err.(Signal); ok {
+		return s.Message(e)
+	}
+	return err.Error()
+}
+
 // Throw is an error that triggers the Emacs throw function.
 type Throw struct{ Tag, Value Value }
 
