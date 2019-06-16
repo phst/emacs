@@ -94,6 +94,21 @@ func (e Env) Str(v Value) (string, error) {
 	return r, nil
 }
 
+// FormatMessage calls the Emacs function format-message with the given format
+// string and arguments.  If the call to format-message fails, FormatMessage
+// returns a descriptive error string.  Note that the syntax of the format
+// string for FormatMessage is similar but not identical to the format strings
+// for the fmt.Printf family.
+func (e Env) FormatMessage(format string, args ...In) string {
+	var s String
+	args = append([]In{String(format)}, args...)
+	if err := e.CallOut("format-message", &s, args...); err != nil {
+		// Don’t return the error to the caller to avoid clutter.
+		return fmt.Sprintf("<error formatting message: %s>", e.Message(err))
+	}
+	return string(s)
+}
+
 // Bytes is a type with underlying type []byte that knows how to convert itself
 // to an Emacs unibyte string.
 type Bytes []byte
