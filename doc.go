@@ -131,5 +131,10 @@ If you want to run code while Emacs is loading the module, use OnInit to
 register initialization functions.  Loading the module will call all
 initialization functions in order.
 
+ERT tests
+
+You can use ERTTest to define ERT tests backed by Go functions.  This works
+similar to Export, but defines ERT tests instead of functions.
+
 */
 package emacs

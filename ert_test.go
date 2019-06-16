@@ -14,10 +14,20 @@
 
 package emacs
 
+import "log"
+
+func ExampleERTTest() {
+	ERTTest(exampleERTTest, Name("example-ert-test"), Doc("Run an example ERT test."))
+}
+
+// Once Emacs has successfully loaded the module, ERT will see a test named
+// example-ert-test that calls exampleERTTest.
+func exampleERTTest(e Env) error {
+	log.Print("running example test")
+	return nil
+}
+
 func init() {
-	ExampleExport()
-	ExampleImport()
-	ExampleVar()
-	ExampleError()
-	ExampleERTTest()
+	// We would normally call ExampleERTTest here, but the test runner
+	// already calls it for us.
 }
