@@ -25,6 +25,9 @@ import (
 // itself from and to an Emacs time value.
 type Time time.Time
 
+// String formats the time as a string.  It calls time.Time.String.
+func (t Time) String() string { return time.Time(t).String() }
+
 // Emacs returns a quadruple (high low μs ps) in the same format as the Emacs
 // function current-time.
 func (t Time) Emacs(e Env) (Value, error) {
@@ -55,6 +58,9 @@ func (t *Time) FromEmacs(e Env, v Value) error {
 // Duration is a type with underlying type time.Duration that knows how to
 // convert itself from and to an Emacs time value.
 type Duration time.Duration
+
+// String formats the duration as a string.  It calls time.Duration.String.
+func (d Duration) String() string { return time.Duration(d).String() }
 
 // Emacs returns a quadruple (high low μs ps) in the same format as the Emacs
 // function current-time.
