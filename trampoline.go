@@ -38,12 +38,15 @@ func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value,
 	// Don’t allow Go panics to crash Emacs.
 	defer protect(e)
 	fun := funcs.get(funcIndex(data))
-	// See
-	// https://github.com/golang/go/wiki/cgo#turning-c-arrays-into-go-slices.
-	argSlice := (*[1 << 40]C.emacs_value)(unsafe.Pointer(args))[:nargs:nargs]
-	in := make([]Value, nargs)
-	for i, a := range argSlice {
-		in[i] = Value{a}
+	var in []Value
+	if nargs > 0 {
+		// See
+		// https://github.com/golang/go/wiki/cgo#turning-c-arrays-into-go-slices.
+		argSlice := (*[1 << 40]C.emacs_value)(unsafe.Pointer(args))[:nargs:nargs]
+		in = make([]Value, nargs)
+		for i, a := range argSlice {
+			in[i] = Value{a}
+		}
 	}
 	r, err := fun(e, in)
 	if err != nil {
