@@ -111,6 +111,20 @@ func (s ErrorSymbol) Emacs(e Env) (Value, error) {
 	return s.name.Emacs(e)
 }
 
+func (s ErrorSymbol) match(e Env, err error) bool {
+	switch x := err.(type) {
+	case Signal:
+		want, err := s.Emacs(e)
+		// We treat an error here as silent failure to not require
+		// clutter at the call sites.
+		return err == nil && e.Eq(x.Symbol, want)
+	case Error:
+		return s == x.Symbol
+	default:
+		return false
+	}
+}
+
 // Signal is an error that that causes Emacs to signal an error with the given
 // symbol and data.  This is the equivalent to Error if you already have an
 // evaluated symbol and data value.
@@ -158,6 +172,12 @@ func WrongTypeArgument(pred Symbol, arg In) error {
 	return wrongTypeArgument.Error(pred, arg)
 }
 
+// IsWrongTypeArgument returns whether err is an Emacs signal of type
+// wrong-type-argument.  This function detects both Error and Signal.
+func (e Env) IsWrongTypeArgument(err error) bool {
+	return wrongTypeArgument.match(e, err)
+}
+
 var wrongTypeArgument = ErrorSymbol{"wrong-type-argument", "Wrong type argument"}
 
 // OverflowError returns an error that will cause Emacs to signal an error of
@@ -167,6 +187,12 @@ var wrongTypeArgument = ErrorSymbol{"wrong-type-argument", "Wrong type argument"
 // converting it to an Emacs value.
 func OverflowError(val string) error {
 	return overflowError.Error(String(val))
+}
+
+// IsOverflowError returns whether err is an Emacs signal of type
+// overflow-error.  This function detects both Error and Signal.
+func (e Env) IsOverflowError(err error) bool {
+	return overflowError.match(e, err)
 }
 
 var overflowError = ErrorSymbol{"overflow-error", "Arithmetic overflow error"}
