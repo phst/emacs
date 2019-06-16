@@ -43,6 +43,8 @@ SUFFIXES = [
 
 [go_test(
     name = "go" + suffix + "_test",
+    size = "small",
+    timeout = "short",
     srcs = glob(
         ["*_test.go"],
         exclude = ["example_test.go"],
@@ -52,6 +54,8 @@ SUFFIXES = [
 
 [sh_test(
     name = "emacs" + suffix + "_test",
+    size = "medium",
+    timeout = "short",
     srcs = ["test.sh"],
     args = [
         "$(location :example" + suffix + ")",
