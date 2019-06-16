@@ -22,7 +22,7 @@ import (
 // Var arranges for an Emacs dynamic variable to be defined once the module is
 // loaded.  If doc is empty, the variable won’t have a documentation string.
 // Var panics if the name is empty or already registered.  Var returns name so
-// you can assign it directly to a Go variable if you want..
+// you can assign it directly to a Go variable if you want.
 func Var(name Name, init In, doc Doc) Name {
 	vars.mustRegister(variable{name, init, doc})
 	return name
