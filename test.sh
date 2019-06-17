@@ -30,6 +30,10 @@ declare -r TEST_EL="$2"
 
 shopt -s -o xtrace
 
-"${EMACS:-emacs}" --quick --batch --module-assertions \
+# Set HOME to a nonempty value to work around
+# https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36263.  Remove this once that
+# bug is either fixed on Emacs 26, or we don’t support Emacs 26 any more.
+HOME=/ \
+  "${EMACS:-emacs}" --quick --batch --module-assertions \
   --load=ert --load="${EXAMPLE_MODULE:?}" --load="${TEST_EL:?}" \
   --funcall=ert-run-tests-batch-and-exit
