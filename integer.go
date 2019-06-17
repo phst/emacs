@@ -102,6 +102,9 @@ func (e Env) Uint(v Value) (uint64, error) {
 // itself to and from an Emacs value.
 type BigInt big.Int
 
+// String formats the big integer as a string.  It calls big.Int.String.
+func (i *BigInt) String() string { return (*big.Int)(i).String() }
+
 // Emacs creates an Emacs value representing the given integer.  It returns an
 // error if the integer value is too big for Emacs.
 func (i BigInt) Emacs(e Env) (Value, error) {
