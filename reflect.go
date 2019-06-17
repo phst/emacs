@@ -112,7 +112,7 @@ func InFuncFor(t reflect.Type) (InFunc, error) {
 	}
 }
 
-// OutFuncFor returns a OutFunc for the given type.  If there’s no known
+// OutFuncFor returns an OutFunc for the given type.  If there’s no known
 // conversion from Emacs to t, OutFuncFor returns an error.
 func OutFuncFor(t reflect.Type) (OutFunc, error) {
 	if t.Implements(outType) {
