@@ -230,7 +230,7 @@ func (ps *Picoseconds) FromDuration(d time.Duration) {
 func (ps *Picoseconds) Emacs(e Env) (Value, error) {
 	var high, low, μsec, psec big.Int
 	ps.quad(&high, &low, &μsec, &psec)
-	return e.List(BigInt(high), BigInt(low), BigInt(μsec), BigInt(psec))
+	return e.List((*BigInt)(&high), (*BigInt)(&low), (*BigInt)(&μsec), (*BigInt)(&psec))
 }
 
 // FromEmacs sets *ps to the Go equivalent of the Emacs time information in v.

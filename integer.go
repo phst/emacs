@@ -206,8 +206,8 @@ func (i *BigInt) String() string { return (*big.Int)(i).String() }
 
 // Emacs creates an Emacs value representing the given integer.  It returns an
 // error if the integer value is too big for Emacs.
-func (i BigInt) Emacs(e Env) (Value, error) {
-	b := big.Int(i)
+func (i *BigInt) Emacs(e Env) (Value, error) {
+	b := (*big.Int)(i)
 	if b.IsInt64() {
 		return Int(b.Int64()).Emacs(e)
 	}
@@ -273,5 +273,5 @@ func (r reflectUint) FromEmacs(e Env, v Value) error {
 	return nil
 }
 
-func bigIntIn(v reflect.Value) In   { return BigInt(v.Interface().(big.Int)) }
+func bigIntIn(v reflect.Value) In   { return (*BigInt)(v.Interface().(*big.Int)) }
 func bigIntOut(v reflect.Value) Out { return (*BigInt)(v.Interface().(*big.Int)) }

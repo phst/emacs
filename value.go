@@ -116,8 +116,8 @@ func newIn(v interface{}) In {
 		return String(v)
 	case []byte:
 		return Bytes(v)
-	case big.Int:
-		return BigInt(v)
+	case *big.Int:
+		return (*BigInt)(v)
 	case time.Time:
 		return Time(v)
 	case time.Duration:
