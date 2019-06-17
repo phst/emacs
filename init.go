@@ -55,7 +55,13 @@ func (m *initManager) register(i InitFunc) {
 }
 
 func (m *initManager) run(e Env) error {
+	if err := majorVersion.init(e); err != nil {
+		return err
+	}
 	inits := m.copy()
+	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
+	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
+	defer gc.inhibit(e).restore(e)
 	for _, i := range inits {
 		if err := i(e); err != nil {
 			return err
@@ -91,6 +97,9 @@ func emacs_module_init(rt *C.struct_emacs_runtime) C.int {
 		e.signal(err)
 		// We still return 0.  See
 		// https://phst.eu/emacs-modules#module-loading-and-initialization.
+		// No normal or deferred call using e is allowed at this point.
+		// That’s why we use the inits.run indirection to defer
+		// gcContext.restore.
 	}
 	return 0
 }

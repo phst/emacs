@@ -48,9 +48,12 @@ func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value,
 			in[i] = Value{a}
 		}
 	}
-	r, err := fun(e, in)
+	r, err := callGo(e, fun, in)
 	if err != nil {
 		e.signal(err)
+		// No normal or deferred call using e is allowed at this point.
+		// That’s why we use the callGo indirection to defer
+		// gcContext.restore.
 	}
 	return r.r
 }
@@ -69,3 +72,10 @@ func protect(e Env) {
 }
 
 var errPanic = DefineError("go-panic", "Panic while running Emacs module function", baseError)
+
+func callGo(e Env, fun Func, in []Value) (Value, error) {
+	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
+	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
+	defer gc.inhibit(e).restore(e)
+	return fun(e, in)
+}
