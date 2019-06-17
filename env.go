@@ -14,6 +14,7 @@
 
 package emacs
 
+// #include <stdbool.h>
 // #include <emacs-module.h>
 // bool eq(emacs_env *env, emacs_value a, emacs_value b) {
 //   return env->eq(env, a, b);
