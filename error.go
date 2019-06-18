@@ -96,11 +96,11 @@ func (s ErrorSymbol) String() string {
 }
 
 // Error returns an error that causes to signal an error with the given symbol
-// and data.  The return value is of type LazySignalError.  Signaling an error
-// will evaluate symbol and data lazily.  The evaluation is best-effort since
-// it can itself fail.  If it fails the symbol and/or data might be lost, but
-// Emacs will signal some error in any case.  If you already have an evaluated
-// symbol and data value, use Signal instead.
+// and data.  The return value is of type Error.  Signaling an error will
+// evaluate symbol and data lazily.  The evaluation is best-effort since it can
+// itself fail.  If it fails the symbol and/or data might be lost, but Emacs
+// will signal some error in any case.  If you already have an evaluated symbol
+// and data value, use Signal instead.
 func (s ErrorSymbol) Error(data ...In) error {
 	return Error{s, data}
 }

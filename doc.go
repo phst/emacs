@@ -98,11 +98,10 @@ exits.  See https://phst.eu/emacs-modules#nonlocal-exits.  This package
 represents Emacs nonlocal exits as ordinary Go errors.
 
 Each call to a function fetches and clears nonlocal exit information after the
-actual call and converts it to an error of type SignalError or ThrowError.
-This means that the Go bindings don’t exhibit the saturating error behavior
-described at https://phst.eu/emacs-modules#nonlocal-exits.  Instead, they
-behave like normal Go functions: an erroneous return doesn’t affect future
-function calls.
+actual call and converts it to an error of type Signal or Throw.  This means
+that the Go bindings don’t exhibit the saturating error behavior described at
+https://phst.eu/emacs-modules#nonlocal-exits.  Instead, they behave like normal
+Go functions: an erroneous return doesn’t affect future function calls.
 
 When returning from an exported function, this package converts errors back to
 Emacs nonlocal exits.  If you return a Signal or Error, Emacs will raise a
