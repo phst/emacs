@@ -19,6 +19,8 @@
 # and library directory.  We assume that the user installed GMP using Homebrew
 # or similar, using the prefix /usr/local.
 
+load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "nogo")
 load(":def.bzl", "emacs_module")
 
 SRCS = glob(
@@ -46,8 +48,6 @@ emacs_module(
     test_srcs = TEST_SRCS,
 )
 
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "nogo")
-
 go_binary(
     name = "genheader",
     srcs = ["genheader/main.go"],
@@ -59,8 +59,6 @@ nogo(
     vet = True,
     visibility = ["//visibility:public"],
 )
-
-load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
 
 buildifier(
     name = "buildifier",
