@@ -19,86 +19,30 @@
 # and library directory.  We assume that the user installed GMP using Homebrew
 # or similar, using the prefix /usr/local.
 
-COPTS = [
-    "-Werror",
-    "-Wall",
-    "-Wextra",
-    "-Wno-unused-parameter",
-    "-DEMACS_MODULE_GMP",
-] + select({
-    ":linux": [],
-    ":macos": ["-I/usr/local/include"],
-})
+load(":def.bzl", "emacs_module")
 
-LINKOPTS = ["-lgmp"] + select({
-    ":linux": [],
-    ":macos": ["-L/usr/local/lib"],
-})
+SRCS = glob(
+    ["*.go"],
+    exclude = ["*_test.go"],
+) + ["trampoline.h"]
 
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test", "nogo")
+TEST_SRCS = glob(["*_test.go"])
 
-SUFFIXES = [
-    "",
-    "_master",
-]
+emacs_module(
+    name = "stable",
+    srcs = SRCS,
+    header = "@emacs_module_header//:header",
+    test_srcs = TEST_SRCS,
+)
 
-[go_library(
-    name = "emacs" + suffix,
-    srcs = glob(
-        ["*.go"],
-        exclude = ["*_test.go"],
-    ) + ["trampoline.h"],
-    cdeps = ["@emacs_module_header" + suffix + "//:header"],
-    cgo = True,
-    clinkopts = LINKOPTS,
-    copts = COPTS,
-    importpath = "github.com/phst/emacs",
-) for suffix in SUFFIXES]
+emacs_module(
+    name = "master",
+    srcs = SRCS,
+    header = "@emacs_module_header_master//:header",
+    test_srcs = TEST_SRCS,
+)
 
-[go_test(
-    name = "go" + suffix + "_test",
-    size = "small",
-    timeout = "short",
-    srcs = glob(["*_test.go"]),
-    embed = [":emacs" + suffix],
-) for suffix in SUFFIXES]
-
-[sh_test(
-    name = "emacs" + suffix + "_test",
-    size = "medium",
-    timeout = "short",
-    srcs = ["test.sh"],
-    args = [
-        "$(location :example" + suffix + ")",
-        "$(location test.el)",
-    ],
-    data = [
-        "test.el",
-        ":example" + suffix,
-    ],
-) for suffix in SUFFIXES]
-
-[go_library(
-    name = "example" + suffix + "_lib",
-    srcs = glob(["*_test.go"]),
-    embed = [":emacs" + suffix],
-    importpath = "github.com/phst/emacs",
-) for suffix in SUFFIXES]
-
-[go_binary(
-    name = "example" + suffix,
-    srcs = ["example/main.go"],
-    out = select(
-        {
-            ":linux": None,
-            # Work around https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.
-            ":macos": "example" + suffix + ".so",
-        },
-        no_match_error = "unsupported platform",
-    ),
-    linkmode = "c-shared",
-    deps = [":example" + suffix + "_lib"],
-) for suffix in SUFFIXES]
+load("@io_bazel_rules_go//go:def.bzl", "nogo")
 
 nogo(
     name = "nogo",
