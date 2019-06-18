@@ -43,8 +43,7 @@ def emacs_module(name, srcs, header, test_srcs):
 
     Generates:
       NAME: a Go library that implements an Emacs module
-      NAME_go_test: a test for NAME that doesn’t use Emacs
-      NAME_emacs_test: a test for NAME that runs in Emacs
+      NAME_test: a test for NAME
     """
     go_library(
         name = name,
@@ -55,27 +54,18 @@ def emacs_module(name, srcs, header, test_srcs):
         copts = _COPTS,
         importpath = "github.com/phst/emacs",
     )
+    bin_name = "_" + name + "_example"
+    lib_name = bin_name + "_lib"
     go_test(
-        name = name + "_go_test",
-        size = "small",
+        name = name + "_test",
+        size = "medium",
         timeout = "short",
         srcs = test_srcs,
         embed = [name],
-    )
-    bin_name = "_" + name + "_example"
-    lib_name = bin_name + "_lib"
-    native.sh_test(
-        name = name + "_emacs_test",
-        size = "medium",
-        timeout = "short",
-        srcs = ["//:test.sh"],
+        data = [bin_name, "//:test.el"],
         args = [
-            "$(location " + bin_name + ")",
-            "$(location //:test.el)",
-        ],
-        data = [
-            "test.el",
-            bin_name,
+            "--module=$(location " + bin_name + ")",
+            "--ert_tests=$(location //:test.el)",
         ],
     )
     go_library(
