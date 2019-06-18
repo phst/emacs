@@ -56,5 +56,5 @@ func testMersennePrime(n uint, ch chan<- bool) {
 var one = big.NewInt(1)
 
 func init() {
-	ExampleEnv_ShouldQuit()
+	ExampleEnv_ProcessInput()
 }
