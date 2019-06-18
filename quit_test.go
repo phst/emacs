@@ -37,7 +37,7 @@ func mersennePrimeP(e Env, n uint) bool {
 		case r := <-ch:
 			return r
 		case <-tick.C:
-			if e.ShouldQuit() {
+			if e.ProcessInput() != Continue {
 				log.Print("quitting")
 				return false // Emacs will ignore the return value
 			}

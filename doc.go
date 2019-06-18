@@ -118,12 +118,12 @@ Variables
 
 You can use Var to define a dynamic variable.
 
-Quitting
+Long-running operations
 
-A long-running operation should periodically call ShouldQuit to check whether
-the user wants to quit the operation.  If so, you should cancel the operation
-as soon as possible.  See the documentation of ShouldQuit for a concrete
-example.
+A long-running operation should periodically call ProcessInput to process
+pending input and to check whether the user wants to quit the operation.  If
+so, you should cancel the operation as soon as possible.  See the documentation
+of ProcessInput for a concrete example.
 
 Initialization
 
