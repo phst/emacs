@@ -217,7 +217,8 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 	return d.name, d.call, arity, d.doc
 }
 
-// Option is an option for Export.
+// Option is an option for Export and ERTTest.  Its implementations are Name,
+// Doc, and Usage.
 type Option interface {
 	apply(*exportAuto)
 }

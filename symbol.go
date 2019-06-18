@@ -66,6 +66,8 @@ func (e Env) Symbol(v Value) (Symbol, error) {
 }
 
 // Name is a Symbol that names a definition such as a function or error symbol.
+// You can use a Name as an Option in Export and ERTTest to set the function or
+// test name.
 type Name Symbol
 
 // Name returns the symbol name.

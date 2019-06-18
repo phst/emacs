@@ -46,7 +46,9 @@ import (
 // a documentation string can contain usage information.  Use SplitUsage to
 // extract the usage information from a documentation string.  Use WithUsage to
 // add usage information to a documentation string.  Documentation strings must
-// be valid UTF-8 strings without embedded null bytes.
+// be valid UTF-8 strings without embedded null bytes.  You can use a Doc as an
+// Option in Export and ERTTest to set the function or test documentation
+// string.
 type Doc string
 
 // Emacs returns nil if d is empty and an Emacs string otherwise.
@@ -108,7 +110,8 @@ func (d Doc) WithUsage(u Usage) Doc {
 // without enclosing parentheses.  See
 // https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Documentation.html.
 // Usage strings must be valid UTF-8 strings without embedded null characters
-// or newlines.
+// or newlines.  You can use a Usage as an Option in Export to set the argument
+// list in the documentation string.
 type Usage string
 
 func (u Usage) validate() error {
