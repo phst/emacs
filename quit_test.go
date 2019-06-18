@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-func ExampleEnv_ShouldQuit() {
+func ExampleEnv_ProcessInput() {
 	Export(mersennePrimeP, Doc("Return whether 2^N − 1 is probably prime."), Usage("N"))
 }
 
