@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-workspace(name = "phst_goemacs")
+workspace(name = "com_github_phst_emacs")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
