@@ -12,11 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This file only exists for the go_binary rule to work.
+// This file initializes the example module for the Emacs tests.
 
 package main
 
-import _ "github.com/phst/emacs"
+import "github.com/phst/emacs"
+
+func init() {
+	emacs.ExampleExport()
+	emacs.ExampleImport()
+	emacs.ExampleVar()
+	emacs.ExampleError()
+	emacs.ExampleERTTest()
+}
 
 func main() {
 	panic("never called")

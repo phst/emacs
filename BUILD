@@ -62,10 +62,7 @@ SUFFIXES = [
     name = "go" + suffix + "_test",
     size = "small",
     timeout = "short",
-    srcs = glob(
-        ["*_test.go"],
-        exclude = ["example_test.go"],
-    ),
+    srcs = glob(["*_test.go"]),
     embed = [":emacs" + suffix],
 ) for suffix in SUFFIXES]
 
