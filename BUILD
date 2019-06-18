@@ -46,10 +46,7 @@ SUFFIXES = [
     name = "emacs" + suffix,
     srcs = glob(
         ["*.go"],
-        exclude = [
-            "*_test.go",
-            "example_main.go",
-        ],
+        exclude = ["*_test.go"],
     ) + ["trampoline.h"],
     cdeps = ["@emacs_module_header" + suffix + "//:header"],
     cgo = True,
