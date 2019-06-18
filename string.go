@@ -14,21 +14,8 @@
 
 package emacs
 
-// #include <assert.h>
-// #include <limits.h>
-// #include <stdint.h>
 // #include <emacs-module.h>
-// static_assert(CHAR_BIT == 8, "unsupported architecture");
-// static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");
-// static_assert(PTRDIFF_MAX == INT64_MAX, "unsupported architecture");
-// bool copy_string_contents(emacs_env *env, emacs_value value, uint8_t *buffer, int64_t *size) {
-//   // It’s fine to cast uint8_t * to char *.  See
-//   // https://en.cppreference.com/w/c/language/object#Strict_aliasing.
-//   ptrdiff_t size_ptrdiff = *size;
-//   bool success = env->copy_string_contents(env, value, (char *) buffer, &size_ptrdiff);
-//   *size = size_ptrdiff;
-//   return success;
-// }
+// #include "wrappers.h"
 // emacs_value make_string(emacs_env *env, _GoString_ contents) {
 //   return env->make_string(env, _GoStringPtr(contents), _GoStringLen(contents) - 1);
 // }

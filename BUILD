@@ -22,9 +22,13 @@
 load(":def.bzl", "emacs_module")
 
 SRCS = glob(
-    ["*.go"],
+    [
+        "*.go",
+        "*.h",
+        "*.c",
+    ],
     exclude = ["*_test.go"],
-) + ["trampoline.h"]
+)
 
 TEST_SRCS = glob(["*_test.go"])
 

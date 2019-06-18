@@ -14,23 +14,7 @@
 
 package emacs
 
-// #include <assert.h>
-// #include <stdbool.h>
-// #include <stddef.h>
-// #include <stdint.h>
-// #include <emacs-module.h>
-// bool should_quit(emacs_env *env) {
-//   return env->should_quit(env);
-// }
-// int process_input(emacs_env *env) {
-// #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
-//   static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
-//   if ((size_t)env->size > offsetof(emacs_env, process_input)) {
-//     return env->process_input(env);
-//   }
-// #endif
-//   return env->should_quit(env);
-// }
+// #include "wrappers.h"
 import "C"
 
 // ShouldQuit returns whether the user has requested a quit.  If ShouldQuit

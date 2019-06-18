@@ -14,23 +14,13 @@
 
 package emacs
 
-// #include <assert.h>
-// #include <stdint.h>
-// #include <emacs-module.h>
-// #include "trampoline.h"
-// static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");
-// static_assert(PTRDIFF_MAX == INT64_MAX, "unsupported architecture");
-// static_assert(UINTPTR_MAX == UINT64_MAX, "unsupported architecture");
-// emacs_value trampoline(emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data) {
-//   return go_emacs_trampoline(env, nargs, args, (uintptr_t) data);
-// }
-// emacs_value make_function(emacs_env *env, int64_t min_arity, int64_t max_arity, _GoString_ documentation, uint64_t data) {
+// #include "wrappers.h"
+// emacs_value make_function(emacs_env *env, int64_t min_arity, int64_t max_arity,
+//                           _GoString_ documentation, uint64_t data) {
 //   size_t length = _GoStringLen(documentation);
 //   const char *doc = length == 0 ? NULL : _GoStringPtr(documentation);
-//   return env->make_function(env, min_arity, max_arity, trampoline, doc, (void *) (uintptr_t) data);
-// }
-// emacs_value funcall(emacs_env *env, emacs_value function, int64_t nargs, emacs_value *args) {
-//   return env->funcall(env, function, nargs, args);
+//   return env->make_function(env, min_arity, max_arity, trampoline, doc,
+//                             (void *)(uintptr_t)data);
 // }
 import "C"
 
