@@ -34,7 +34,7 @@ package emacs
 // void extract_big_integer(emacs_env *env, emacs_value value, mpz_t result) {
 // #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
 //   if ((size_t)env->size > offsetof(emacs_env, extract_big_integer)) {
-//     struct emacs_mpz temp = {*result};
+//     struct emacs_mpz temp = {{*result}};
 //     env->extract_big_integer(env, value, &temp);
 //     *result = *temp.value;
 //     return;
@@ -72,7 +72,7 @@ package emacs
 // emacs_value make_big_integer(emacs_env *env, const mpz_t value) {
 // #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
 //   if ((size_t)env->size > offsetof(emacs_env, make_big_integer)) {
-//     struct emacs_mpz temp = {*value};
+//     struct emacs_mpz temp = {{*value}};
 //     return env->make_big_integer(env, &temp);
 //   }
 // #endif
