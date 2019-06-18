@@ -50,6 +50,15 @@ nogo(
     visibility = ["//visibility:public"],
 )
 
+load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+
+buildifier(
+    name = "buildifier",
+    lint_mode = "warn",
+    lint_warnings = ["all"],
+    mode = "fix",
+)
+
 config_setting(
     name = "linux",
     constraint_values = ["@bazel_tools//platforms:linux"],

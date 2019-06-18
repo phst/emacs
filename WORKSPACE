@@ -47,6 +47,17 @@ go_rules_dependencies()
 
 go_register_toolchains(nogo = "@//:nogo")
 
+http_archive(
+    name = "com_github_bazelbuild_buildtools",
+    sha256 = "5fb946659443db737844bfd07fec58acf92a8213567306641b56da2993c50ffa",
+    strip_prefix = "buildtools-0.26.0",
+    urls = ["https://github.com/bazelbuild/buildtools/archive/0.26.0.zip"],
+)
+
+load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
+
+buildifier_dependencies()
+
 # Local Variables:
 # mode: bazel
 # End:
