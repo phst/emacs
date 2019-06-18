@@ -28,18 +28,25 @@ VERSIONS = [
     27,
 ]
 
+filegroup(
+    name = "snippets",
+    srcs = ["module-env-{}.h".format(ver) for ver in VERSIONS],
+)
+
 genrule(
     name = "gen_header",
-    srcs = ["emacs-module.h.in"] + ["module-env-{}.h".format(ver) for ver in VERSIONS],
+    srcs = [
+        "emacs-module.h.in",
+        ":snippets",
+    ],
     outs = ["emacs-module.h"],
     cmd = (
-        "sed -E -e 's/@emacs_major_version@/{}/'".format(VERSIONS[-1]) +
-        " ".join([
-            " -e '/@module_env_snippet_{ver}@/{{r $(location module-env-{ver}.h)\nd\n}}'".format(ver = ver)
-            for ver in VERSIONS
-        ]) +
-        " -- $(location emacs-module.h.in) > $@"
+        "$(location @com_github_phst_emacs//:genheader)" +
+        " --template=$(location emacs-module.h.in)" +
+        " --output=$@" +
+        " -- $(locations :snippets)"
     ),
+    tools = ["@com_github_phst_emacs//:genheader"],
 )
 # Local Variables:
 # mode: bazel

@@ -42,7 +42,13 @@ emacs_module(
     test_srcs = TEST_SRCS,
 )
 
-load("@io_bazel_rules_go//go:def.bzl", "nogo")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "nogo")
+
+go_binary(
+    name = "genheader",
+    srcs = ["genheader/main.go"],
+    visibility = ["@emacs_module_header_master//:__pkg__"],
+)
 
 nogo(
     name = "nogo",
