@@ -23,6 +23,9 @@
 
 bool eq(emacs_env *env, emacs_value a, emacs_value b);
 
+emacs_value go_emacs_trampoline(emacs_env *env, int64_t nargs,
+                                emacs_value *args, uint64_t data);
+
 emacs_value trampoline(emacs_env *env, ptrdiff_t nargs, emacs_value *args,
                        void *data);
 emacs_value funcall(emacs_env *env, emacs_value function, int64_t nargs,

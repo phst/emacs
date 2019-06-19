@@ -16,7 +16,6 @@
 #include <emacs-module.h>
 #include <stdint.h>
 
-#include "trampoline.h"
 #include "wrappers.h"
 
 static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");

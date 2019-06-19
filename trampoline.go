@@ -15,7 +15,7 @@
 package emacs
 
 // #include <emacs-module.h>
-// #include "trampoline.h"
+// #include "wrappers.h"
 import "C"
 
 import (
