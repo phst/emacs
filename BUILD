@@ -12,13 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# We can’t link against GMP statically because Emacs links against the system
-# GMP dynamically.  Therefore we add -lgmp to the linker options.  On macOS, we
-# furthermore have to work around
-# https://github.com/bazelbuild/bazel/issues/5391 by adding the local include
-# and library directory.  We assume that the user installed GMP using Homebrew
-# or similar, using the prefix /usr/local.
-
 load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "nogo")
 load(":def.bzl", "emacs_module")

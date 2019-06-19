@@ -16,6 +16,13 @@
 
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 
+# We can’t link against GMP statically because Emacs links against the system
+# GMP dynamically.  Therefore we add -lgmp to the linker options.  On macOS, we
+# furthermore have to work around
+# https://github.com/bazelbuild/bazel/issues/5391 by adding the local include
+# and library directory.  We assume that the user installed GMP using Homebrew
+# or similar, using the prefix /usr/local.
+
 _COPTS = [
     "-Werror",
     "-Wall",
