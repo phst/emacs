@@ -29,6 +29,7 @@ _COPTS = [
     "-Wextra",
     "-Wno-unused-parameter",
     "-DEMACS_MODULE_GMP",
+    "-fvisibility=hidden",
 ] + select({
     ":linux": [],
     ":macos": ["-I/usr/local/include"],

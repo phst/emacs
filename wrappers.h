@@ -21,6 +21,11 @@
 #include <stdint.h>
 #include <time.h>
 
+__attribute__((__visibility__("default"))) void plugin_is_GPL_compatible(void);
+
+__attribute__((__visibility__("default"))) int
+emacs_module_init(struct emacs_runtime *rt);
+
 bool eq(emacs_env *env, emacs_value a, emacs_value b);
 
 emacs_value go_emacs_trampoline(emacs_env *env, int64_t nargs,
