@@ -14,10 +14,19 @@
 
 package emacs
 
+// #include <assert.h>
+// #include <stddef.h>
+// #include <stdint.h>
 // #include <emacs-module.h>
 // #include "wrappers.h"
 // emacs_value make_string(emacs_env *env, _GoString_ contents) {
-//   return env->make_string(env, _GoStringPtr(contents), _GoStringLen(contents) - 1);
+//   size_t length = _GoStringLen(contents);
+//   assert(length > 0);
+//   if (length > PTRDIFF_MAX) {
+//     env->non_local_exit_signal(env, env->intern(env, "overflow-error"), env->intern(env, "nil"));
+//     return NULL;
+//   }
+//   return env->make_string(env, _GoStringPtr(contents), (ptrdiff_t)length - 1);
 // }
 import "C"
 

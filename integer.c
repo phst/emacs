@@ -53,7 +53,7 @@ void extract_big_integer(emacs_env *env, emacs_value value, mpz_t result) {
   uint64_t u;
   // Set u = abs(i).  See https://stackoverflow.com/a/17313717.
   if (i >= 0) {
-    u = i;
+    u = (uint64_t)i;
   } else {
     u = -(uint64_t)i;
   }

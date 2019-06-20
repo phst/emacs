@@ -26,6 +26,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 _COPTS = [
     "-Werror",
     "-Wall",
+    "-Wconversion",
     "-Wextra",
     "-Wno-unused-parameter",
     "-DEMACS_MODULE_GMP",
