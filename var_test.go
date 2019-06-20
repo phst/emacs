@@ -23,4 +23,4 @@ func ExampleVar() {
 	// Output: panic: duplicate variable name go-var
 }
 
-var goVar = Var("go-var", String("hi"), "Example variable.")
+var _ = Var("go-var", String("hi"), "Example variable.")
