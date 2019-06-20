@@ -15,11 +15,23 @@
 #ifndef PHST_EMACS_GO_WRAPPERS_H
 #define PHST_EMACS_GO_WRAPPERS_H
 
+#if !defined __STDC_VERSION__ || __STDC_VERSION__ < 201112L
+#error "This library requires ISO C11 or later"
+#endif
+
 #include <emacs-module.h>
 #include <gmp.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
+
+#if !defined __has_attribute
+#error "This library requires __has_attribute"
+#endif
+
+#if !__has_attribute(__visibility__)
+#error "This library requires __attribute__((__visibility__))"
+#endif
 
 __attribute__((__visibility__("default"))) void plugin_is_GPL_compatible(void);
 
