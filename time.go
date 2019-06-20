@@ -116,12 +116,12 @@ func (e Env) Duration(v Value) (time.Duration, error) {
 }
 
 func (e Env) makeTime(s int64, ns int) (Value, error) {
-	return e.checkRaw(C.make_time(e.raw(), C.struct_timespec{C.time_t(s), C.long(ns)}))
+	return e.checkValue(C.make_time(e.raw(), C.struct_timespec{C.time_t(s), C.long(ns)}))
 }
 
 func (e Env) extractTime(v Value) (s int64, ns int, err error) {
-	t := C.extract_time(e.raw(), v.r)
-	return int64(t.tv_sec), int(t.tv_nsec), e.check()
+	r := C.extract_time(e.raw(), v.r)
+	return int64(r.value.tv_sec), int(r.value.tv_nsec), e.check(r.base)
 }
 
 func timeIn(v reflect.Value) In   { return Time(v.Interface().(time.Time)) }

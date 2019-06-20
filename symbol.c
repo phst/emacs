@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package emacs
+#include "wrappers.h"
 
-// #include <emacs-module.h>
-// emacs_env *get_environment(struct emacs_runtime *rt) {
-//   return rt->get_environment(rt);
-// }
-import "C"
+#include <emacs-module.h>
 
-func getEnv(rt *C.struct_emacs_runtime) Env {
-	return Env{C.get_environment(rt)}
+struct value_result intern_impl(emacs_env *env, const char* data) {
+  return check_value(env, env->intern(env, data));
 }

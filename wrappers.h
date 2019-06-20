@@ -22,6 +22,7 @@
 #include <emacs-module.h>
 #include <gmp.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <time.h>
 
@@ -38,33 +39,129 @@ __attribute__((__visibility__("default"))) void plugin_is_GPL_compatible(void);
 __attribute__((__visibility__("default"))) int
 emacs_module_init(struct emacs_runtime *rt);
 
+// Result of non_local_exit_get.
+struct result_base {
+  enum emacs_funcall_exit exit;
+  emacs_value error_symbol;
+  emacs_value error_data;
+};
+
+// Variant of result_base where error_symbol and error_data may be missing.
+struct result_base_with_optional_error_info {
+  enum emacs_funcall_exit exit;
+  bool has_error_info;
+  emacs_value error_symbol;
+  emacs_value error_data;
+};
+
+// Checks for a nonlocal exit in env.  Clears and returns it.
+struct result_base check(emacs_env *env);
+
+// Wrapper types and functions for check for all possible return types.
+
+struct void_result {
+  struct result_base base;
+};
+
+struct void_result check_void(emacs_env *env);
+
+struct init_result {
+  struct result_base_with_optional_error_info base;
+};
+
+struct init_result go_emacs_init(emacs_env *env);
+
 bool eq(emacs_env *env, emacs_value a, emacs_value b);
 
-emacs_value go_emacs_trampoline(emacs_env *env, int64_t nargs,
-                                emacs_value *args, uint64_t data);
+struct value_result {
+  struct result_base base;
+  emacs_value value;
+};
 
-emacs_value trampoline(emacs_env *env, ptrdiff_t nargs, emacs_value *args,
-                       void *data);
-emacs_value funcall(emacs_env *env, emacs_value function, int64_t nargs,
-                    emacs_value *args);
+struct value_result check_value(emacs_env *env, emacs_value value);
 
-int64_t extract_integer(emacs_env *env, emacs_value value);
-void extract_big_integer(emacs_env *env, emacs_value value, mpz_t result);
-emacs_value make_integer(emacs_env *env, int64_t value);
-emacs_value make_big_integer(emacs_env *env, const mpz_t value);
-int emacs_mpz_sgn(const mpz_t value);
+struct trampoline_result {
+  struct result_base_with_optional_error_info base;
+  emacs_value value;
+};
 
-bool copy_string_contents(emacs_env *env, emacs_value value, uint8_t *buffer,
-                          int64_t *size);
+struct trampoline_result go_emacs_trampoline(emacs_env *env, int64_t nargs,
+                                             emacs_value *args, uint64_t data);
 
-emacs_value vec_get(emacs_env *env, emacs_value vec, int64_t i);
-void vec_set(emacs_env *env, emacs_value vec, int64_t i, emacs_value val);
-int64_t vec_size(emacs_env *env, emacs_value vec);
+struct value_result funcall(emacs_env *env, emacs_value function, int64_t nargs,
+                            emacs_value *args);
+struct value_result make_function_impl(emacs_env *env, int64_t min_arity,
+                                       int64_t max_arity,
+                                       const char *documentation,
+                                       uint64_t data);
 
-struct timespec extract_time(emacs_env *env, emacs_value value);
-emacs_value make_time(emacs_env *env, struct timespec time);
+struct integer_result {
+  struct result_base base;
+  int64_t value;
+};
+
+struct integer_result check_integer(emacs_env *env, int64_t value);
+
+struct big_integer_result {
+  struct result_base base;
+  int sign;            // −1, 0, or +1
+  const uint8_t *data; // allocated with malloc iff successful and sign ≠ 0
+  int size;            // int because of GoSlice signature
+};
+
+struct integer_result extract_integer(emacs_env *env, emacs_value value);
+struct big_integer_result extract_big_integer(emacs_env *env,
+                                              emacs_value value);
+struct value_result make_integer(emacs_env *env, int64_t value);
+
+// The number (and therefore sign) may not be zero.  sign must be −1, 0, or +1.
+struct value_result make_big_integer(emacs_env *env, int sign,
+                                     const uint8_t *data, int64_t size);
+
+struct float_result {
+  struct result_base base;
+  double value;
+};
+
+struct float_result extract_float(emacs_env *env, emacs_value value);
+struct value_result make_float(emacs_env *env, double value);
+
+struct string_result {
+  struct result_base base;
+  const char *data;  // allocated with malloc iff successful and size > 0
+  int size;          // int because of GoStringN signature
+};
+
+struct string_result copy_string_contents(emacs_env *env, emacs_value value);
+
+struct value_result make_string_impl(emacs_env *env, const char *data,
+                                     size_t size);
+
+// symbol_name must be ASCII-only without embedded null characters.
+struct value_result intern_impl(emacs_env *env, const char *symbol_name);
+
+struct value_result vec_get(emacs_env *env, emacs_value vec, int64_t i);
+struct void_result vec_set(emacs_env *env, emacs_value vec, int64_t i,
+                           emacs_value val);
+struct integer_result vec_size(emacs_env *env, emacs_value vec);
+
+struct timespec_result {
+  struct result_base base;
+  struct timespec value;
+};
+
+struct timespec_result extract_time(emacs_env *env, emacs_value value);
+struct value_result make_time(emacs_env *env, struct timespec time);
 
 bool should_quit(emacs_env *env);
-void process_input(emacs_env *env);
+struct void_result process_input(emacs_env *env);
+
+// Sets the nonlocal exit state of env according to result.  Call this only
+// directly before returning control to Emacs.
+void handle_nonlocal_exit(emacs_env *env,
+                          struct result_base_with_optional_error_info result);
+
+struct result_base out_of_memory(emacs_env *env);
+struct result_base overflow_error(emacs_env *env);
 
 #endif

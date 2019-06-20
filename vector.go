@@ -95,11 +95,7 @@ func (e Env) MakeVector(n int, init Value) (Value, error) {
 // VecGet returns the i-th element of vector.  It returns an error if vector is
 // not a vector.
 func (e Env) VecGet(vector Value, i int) (Value, error) {
-	// d, err := intToCptrdiff(i)
-	// if err != nil {
-	// 	return Value{}, err
-	// }
-	return e.checkRaw(C.vec_get(e.raw(), vector.r, C.int64_t(i)))
+	return e.checkValue(C.vec_get(e.raw(), vector.r, C.int64_t(i)))
 }
 
 // VecGetOut sets elem to the value of the i-th element of vector.  It returns
@@ -114,21 +110,16 @@ func (e Env) VecGetOut(vector Value, i int, elem Out) error {
 
 // VecSet sets the i-th element of the given Emacs vector.
 func (e Env) VecSet(v Value, i int, elem Value) error {
-	// ri, err := intToCptrdiff(i)
-	// if err != nil {
-	// 	return err
-	// }
-	C.vec_set(e.raw(), v.r, C.int64_t(i), elem.r)
-	return e.check()
+	return e.checkVoid(C.vec_set(e.raw(), v.r, C.int64_t(i), elem.r))
 }
 
 // VecSize returns the size of the given Emacs vector.
 func (e Env) VecSize(v Value) (int, error) {
-	r := int64(C.vec_size(e.raw(), v.r))
-	if err := e.check(); err != nil {
+	r := C.vec_size(e.raw(), v.r)
+	if err := e.check(r.base); err != nil {
 		return -1, err
 	}
-	return int64ToInt(r)
+	return int64ToInt(int64(r.value))
 }
 
 type vectorIn struct{ elem InFunc }

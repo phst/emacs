@@ -16,17 +16,13 @@ package emacs
 
 // #include <assert.h>
 // #include <stddef.h>
-// #include <stdint.h>
+// #include <stdlib.h>
 // #include <emacs-module.h>
 // #include "wrappers.h"
-// emacs_value make_string(emacs_env *env, _GoString_ contents) {
-//   size_t length = _GoStringLen(contents);
-//   assert(length > 0);
-//   if (length > PTRDIFF_MAX) {
-//     env->non_local_exit_signal(env, env->intern(env, "overflow-error"), env->intern(env, "nil"));
-//     return NULL;
-//   }
-//   return env->make_string(env, _GoStringPtr(contents), (ptrdiff_t)length - 1);
+// struct value_result make_string(emacs_env *env, _GoString_ contents) {
+//   size_t size = _GoStringLen(contents);
+//   assert(size > 0);
+//   return make_string_impl(env, _GoStringPtr(contents), size - 1);
 // }
 import "C"
 
@@ -35,6 +31,7 @@ import (
 	"reflect"
 	"strconv"
 	"unicode/utf8"
+	"unsafe"
 )
 
 // String is a type with underlying type string that knows how to convert
@@ -52,7 +49,7 @@ func (s String) Emacs(e Env) (Value, error) {
 	if !utf8.ValidString(string(s)) {
 		return Value{}, WrongTypeArgument("valid-string-p", String(fmt.Sprintf("%+q", s)))
 	}
-	return e.checkRaw(C.make_string(e.raw(), string(s)+"\x00"))
+	return e.checkValue(C.make_string(e.raw(), string(s)+"\x00"))
 }
 
 // FromEmacs sets *s to the string stored in v.  It returns an error if v is
@@ -71,23 +68,19 @@ func (s *String) FromEmacs(e Env, v Value) error {
 // named String to avoid confusion with the String method of the Stringer
 // interface.
 func (e Env) Str(v Value) (string, error) {
-	// See https://phst.eu/emacs-modules#copy_string_contents.
-	var size C.int64_t
-	if ok := C.copy_string_contents(e.raw(), v.r, nil, &size); !ok {
-		return "", e.check()
+	r := C.copy_string_contents(e.raw(), v.r)
+	if err := e.check(r.base); err != nil {
+		return "", err
 	}
-	if size == 0 {
+	if r.size == 0 {
 		return "", nil
 	}
-	buffer := make([]byte, size)
-	if ok := C.copy_string_contents(e.raw(), v.r, (*C.uint8_t)(&buffer[0]), &size); !ok {
-		return "", e.check()
-	}
-	r := string(buffer[:size-1])
-	if !utf8.ValidString(r) {
+	defer C.free(unsafe.Pointer(r.data))
+	s := C.GoStringN(r.data, r.size)
+	if !utf8.ValidString(s) {
 		return "", WrongTypeArgument("valid-string-p", v)
 	}
-	return r, nil
+	return s, nil
 }
 
 // FormatMessage calls the Emacs function format-message with the given format

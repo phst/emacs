@@ -14,13 +14,14 @@
 
 package emacs
 
+// #include <emacs-module.h>
 // #include "wrappers.h"
-// emacs_value make_function(emacs_env *env, int64_t min_arity, int64_t max_arity,
-//                           _GoString_ documentation, uint64_t data) {
+// struct value_result make_function(emacs_env *env,
+//                                   int64_t min_arity, int64_t max_arity,
+//                                   _GoString_ documentation, uint64_t data) {
 //   size_t length = _GoStringLen(documentation);
 //   const char *doc = length == 0 ? NULL : _GoStringPtr(documentation);
-//   return env->make_function(env, min_arity, max_arity, trampoline, doc,
-//                             (void *)(uintptr_t)data);
+//   return make_function_impl(env, min_arity, max_arity, doc, data);
 // }
 import "C"
 
@@ -146,7 +147,7 @@ func (e Env) makeFunction(arity Arity, doc Doc, data uint64) (Value, error) {
 		}
 		doc += "\x00"
 	}
-	return e.checkRaw(C.make_function(e.raw(), min, max, string(doc), C.uint64_t(data)))
+	return e.checkValue(C.make_function(e.raw(), min, max, string(doc), C.uint64_t(data)))
 }
 
 // Funcall calls the Emacs function fun with the given arguments.  Both
@@ -158,5 +159,5 @@ func (e Env) Funcall(fun Value, args []Value) (Value, error) {
 	for i, a := range args {
 		rawArgs[i] = a.r
 	}
-	return e.checkRaw(C.funcall(e.raw(), fun.r, C.int64_t(nargs), &rawArgs[0]))
+	return e.checkValue(C.funcall(e.raw(), fun.r, C.int64_t(nargs), &rawArgs[0]))
 }

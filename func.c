@@ -22,12 +22,24 @@ static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");
 static_assert(PTRDIFF_MAX == INT64_MAX, "unsupported architecture");
 static_assert(UINTPTR_MAX == UINT64_MAX, "unsupported architecture");
 
-emacs_value trampoline(emacs_env *env, ptrdiff_t nargs, emacs_value *args,
-                       void *data) {
-  return go_emacs_trampoline(env, nargs, args, (uintptr_t)data);
+static emacs_value trampoline(emacs_env *env, ptrdiff_t nargs,
+                              emacs_value *args, void *data) {
+  struct trampoline_result result =
+      go_emacs_trampoline(env, nargs, args, (uintptr_t)data);
+  handle_nonlocal_exit(env, result.base);
+  return result.value;
 }
 
-emacs_value funcall(emacs_env *env, emacs_value function, int64_t nargs,
-                    emacs_value *args) {
-  return env->funcall(env, function, nargs, args);
+struct value_result funcall(emacs_env *env, emacs_value function, int64_t nargs,
+                            emacs_value *args) {
+  return check_value(env, env->funcall(env, function, nargs, args));
+}
+
+struct value_result make_function_impl(emacs_env *env, int64_t min_arity,
+                                       int64_t max_arity,
+                                       const char *documentation,
+                                       uint64_t data) {
+  return check_value(env, env->make_function(env, min_arity, max_arity,
+                                             trampoline, documentation,
+                                             (void *)(uintptr_t)data));
 }

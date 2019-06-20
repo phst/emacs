@@ -15,8 +15,9 @@
 package emacs
 
 // #include <emacs-module.h>
-// emacs_value intern(emacs_env *env, _GoString_ symbol_name) {
-//   return env->intern(env, _GoStringPtr(symbol_name));
+// #include "wrappers.h"
+// struct value_result intern(emacs_env *env, _GoString_ symbol_name) {
+//   return intern_impl(env, _GoStringPtr(symbol_name));
 // }
 import "C"
 
@@ -102,7 +103,7 @@ func (n Name) validate() error {
 func (e Env) Intern(s Symbol) (Value, error) {
 	// See https://phst.eu/emacs-modules#intern.
 	if isNonNullASCII(string(s)) {
-		return e.checkValue(e.uncheckedIntern(s))
+		return e.internASCII(s)
 	}
 	return e.Call("intern", s)
 }
@@ -126,20 +127,11 @@ func (e Env) MaybeIntern(nameOrValue interface{}) (Value, error) {
 
 // Nil returns the interned symbol nil.  It fails only if interning nil fails.
 func (e Env) Nil() (Value, error) {
-	return e.checkValue(e.uncheckedNil())
+	return e.internASCII("nil")
 }
 
-// uncheckedNil returns the interned symbol nil.  Unlike Nil, it doesn’t clear
-// the error flag on e.  Use uncheckedNil only if you call either e.check or
-// e.signal immediately afterwards.
-func (e Env) uncheckedNil() Value {
-	return e.uncheckedIntern("nil")
-}
-
-// uncheckedIntern interns the ASCII symbol s in the default obarray.  Unlike
-// Intern, it doesn’t clear the error flag on e.  s must not contain non-ASCII
-// characters or null bytes.  Use uncheckedIntern only if you call either
-// e.check or e.signal immediately afterwards.
-func (e Env) uncheckedIntern(s Symbol) Value {
-	return Value{C.intern(e.raw(), string(s)+"\x00")}
+// internASCII interns the ASCII symbol s in the default obarray.  s must not
+// contain non-ASCII characters or null bytes.
+func (e Env) internASCII(s Symbol) (Value, error) {
+	return e.checkValue(C.intern(e.raw(), string(s)+"\x00"))
 }

@@ -15,18 +15,7 @@
 package emacs
 
 // #include <emacs-module.h>
-// void non_local_exit_clear(emacs_env *env) {
-//   env->non_local_exit_clear(env);
-// }
-// enum emacs_funcall_exit non_local_exit_get(emacs_env *env, emacs_value *symbol, emacs_value *data) {
-//   return env->non_local_exit_get(env, symbol, data);
-// }
-// void non_local_exit_signal(emacs_env *env, emacs_value symbol, emacs_value data) {
-//   env->non_local_exit_signal(env, symbol, data);
-// }
-// void non_local_exit_throw(emacs_env *env, emacs_value tag, emacs_value value) {
-//   env->non_local_exit_throw(env, tag, value);
-// }
+// #include "wrappers.h"
 import "C"
 
 import (
@@ -198,75 +187,73 @@ func (e Env) IsOverflowError(err error) bool {
 var overflowError = ErrorSymbol{"overflow-error", "Arithmetic overflow error"}
 
 type nonlocalExit interface {
-	// signal sets the nonlocal exit in the environment.  Call it only
-	// immediately before returning control to Emacs.
-	signal(Env)
+	// signal returns a C representation of this nonlocal exit.
+	signal(Env) C.struct_result_base_with_optional_error_info
 }
 
-func (x Error) signal(e Env) {
-	// We need to be careful here to not call other signal functions, as
-	// that easily leads to infinite recursion.
+func (x Error) signal(e Env) C.struct_result_base_with_optional_error_info {
+	// If we can’t create the error symbol or data, report this fact back
+	// by setting has_error_info to false.  handle_nonlocal_exit detects
+	// this case and attempts to fill in generic error information.  This
+	// approach prevents infinite recursion if there’s an error during
+	// error handling.
 	symbol, err := x.Symbol.Emacs(e)
 	if err != nil {
-		symbol = e.uncheckedIntern(Symbol(baseError.name))
+		return C.struct_result_base_with_optional_error_info{C.emacs_funcall_exit_signal, false, nil, nil}
 	}
 	data, err := x.Data.Emacs(e)
 	if err != nil {
-		data = e.uncheckedNil()
+		return C.struct_result_base_with_optional_error_info{C.emacs_funcall_exit_signal, false, nil, nil}
 	}
-	Signal{symbol, data}.signal(e)
+	return Signal{symbol, data}.signal(e)
 }
 
-func (s Signal) signal(e Env) {
-	C.non_local_exit_signal(e.raw(), s.Symbol.r, s.Data.r)
+func (s Signal) signal(e Env) C.struct_result_base_with_optional_error_info {
+	return C.struct_result_base_with_optional_error_info{C.emacs_funcall_exit_signal, true, s.Symbol.r, s.Data.r}
 }
 
-func (t Throw) signal(e Env) {
-	C.non_local_exit_throw(e.raw(), t.Tag.r, t.Value.r)
+func (t Throw) signal(e Env) C.struct_result_base_with_optional_error_info {
+	return C.struct_result_base_with_optional_error_info{C.emacs_funcall_exit_throw, true, t.Tag.r, t.Value.r}
 }
 
-// signal sets the nonlocal exit state in e.  Call it only immediately before
-// returning control to Emacs.
-func (e Env) signal(err error) {
+// signal returns a C representation of err.
+func (e Env) signal(err error) C.struct_result_base_with_optional_error_info {
 	if err == nil {
-		return
+		return C.struct_result_base_with_optional_error_info{C.emacs_funcall_exit_return, false, nil, nil}
 	}
 	if n, ok := err.(nonlocalExit); ok {
-		n.signal(e)
-		return
+		return n.signal(e)
 	}
-	Error{baseError, List{String(err.Error())}}.signal(e)
+	return Error{baseError, List{String(err.Error())}}.signal(e)
 }
 
 // check converts a pending nonlocal exit to a Go error.  If no nonlocal exit
-// is pending, check returns nil.  If a signal is pending, check returns an
-// error of dynamic type Signal.  If a throw is pending, check returns an error
-// of dynamic type Throw.
-func (e Env) check() error {
-	var a, b Value
-	switch k := C.non_local_exit_get(e.raw(), &a.r, &b.r); k {
+// is set in r, check returns nil.  If a signal is set in r, check returns an
+// error of dynamic type Signal.  If a throw is set in r, check returns an
+// error of dynamic type Throw.
+func (e Env) check(r C.struct_result_base) error {
+	switch r.exit {
 	case C.emacs_funcall_exit_return:
 		return nil
 	case C.emacs_funcall_exit_signal:
-		C.non_local_exit_clear(e.raw())
-		return Signal{a, b}
+		return Signal{Value{r.error_symbol}, Value{r.error_data}}
 	case C.emacs_funcall_exit_throw:
-		C.non_local_exit_clear(e.raw())
-		return Throw{a, b}
+		return Throw{Value{r.error_symbol}, Value{r.error_data}}
 	default:
 		// This cannot really happen, but better safe than sorry.
-		return WrongTypeArgument("module-funcall-exit-p", Int(k))
+		return WrongTypeArgument("module-funcall-exit-p", Int(r.exit))
 	}
 }
 
-// checkValue is like check, but also returns v for convenience.
-func (e Env) checkValue(v Value) (Value, error) {
-	return e.checkRaw(v.r)
+// checkVoid is like check, but takes a struct void_result for convenience.
+func (e Env) checkVoid(r C.struct_void_result) error {
+	return e.check(r.base)
 }
 
-// checkRaw is like check, but also wraps v in Value for convenience.
-func (e Env) checkRaw(v C.emacs_value) (Value, error) {
-	return Value{v}, e.check()
+// checkValue is like check, but takes a struct value_result and returns v for
+// convenience.
+func (e Env) checkValue(r C.struct_value_result) (Value, error) {
+	return Value{r.value}, e.check(r.base)
 }
 
 var baseError = DefineError("go-error", "Generic Go error")

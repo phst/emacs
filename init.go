@@ -15,6 +15,7 @@
 package emacs
 
 // #include <emacs-module.h>
+// #include "wrappers.h"
 import "C"
 
 import (
@@ -59,9 +60,6 @@ func (m *initManager) run(e Env) error {
 		return err
 	}
 	inits := m.copy()
-	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
-	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
-	defer gc.inhibit(e).restore(e)
 	for _, i := range inits {
 		if err := i(e); err != nil {
 			return err
@@ -78,30 +76,20 @@ func (m *initManager) copy() []InitFunc {
 	return r
 }
 
-//export emacs_module_init
-func emacs_module_init(rt *C.struct_emacs_runtime) C.int {
+//export go_emacs_init
+func go_emacs_init(env *C.emacs_env) C.struct_init_result {
 	// We can’t use environments from other threads, so make sure that we
 	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
-	if rt.size < C.sizeof_struct_emacs_runtime {
-		return 1
-	}
-	e := getEnv(rt)
-	if e.ptr.size < C.sizeof_struct_emacs_env_26 {
-		return 2
-	}
+	e := Env{env}
 	// Don’t allow Go panics to crash Emacs.
 	defer protect(e)
-	if err := inits.run(e); err != nil {
-		e.signal(err)
-		// We still return 0.  See
-		// https://phst.eu/emacs-modules#module-loading-and-initialization.
-		// No normal or deferred call using e is allowed at this point.
-		// That’s why we use the inits.run indirection to defer
-		// gcContext.restore.
-	}
-	return 0
+	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
+	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
+	defer gc.inhibit(e).restore(e)
+	err := inits.run(e)
+	return C.struct_init_result{e.signal(err)}
 }
 
 //export plugin_is_GPL_compatible

@@ -16,6 +16,7 @@ package emacs
 
 // #cgo CPPFLAGS: -DEMACS_MODULE_GMP
 // #cgo LDFLAGS: -lgmp
+// #include <stdlib.h>
 // #include "wrappers.h"
 import "C"
 
@@ -34,7 +35,7 @@ type Int int64
 // Emacs creates an Emacs value representing the given integer.  It returns an
 // error if the integer value is too big for Emacs.
 func (i Int) Emacs(e Env) (Value, error) {
-	return e.checkRaw(C.make_integer(e.raw(), C.int64_t(i)))
+	return e.checkValue(C.make_integer(e.raw(), C.int64_t(i)))
 }
 
 // FromEmacs sets *i to the integer stored in v.  It returns an error if v is
@@ -52,39 +53,23 @@ func (i *Int) FromEmacs(e Env, v Value) error {
 // integer, or if it doesn’t fit into an int64.
 func (e Env) Int(v Value) (int64, error) {
 	i := C.extract_integer(e.raw(), v.r)
-	return int64(i), e.check()
+	return int64(i.value), e.check(i.base)
 }
 
 // BigInt sets z to the integer stored in v.  It returns an error if v is not
 // an integer.
 func (e Env) BigInt(v Value, z *big.Int) error {
-	var i C.mpz_t
-	C.mpz_init(&i[0])
-	defer C.mpz_clear(&i[0])
-	C.extract_big_integer(e.raw(), v.r, &i[0])
-	if err := e.check(); err != nil {
+	r := C.extract_big_integer(e.raw(), v.r, &i[0])
+	if err := e.check(r.base); err != nil {
 		return err
 	}
-	if C.mpz_fits_ulong_p(&i[0]) != 0 {
-		z.SetUint64(uint64(C.mpz_get_ui(&i[0])))
+	if r.sign == 0 {
+		z.SetInt64(0)
 		return nil
 	}
-	if C.mpz_fits_slong_p(&i[0]) != 0 {
-		z.SetInt64(int64(C.mpz_get_si(&i[0])))
-		return nil
-	}
-	// See
-	// https://gmplib.org/manual/Integer-Import-and-Export.html#index-Export.
-	const numb = 8*gmpSize - gmpNails
-	count := (C.mpz_sizeinbase(&i[0], 2) + numb - 1) / numb
-	p := make([]byte, count)
-	var written C.size_t
-	C.mpz_export(unsafe.Pointer(&p[0]), &written, gmpOrder, gmpSize, gmpEndian, gmpNails, &i[0])
-	if written != count {
-		return fmt.Errorf("unexpected number of bytes exported: got %d, want %d", written, count)
-	}
-	z.SetBytes(p)
-	if C.emacs_mpz_sgn(&i[0]) == -1 {
+	defer C.free(unsafe.Pointer(r.data))
+	z.SetBytes(C.GoBytes(unsafe.Pointer(r.data), r.size))
+	if r.sign == -1 {
 		z.Neg(z)
 	}
 	return nil
@@ -143,15 +128,8 @@ func (i *BigInt) Emacs(e Env) (Value, error) {
 	if b.IsInt64() {
 		return Int(b.Int64()).Emacs(e)
 	}
-	var v C.mpz_t
-	C.mpz_init(&v[0])
-	defer C.mpz_clear(&v[0])
 	p := b.Bytes()
-	C.mpz_import(&v[0], C.size_t(len(p)), gmpOrder, gmpSize, gmpEndian, gmpNails, unsafe.Pointer(&p[0]))
-	if b.Sign() == -1 {
-		C.mpz_neg(&v[0], &v[0])
-	}
-	return e.checkRaw(C.make_big_integer(e.raw(), &v[0]))
+	return e.checkValue(C.make_big_integer(e.raw(), C.int(b.Sign()), (*C.uint8_t)(&p[0]), C.int64_t(len(p))))
 }
 
 // FromEmacs sets *i to the integer stored in v.  It returns an error if v is
@@ -159,15 +137,6 @@ func (i *BigInt) Emacs(e Env) (Value, error) {
 func (i *BigInt) FromEmacs(e Env, v Value) error {
 	return e.BigInt(v, (*big.Int)(i))
 }
-
-// Constants for mpz_import and mpz_export.  See
-// https://gmplib.org/manual/Integer-Import-and-Export.html.
-const (
-	gmpSize   = 1
-	gmpOrder  = 1
-	gmpEndian = 1
-	gmpNails  = 0
-)
 
 func intIn(v reflect.Value) In   { return Int(reflect.Value(v).Int()) }
 func intOut(v reflect.Value) Out { return reflectInt(v) }

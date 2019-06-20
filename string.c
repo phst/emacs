@@ -16,21 +16,45 @@
 #include <emacs-module.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "wrappers.h"
 
 static_assert(CHAR_BIT == 8, "unsupported architecture");
-static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");
-static_assert(PTRDIFF_MAX == INT64_MAX, "unsupported architecture");
 
-bool copy_string_contents(emacs_env *env, emacs_value value, uint8_t *buffer,
-                          int64_t *size) {
-  // It’s fine to cast uint8_t * to char *.  See
-  // https://en.cppreference.com/w/c/language/object#Strict_aliasing.
-  ptrdiff_t size_ptrdiff = *size;
-  bool success =
-      env->copy_string_contents(env, value, (char *)buffer, &size_ptrdiff);
-  *size = size_ptrdiff;
-  return success;
+struct string_result copy_string_contents(emacs_env *env, emacs_value value) {
+  // See https://phst.eu/emacs-modules#copy_string_contents.
+  ptrdiff_t size;
+  if (!env->copy_string_contents(env, value, NULL, &size)) {
+    return (struct string_result){check(env), NULL, 0};
+  }
+  assert(size >= 0);
+  if (size == 0) {
+    return (struct string_result){
+        {emacs_funcall_exit_return, NULL, NULL}, NULL, 0};
+  }
+  if (size >= INT_MAX) {
+    return (struct string_result){overflow_error(env), NULL, 0};
+  }
+  static_assert(PTRDIFF_MAX <= SIZE_MAX, "unsupported architecture");
+  char *buffer = malloc((size_t)size);
+  if (buffer == NULL) {
+    return (struct string_result){out_of_memory(env), NULL, 0};
+  }
+  if (!env->copy_string_contents(env, value, buffer, &size)) {
+    free(buffer);
+    return (struct string_result){check(env), NULL, 0};
+  }
+  return (struct string_result){
+      {emacs_funcall_exit_return, NULL, NULL}, buffer, (int)size - 1};
+}
+
+struct value_result make_string_impl(emacs_env *env, const char *data,
+                                     size_t size) {
+  if (size > PTRDIFF_MAX) {
+    return (struct value_result){overflow_error(env), NULL};
+  }
+  return check_value(env, env->make_string(env, data, (ptrdiff_t)size));
 }

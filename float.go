@@ -14,13 +14,7 @@
 
 package emacs
 
-// #include <emacs-module.h>
-// double extract_float(emacs_env *env, emacs_value value) {
-//   return env->extract_float(env, value);
-// }
-// emacs_value make_float(emacs_env *env, double value) {
-//   return env->make_float(env, value);
-// }
+// #include "wrappers.h"
 import "C"
 
 import "reflect"
@@ -31,7 +25,7 @@ type Float float64
 
 // Emacs creates an Emacs value representing the given floating-point number.
 func (f Float) Emacs(e Env) (Value, error) {
-	return e.checkRaw(C.make_float(e.raw(), C.double(f)))
+	return e.checkValue(C.make_float(e.raw(), C.double(f)))
 }
 
 // FromEmacs sets *f to the floating-point number stored in v.  It returns an
@@ -49,10 +43,10 @@ func (f *Float) FromEmacs(e Env, v Value) error {
 // v is not a floating-point value.
 func (e Env) Float(v Value) (float64, error) {
 	r := C.extract_float(e.raw(), v.r)
-	if err := e.check(); err != nil {
+	if err := e.check(r.base); err != nil {
 		return 0, err
 	}
-	return float64(r), nil
+	return float64(r.value), nil
 }
 
 func floatIn(v reflect.Value) In   { return Float(reflect.Value(v).Float()) }

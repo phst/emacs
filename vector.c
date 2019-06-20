@@ -21,14 +21,16 @@
 static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");
 static_assert(PTRDIFF_MAX == INT64_MAX, "unsupported architecture");
 
-emacs_value vec_get(emacs_env *env, emacs_value vec, int64_t i) {
-  return env->vec_get(env, vec, i);
+struct value_result vec_get(emacs_env *env, emacs_value vec, int64_t i) {
+  return check_value(env, env->vec_get(env, vec, i));
 }
 
-void vec_set(emacs_env *env, emacs_value vec, int64_t i, emacs_value val) {
+struct void_result vec_set(emacs_env *env, emacs_value vec, int64_t i,
+                           emacs_value val) {
   env->vec_set(env, vec, i, val);
+  return check_void(env);
 }
 
-int64_t vec_size(emacs_env *env, emacs_value vec) {
-  return env->vec_size(env, vec);
+struct integer_result vec_size(emacs_env *env, emacs_value vec) {
+  return check_integer(env, env->vec_size(env, vec));
 }

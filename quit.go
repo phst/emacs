@@ -34,6 +34,5 @@ func (e Env) ShouldQuit() bool {
 // Note that processing input can run arbitrary Lisp code, so don’t rely on
 // global state staying the same after calling ProcessInput.
 func (e Env) ProcessInput() error {
-	C.process_input(e.raw())
-	return e.check()
+	return e.checkVoid(C.process_input(e.raw()))
 }

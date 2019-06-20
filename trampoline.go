@@ -29,7 +29,7 @@ import (
 // https://golang.org/cmd/cgo/#hdr-C_references_to_Go.
 
 //export go_emacs_trampoline
-func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) C.emacs_value {
+func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) C.struct_trampoline_result {
 	// We can’t use environments from other threads, so make sure that we
 	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
@@ -37,6 +37,9 @@ func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value,
 	e := Env{env}
 	// Don’t allow Go panics to crash Emacs.
 	defer protect(e)
+	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
+	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
+	defer gc.inhibit(e).restore(e)
 	fun := funcs.get(funcIndex(data))
 	var in []Value
 	if nargs > 0 {
@@ -48,14 +51,8 @@ func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value,
 			in[i] = Value{a}
 		}
 	}
-	r, err := callGo(e, fun, in)
-	if err != nil {
-		e.signal(err)
-		// No normal or deferred call using e is allowed at this point.
-		// That’s why we use the callGo indirection to defer
-		// gcContext.restore.
-	}
-	return r.r
+	v, err := fun(e, in)
+	return C.struct_trampoline_result{e.signal(err), v.r}
 }
 
 func protect(e Env) {
@@ -72,10 +69,3 @@ func protect(e Env) {
 }
 
 var errPanic = DefineError("go-panic", "Panic while running Emacs module function", baseError)
-
-func callGo(e Env, fun Func, in []Value) (Value, error) {
-	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
-	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
-	defer gc.inhibit(e).restore(e)
-	return fun(e, in)
-}

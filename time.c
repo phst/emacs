@@ -27,10 +27,13 @@ static_assert(PTRDIFF_MAX <= SIZE_MAX, "unsupported architecture");
 static_assert((time_t)1.5 == 1, "unsupported architecture");
 static_assert(LONG_MAX >= 1000000000, "unsupported architecture");
 
-struct timespec extract_time(emacs_env *env, emacs_value value) {
+struct timespec_result extract_time(emacs_env *env, emacs_value value) {
 #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
   if ((size_t)env->size > offsetof(emacs_env, extract_time)) {
-    return env->extract_time(env, value);
+    struct timespec_result result;
+    result.value = env->extract_time(env, value);
+    result.base = check(env);
+    return result;
   }
 #endif
   emacs_value list =
@@ -43,25 +46,24 @@ struct timespec extract_time(emacs_env *env, emacs_value value) {
     list = env->funcall(env, cdr, 1, &list);
     if (!env->is_not_nil(env, list)) break;
   }
-  struct timespec result;
+  struct timespec time;
   assert(parts[1] >= 0 && parts[1] <= 0x10000);
-  if (__builtin_mul_overflow(parts[0], 0x10000, &result.tv_sec) ||
-      __builtin_add_overflow(result.tv_sec, parts[1], &result.tv_sec)) {
-    env->non_local_exit_signal(env, env->intern(env, "overflow-error"),
-                               env->intern(env, "nil"));
-    return result;
+  if (__builtin_mul_overflow(parts[0], 0x10000, &time.tv_sec) ||
+      __builtin_add_overflow(time.tv_sec, parts[1], &time.tv_sec)) {
+    return (struct timespec_result){overflow_error(env), {0, 0}};
   }
   assert(parts[2] >= 0 && parts[2] < 1000000);
   assert(parts[3] >= 0 && parts[3] < 1000000);
-  result.tv_nsec = (long)parts[2] * 1000 + (long)parts[3] / 1000;
-  return result;
+  time.tv_nsec = (long)parts[2] * 1000 + (long)parts[3] / 1000;
+  return (struct timespec_result){{emacs_funcall_exit_return, NULL, NULL},
+                                  time};
 }
 
-emacs_value make_time(emacs_env *env, struct timespec time) {
+struct value_result make_time(emacs_env *env, struct timespec time) {
   assert(time.tv_nsec >= 0 && time.tv_nsec < 1000000000);
 #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
   if ((size_t)env->size > offsetof(emacs_env, make_time)) {
-    return env->make_time(env, time);
+    return check_value(env, env->make_time(env, time));
   }
 #endif
   imaxdiv_t seconds = imaxdiv(time.tv_sec, 0x10000);
@@ -77,5 +79,5 @@ emacs_value make_time(emacs_env *env, struct timespec time) {
                         env->make_integer(env, seconds.rem),
                         env->make_integer(env, nanos.quot),
                         env->make_integer(env, nanos.rem * 1000)};
-  return env->funcall(env, env->intern(env, "list"), 4, args);
+  return funcall(env, env->intern(env, "list"), 4, args);
 }

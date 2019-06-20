@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "wrappers.h"
+
 #include <assert.h>
-#include <emacs-module.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include "wrappers.h"
+#include <emacs-module.h>
 
-bool should_quit(emacs_env *env) { return env->should_quit(env); }
+static_assert(PTRDIFF_MAX <= SIZE_MAX, "unsupported architecture");
 
-struct void_result process_input(emacs_env *env) {
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
-  static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
-  if ((size_t)env->size > offsetof(emacs_env, process_input)) {
-    env->process_input(env);
-    return check_void(env);
+int emacs_module_init(struct emacs_runtime *rt) {
+  if ((size_t)rt->size < sizeof *rt) {
+    return 1;
   }
-#endif
-  if (env->should_quit(env)) {
-    env->non_local_exit_signal(env, env->intern(env, "quit"),
-                               env->intern(env, "nil"));
+  emacs_env *env = rt->get_environment(rt);
+  if ((size_t)env->size < sizeof(struct emacs_env_26)) {
+    return 2;
   }
-  return check_void(env);
+  struct init_result result = go_emacs_init(env);
+  handle_nonlocal_exit(env, result.base);
+  // We return 0 even if go_emacs_init exited nonlocally.  See
+  // https://phst.eu/emacs-modules#module-loading-and-initialization.
+  return 0;
 }
