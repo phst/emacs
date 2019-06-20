@@ -32,7 +32,7 @@ _COPTS = [
     "-fvisibility=hidden",
 ] + select({
     ":linux": [],
-    ":macos": ["-I/usr/local/include"],
+    ":macos": ["-isystem", "/usr/local/include"],
 })
 
 _LINKOPTS = ["-lgmp"] + select({
