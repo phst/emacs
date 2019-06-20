@@ -24,7 +24,7 @@ func ExampleEnv_ProcessInput() {
 	Export(mersennePrimeP, Doc("Return whether 2^N − 1 is probably prime."), Usage("N"))
 }
 
-func mersennePrimeP(e Env, n uint) bool {
+func mersennePrimeP(e Env, n uint) (bool, error) {
 	tick := time.NewTicker(100 * time.Millisecond)
 	defer tick.Stop()
 	// Start long-running operation in another goroutine.  Note that we
@@ -35,11 +35,11 @@ func mersennePrimeP(e Env, n uint) bool {
 	for {
 		select {
 		case r := <-ch:
-			return r
+			return r, nil
 		case <-tick.C:
-			if e.ProcessInput() != Continue {
+			if err := e.ProcessInput(); err != nil {
 				log.Print("quitting")
-				return false // Emacs will ignore the return value
+				return false, err // Emacs will ignore the return value
 			}
 		}
 	}

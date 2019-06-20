@@ -53,6 +53,6 @@ struct timespec extract_time(emacs_env *env, emacs_value value);
 emacs_value make_time(emacs_env *env, struct timespec time);
 
 bool should_quit(emacs_env *env);
-int process_input(emacs_env *env);
+void process_input(emacs_env *env);
 
 #endif
