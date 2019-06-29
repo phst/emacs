@@ -134,9 +134,9 @@ func (quad) Generate(rand *rand.Rand, size int) reflect.Value {
 		// numbers.
 		int64(rand.Uint64()) >> 16,
 		// The other parts have technically a smaller domain than
-		// uint16, but the functions should accept denormalized values
-		// as well.
-		uint16(rand.Uint32()), uint16(rand.Uint32()), uint16(rand.Uint32()),
+		// uint16/uint32, but the functions should accept denormalized
+		// values as well.
+		uint16(rand.Uint32()), rand.Uint32(), rand.Uint32(),
 	})
 }
 
