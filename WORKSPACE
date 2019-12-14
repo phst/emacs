@@ -19,9 +19,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "emacs_module_header",
     build_file = "@//:header.BUILD",
-    sha256 = "151ce69dbe5b809d4492ffae4a4b153b2778459de6deb26f35691e1281a9c58e",
-    strip_prefix = "emacs-26.2/src/",
-    urls = ["https://ftp.gnu.org/gnu/emacs/emacs-26.2.tar.xz"],
+    sha256 = "4d90e6751ad8967822c6e092db07466b9d383ef1653feb2f95c93e7de66d3485",
+    strip_prefix = "emacs-26.3/src/",
+    urls = ["https://ftp.gnu.org/gnu/emacs/emacs-26.3.tar.xz"],
 )
 
 http_archive(
@@ -34,10 +34,10 @@ http_archive(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
+    sha256 = "e88471aea3a3a4f19ec1310a55ba94772d087e9ce46e41ae38ecebe17935de7b",
     urls = [
-        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
-        "https://github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
+        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.20.3/rules_go-v0.20.3.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.20.3/rules_go-v0.20.3.tar.gz",
     ],
 )
 
@@ -49,9 +49,9 @@ go_register_toolchains(nogo = "@//:nogo")
 
 http_archive(
     name = "com_github_bazelbuild_buildtools",
-    sha256 = "5fb946659443db737844bfd07fec58acf92a8213567306641b56da2993c50ffa",
-    strip_prefix = "buildtools-0.26.0",
-    urls = ["https://github.com/bazelbuild/buildtools/archive/0.26.0.zip"],
+    sha256 = "05eb52437fb250c7591dd6cbcfd1f9b5b61d85d6b20f04b041e0830dd1ab39b3",
+    strip_prefix = "buildtools-0.29.0",
+    urls = ["https://github.com/bazelbuild/buildtools/archive/0.29.0.zip"],
 )
 
 load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
