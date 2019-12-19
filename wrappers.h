@@ -20,7 +20,6 @@
 #endif
 
 #include <emacs-module.h>
-#include <gmp.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

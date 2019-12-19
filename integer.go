@@ -14,8 +14,6 @@
 
 package emacs
 
-// #cgo CPPFLAGS: -DEMACS_MODULE_GMP
-// #cgo LDFLAGS: -lgmp
 // #include <stdlib.h>
 // #include "wrappers.h"
 import "C"

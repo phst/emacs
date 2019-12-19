@@ -16,30 +16,14 @@
 
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 
-# We can’t link against GMP statically because Emacs links against the system
-# GMP dynamically.  Therefore we add -lgmp to the linker options.  On macOS, we
-# furthermore have to work around
-# https://github.com/bazelbuild/bazel/issues/5391 by adding the local include
-# and library directory.  We assume that the user installed GMP using Homebrew
-# or similar, using the prefix /usr/local.
-
 _COPTS = [
     "-Werror",
     "-Wall",
     "-Wconversion",
     "-Wextra",
     "-Wno-unused-parameter",
-    "-DEMACS_MODULE_GMP",
     "-fvisibility=hidden",
-] + select({
-    ":linux": [],
-    ":macos": ["-isystem", "/usr/local/include"],
-})
-
-_LINKOPTS = ["-lgmp"] + select({
-    ":linux": [],
-    ":macos": ["-L/usr/local/lib"],
-})
+]
 
 def emacs_module(name, srcs, header, test_srcs):
     """Generates an Emacs module library and associated tests.
@@ -59,7 +43,6 @@ def emacs_module(name, srcs, header, test_srcs):
         srcs = srcs,
         cdeps = [header],
         cgo = True,
-        clinkopts = _LINKOPTS,
         copts = _COPTS,
         importpath = "github.com/phst/emacs",
     )
