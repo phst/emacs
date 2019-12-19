@@ -121,8 +121,9 @@ func emacsDurationRoundtrip(e Env) error {
 }
 
 type quad struct {
-	hi         int64
-	lo, μs, ps uint16
+	hi     int64
+	lo     uint16
+	μs, ps uint32
 }
 
 func (quad) Generate(rand *rand.Rand, size int) reflect.Value {
