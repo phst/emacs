@@ -59,7 +59,7 @@ func (e Env) Int(v Value) (int64, error) {
 // BigInt sets z to the integer stored in v.  It returns an error if v is not
 // an integer.
 func (e Env) BigInt(v Value, z *big.Int) error {
-	r := C.extract_big_integer(e.raw(), v.r, &i[0])
+	r := C.extract_big_integer(e.raw(), v.r)
 	if err := e.check(r.base); err != nil {
 		return err
 	}
