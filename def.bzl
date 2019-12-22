@@ -21,6 +21,7 @@ _COPTS = [
     "-Wall",
     "-Wconversion",
     "-Wextra",
+    "-Wno-sign-conversion",
     "-Wno-unused-parameter",
     "-fvisibility=hidden",
 ]
