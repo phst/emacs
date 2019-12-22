@@ -60,7 +60,7 @@ struct big_integer_result extract_big_integer(emacs_env *env,
     if (size > INT_MAX || (size_t)size > SIZE_MAX / 2) {
       return (struct big_integer_result){overflow_error(env), 0, NULL, 0};
     }
-    unsigned char *bytes = malloc(2 * (size_t)size);
+    uint8_t *bytes = malloc(2 * (size_t)size);
     if (bytes == NULL) {
       return (struct big_integer_result){out_of_memory(env), 0, NULL, 0};
     }
@@ -70,8 +70,7 @@ struct big_integer_result extract_big_integer(emacs_env *env,
     for (ptrdiff_t i = 0; i < count; ++i) {
       emacs_limb_t limb = magnitude[i];
       for (ptrdiff_t j = 0; j < limb_size; ++j) {
-        bytes[size - i * limb_size - j - 1] =
-            (unsigned char)(limb >> (j * CHAR_BIT));
+        bytes[size - i * limb_size - j - 1] = (uint8_t)(limb >> (j * CHAR_BIT));
       }
     }
     return (struct big_integer_result){
