@@ -93,15 +93,9 @@ struct big_integer_result extract_big_integer(emacs_env *env,
     return (struct big_integer_result){out_of_memory(env), 0, NULL, 0};
   }
   int sign = i.value > 0 ? 1 : -1;
-  static_assert(sizeof u == 8, "unsupported architecture");
-  bytes[0] = (uint8_t)(u >> 56);
-  bytes[1] = (uint8_t)(u >> 48);
-  bytes[2] = (uint8_t)(u >> 40);
-  bytes[3] = (uint8_t)(u >> 32);
-  bytes[4] = (uint8_t)(u >> 24);
-  bytes[5] = (uint8_t)(u >> 16);
-  bytes[6] = (uint8_t)(u >> 8);
-  bytes[7] = (uint8_t)u;
+  for (size_t j = 0; j < sizeof u; ++j) {
+    bytes[sizeof u - j - 1] = (uint8_t)(u >> (j * CHAR_BIT));
+  }
   return (struct big_integer_result){
       {emacs_funcall_exit_return, NULL, NULL}, sign, bytes, sizeof u};
 }
