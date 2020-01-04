@@ -15,7 +15,9 @@
 package emacs
 
 import (
+	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -323,13 +325,14 @@ type funcIndex uint64
 
 type funcManager struct {
 	mu    sync.RWMutex
-	funcs []function
+	funcs map[funcIndex]function
+	next  funcIndex
 	names map[Name]struct{}
 }
 
 func (m *funcManager) register(f function) (funcIndex, error) {
 	if f.name == "" {
-		return m.registerUnnamed(f), nil
+		return m.registerUnnamed(f)
 	}
 	return m.registerNamed(f)
 }
@@ -343,8 +346,10 @@ func (m *funcManager) registerNamed(f function) (funcIndex, error) {
 	if _, dup := m.names[f.name]; dup {
 		return 0, fmt.Errorf("duplicate definition of %s", f.name)
 	}
-	index := funcIndex(len(m.funcs))
-	m.funcs = append(m.funcs, f)
+	index, err := m.registerLocked(f)
+	if err != nil {
+		return 0, err
+	}
 	if m.names == nil {
 		m.names = make(map[Name]struct{})
 	}
@@ -352,12 +357,23 @@ func (m *funcManager) registerNamed(f function) (funcIndex, error) {
 	return index, nil
 }
 
-func (m *funcManager) registerUnnamed(f function) funcIndex {
+func (m *funcManager) registerUnnamed(f function) (funcIndex, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	index := funcIndex(len(m.funcs))
-	m.funcs = append(m.funcs, f)
-	return index
+	return m.registerLocked(f)
+}
+
+func (m *funcManager) registerLocked(f function) (funcIndex, error) {
+	index := m.next
+	if index == math.MaxUint64 {
+		return 0, errors.New("too many functions")
+	}
+	m.next++
+	if m.funcs == nil {
+		m.funcs = make(map[funcIndex]function)
+	}
+	m.funcs[index] = f
+	return index, nil
 }
 
 func (m *funcManager) mustRegister(f function) {
@@ -374,18 +390,26 @@ func (m *funcManager) get(i funcIndex) Func {
 
 func (m *funcManager) define(e Env) error {
 	for i, f := range m.copy() {
-		if _, err := f.define(e, funcIndex(i)); err != nil {
+		if _, err := f.define(e, i); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (m *funcManager) copy() []function {
+func (m *funcManager) delete(i funcIndex) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	delete(m.funcs, i)
+}
+
+func (m *funcManager) copy() map[funcIndex]function {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	r := make([]function, len(m.funcs))
-	copy(r, m.funcs)
+	r := make(map[funcIndex]function, len(m.funcs))
+	for i, f := range m.funcs {
+		r[i] = f
+	}
 	return r
 }
 

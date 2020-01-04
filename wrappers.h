@@ -86,6 +86,7 @@ struct trampoline_result {
 
 struct trampoline_result go_emacs_trampoline(emacs_env *env, int64_t nargs,
                                              emacs_value *args, uint64_t data);
+void go_emacs_finalizer(uint64_t data);
 
 struct value_result funcall(emacs_env *env, emacs_value function, int64_t nargs,
                             emacs_value *args);

@@ -14,6 +14,7 @@
 
 #include <assert.h>
 #include <emacs-module.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include "wrappers.h"
@@ -21,6 +22,7 @@
 static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");
 static_assert(PTRDIFF_MAX == INT64_MAX, "unsupported architecture");
 static_assert(UINTPTR_MAX == UINT64_MAX, "unsupported architecture");
+static_assert(PTRDIFF_MAX <= SIZE_MAX, "unsupported architecture");
 
 static emacs_value trampoline(emacs_env *env, ptrdiff_t nargs,
                               emacs_value *args, void *data) {
@@ -29,6 +31,12 @@ static emacs_value trampoline(emacs_env *env, ptrdiff_t nargs,
   handle_nonlocal_exit(env, result.base);
   return result.value;
 }
+
+#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
+static void finalizer(void *data) {
+  go_emacs_finalizer((uintptr_t)data);
+}
+#endif
 
 struct value_result funcall(emacs_env *env, emacs_value function, int64_t nargs,
                             emacs_value *args) {
@@ -39,7 +47,12 @@ struct value_result make_function_impl(emacs_env *env, int64_t min_arity,
                                        int64_t max_arity,
                                        const char *documentation,
                                        uint64_t data) {
-  return check_value(env, env->make_function(env, min_arity, max_arity,
-                                             trampoline, documentation,
-                                             (void *)(uintptr_t)data));
+  emacs_value value =
+      env->make_function(env, min_arity, max_arity, trampoline, documentation,
+                         (void *)(uintptr_t)data);
+#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
+  if ((size_t)env->size > offsetof(emacs_env, set_function_finalizer))
+    env->set_function_finalizer(env, value, finalizer);
+#endif
+  return check_value(env, value);
 }
