@@ -16,7 +16,8 @@ SHELL := /bin/bash
 
 export CGO_CFLAGS := -pedantic-errors -Werror -Wall -Wextra \
   -Wno-sign-compare \
-  -Wno-unused-parameter
+  -Wno-unused-parameter \
+  -Wno-language-extension-token
 
 check: go-test
 
