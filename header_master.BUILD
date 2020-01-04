@@ -26,6 +26,7 @@ VERSIONS = [
     25,
     26,
     27,
+    28,
 ]
 
 filegroup(
