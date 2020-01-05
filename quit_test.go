@@ -24,7 +24,7 @@ func ExampleEnv_ProcessInput() {
 	Export(mersennePrimeP, Doc("Return whether 2^N − 1 is probably prime."), Usage("N"))
 }
 
-func mersennePrimeP(e Env, n uint) (bool, error) {
+func mersennePrimeP(e Env, n uint16) (bool, error) {
 	tick := time.NewTicker(100 * time.Millisecond)
 	defer tick.Stop()
 	// Start long-running operation in another goroutine.  Note that we
@@ -45,9 +45,9 @@ func mersennePrimeP(e Env, n uint) (bool, error) {
 	}
 }
 
-func testMersennePrime(n uint, ch chan<- bool) {
+func testMersennePrime(n uint16, ch chan<- bool) {
 	x := big.NewInt(1)
-	x.Lsh(x, n)
+	x.Lsh(x, uint(n))
 	x.Sub(x, one)
 	ch <- x.ProbablyPrime(10)
 	log.Print("testMersennePrime finished")
