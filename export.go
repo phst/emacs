@@ -75,7 +75,7 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 	if name == "" {
 		panic("empty function name")
 	}
-	funcs.mustRegister(function{name, fun, arity, doc})
+	funcs.mustRegister(function{lazy, name, fun, arity, doc})
 }
 
 // Export exports a Go function to Emacs.  Unlike the global Export function,
@@ -120,7 +120,7 @@ func (e Env) Export(fun interface{}, opts ...Option) (Value, error) {
 // the new function.  If doc is empty, the function won’t have a documentation
 // string.
 func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error) {
-	f := function{name, fun, arity, doc}
+	f := function{eager, name, fun, arity, doc}
 	i, err := funcs.register(f)
 	if err != nil {
 		return Value{}, err
@@ -298,7 +298,20 @@ func (d exportAuto) call(e Env, args []Value) (Value, error) {
 	return e.Nil()
 }
 
+type functionKind int
+
+const (
+	// Function is defined eagerly, directly after registration.  Don’t
+	// define it (twice) on module loading.
+	eager functionKind = iota
+
+	// Function is defined lazily.  It’s registered, but can only be
+	// defined when the module is being loaded.
+	lazy
+)
+
 type function struct {
+	kind  functionKind
 	name  Name
 	fun   Func
 	arity Arity
@@ -388,8 +401,8 @@ func (m *funcManager) get(i funcIndex) Func {
 	return m.funcs[i].fun
 }
 
-func (m *funcManager) define(e Env) error {
-	for i, f := range m.copy() {
+func (m *funcManager) defineLazy(e Env) error {
+	for i, f := range m.copyLazy() {
 		if _, err := f.define(e, i); err != nil {
 			return err
 		}
@@ -403,12 +416,14 @@ func (m *funcManager) delete(i funcIndex) {
 	delete(m.funcs, i)
 }
 
-func (m *funcManager) copy() map[funcIndex]function {
+func (m *funcManager) copyLazy() map[funcIndex]function {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	r := make(map[funcIndex]function, len(m.funcs))
 	for i, f := range m.funcs {
-		r[i] = f
+		if f.kind == lazy {
+			r[i] = f
+		}
 	}
 	return r
 }
@@ -416,5 +431,5 @@ func (m *funcManager) copy() map[funcIndex]function {
 var funcs funcManager
 
 func init() {
-	OnInit(funcs.define)
+	OnInit(funcs.defineLazy)
 }
