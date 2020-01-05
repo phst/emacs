@@ -57,20 +57,27 @@ struct big_integer_result extract_big_integer(emacs_env *env,
     ptrdiff_t limb_size = (ptrdiff_t)sizeof(emacs_limb_t);
     assert(count > 0 && count <= PTRDIFF_MAX / limb_size);
     ptrdiff_t size = count * limb_size;
-    if (size > INT_MAX || (size_t)size > SIZE_MAX / 2) {
+    if (size > INT_MAX) {
       return (struct big_integer_result){overflow_error(env), 0, NULL, 0};
     }
-    uint8_t *bytes = malloc(2 * (size_t)size);
-    if (bytes == NULL) {
+    emacs_limb_t *magnitude = malloc((size_t)size);
+    if (magnitude == NULL) {
       return (struct big_integer_result){out_of_memory(env), 0, NULL, 0};
     }
-    emacs_limb_t *magnitude = (emacs_limb_t *)(bytes + size);
-    ok = env->extract_big_integer(env, value, NULL, &count, magnitude);
-    assert(ok);
+    ptrdiff_t temp_count = count;
+    ok = env->extract_big_integer(env, value, NULL, &temp_count, magnitude);
+    assert(ok && count == temp_count);
+    for (ptrdiff_t i = 0; i < count / 2; ++i) {
+      emacs_limb_t temp = magnitude[i];
+      magnitude[i] = magnitude[count - i - 1];
+      magnitude[count - i - 1] = temp;
+    }
+    unsigned char *bytes = (unsigned char *)magnitude;
     for (ptrdiff_t i = 0; i < count; ++i) {
       emacs_limb_t limb = magnitude[i];
+      unsigned char *ptr = &bytes[i * limb_size];
       for (ptrdiff_t j = 0; j < limb_size; ++j) {
-        bytes[size - i * limb_size - j - 1] = (uint8_t)(limb >> (j * CHAR_BIT));
+        ptr[limb_size - j - 1] = (unsigned char)(limb >> (j * CHAR_BIT));
       }
     }
     return (struct big_integer_result){
