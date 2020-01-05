@@ -68,7 +68,7 @@ struct result_base out_of_memory(emacs_env *env) {
   const char *message = "Out of memory";
   size_t length = strlen(message);
   assert(length < PTRDIFF_MAX);
-  emacs_value temp = env->make_string(env, message, (ptrdiff_t)strlen(message));
+  emacs_value temp = env->make_string(env, message, (ptrdiff_t)length);
   env->non_local_exit_signal(
       env, env->intern(env, "error"),
       env->funcall(env, env->intern(env, "list"), 1, &temp));
