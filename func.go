@@ -155,9 +155,13 @@ func (e Env) makeFunction(arity Arity, doc Doc, data uint64) (Value, error) {
 // them to be autoconverted.
 func (e Env) Funcall(fun Value, args []Value) (Value, error) {
 	nargs := len(args)
-	rawArgs := make([]C.emacs_value, nargs)
-	for i, a := range args {
-		rawArgs[i] = a.r
+	var ptr *C.emacs_value
+	if nargs > 0 {
+		rawArgs := make([]C.emacs_value, nargs)
+		for i, a := range args {
+			rawArgs[i] = a.r
+		}
+		ptr = &rawArgs[0]
 	}
-	return e.checkValue(C.funcall(e.raw(), fun.r, C.int64_t(nargs), &rawArgs[0]))
+	return e.checkValue(C.funcall(e.raw(), fun.r, C.int64_t(nargs), ptr))
 }
