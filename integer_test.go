@@ -53,11 +53,12 @@ func intRoundtrip(e Env) error {
 
 func bigIntRoundtrip(e Env) error {
 	canOverflow := MajorVersion() < 27
-	f := func(a *BigInt) bool {
-		v, err := a.Emacs(e)
+	f := func(i *BigInt) bool {
+		v, err := i.Emacs(e)
 		if canOverflow && e.IsOverflowError(err) {
 			return true
 		}
+		a := (*big.Int)(i)
 		if err != nil {
 			log.Printf("couldn’t convert big integer %s to Emacs: %s", a, e.Message(err))
 			return false
@@ -67,7 +68,7 @@ func bigIntRoundtrip(e Env) error {
 			log.Printf("couldn’t convert big integer from Emacs: %s", e.Message(err))
 			return false
 		}
-		equal := (*big.Int)(a).Cmp(b) == 0
+		equal := a.Cmp(b) == 0
 		if !equal {
 			log.Printf("big integer roundtrip: got %s, want %s", b, a)
 		}
