@@ -54,12 +54,12 @@ def emacs_module(name, srcs, header, test_srcs):
         size = "medium",
         timeout = "short",
         srcs = test_srcs,
-        embed = [name],
-        data = [bin_name, "//:test.el"],
         args = [
             "--module=$(location " + bin_name + ")",
             "--ert_tests=$(location //:test.el)",
         ],
+        data = [bin_name, "//:test.el"],
+        embed = [name],
     )
     go_library(
         name = lib_name,
