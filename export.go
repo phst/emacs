@@ -336,11 +336,12 @@ func (f function) define(e Env, index funcIndex) (Value, error) {
 type funcIndex uint64
 
 type funcManager struct {
-	mu    sync.RWMutex
-	funcs map[funcIndex]Func
-	next  funcIndex
-	queue map[funcIndex]function
-	names map[Name]struct{}
+	mu       sync.RWMutex
+	initDone bool
+	funcs    map[funcIndex]Func
+	next     funcIndex
+	queue    map[funcIndex]function
+	names    map[Name]struct{}
 }
 
 func (m *funcManager) register(k functionKind, f function) (funcIndex, error) {
@@ -425,11 +426,15 @@ func (m *funcManager) delete(i funcIndex) {
 func (m *funcManager) drainQueue() map[funcIndex]function {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	if m.initDone {
+		panic("queued functions are already defined")
+	}
 	r := make(map[funcIndex]function, len(m.queue))
 	for i, f := range m.queue {
 		r[i] = f
 	}
 	m.queue = nil
+	m.initDone = true
 	return r
 }
 
