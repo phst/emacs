@@ -75,7 +75,7 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 	if name == "" {
 		panic("empty function name")
 	}
-	funcs.mustRegister(function{lazy, name, fun, arity, doc})
+	funcs.mustRegister(lazy, function{name, fun, arity, doc})
 }
 
 // Export exports a Go function to Emacs.  Unlike the global Export function,
@@ -120,8 +120,8 @@ func (e Env) Export(fun interface{}, opts ...Option) (Value, error) {
 // the new function.  If doc is empty, the function won’t have a documentation
 // string.
 func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error) {
-	f := function{eager, name, fun, arity, doc}
-	i, err := funcs.register(f)
+	f := function{name, fun, arity, doc}
+	i, err := funcs.register(eager, f)
 	if err != nil {
 		return Value{}, err
 	}
@@ -311,7 +311,6 @@ const (
 )
 
 type function struct {
-	kind  functionKind
 	name  Name
 	fun   Func
 	arity Arity
@@ -338,19 +337,20 @@ type funcIndex uint64
 
 type funcManager struct {
 	mu    sync.RWMutex
-	funcs map[funcIndex]function
+	funcs map[funcIndex]Func
 	next  funcIndex
+	queue map[funcIndex]function
 	names map[Name]struct{}
 }
 
-func (m *funcManager) register(f function) (funcIndex, error) {
+func (m *funcManager) register(k functionKind, f function) (funcIndex, error) {
 	if f.name == "" {
-		return m.registerUnnamed(f)
+		return m.registerUnnamed(k, f)
 	}
-	return m.registerNamed(f)
+	return m.registerNamed(k, f)
 }
 
-func (m *funcManager) registerNamed(f function) (funcIndex, error) {
+func (m *funcManager) registerNamed(k functionKind, f function) (funcIndex, error) {
 	if err := f.name.validate(); err != nil {
 		return 0, err
 	}
@@ -359,7 +359,7 @@ func (m *funcManager) registerNamed(f function) (funcIndex, error) {
 	if _, dup := m.names[f.name]; dup {
 		return 0, fmt.Errorf("duplicate definition of %s", f.name)
 	}
-	index, err := m.registerLocked(f)
+	index, err := m.registerLocked(k, f)
 	if err != nil {
 		return 0, err
 	}
@@ -370,27 +370,33 @@ func (m *funcManager) registerNamed(f function) (funcIndex, error) {
 	return index, nil
 }
 
-func (m *funcManager) registerUnnamed(f function) (funcIndex, error) {
+func (m *funcManager) registerUnnamed(k functionKind, f function) (funcIndex, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.registerLocked(f)
+	return m.registerLocked(k, f)
 }
 
-func (m *funcManager) registerLocked(f function) (funcIndex, error) {
+func (m *funcManager) registerLocked(k functionKind, f function) (funcIndex, error) {
 	index := m.next
 	if index == math.MaxUint64 {
 		return 0, errors.New("too many functions")
 	}
 	m.next++
 	if m.funcs == nil {
-		m.funcs = make(map[funcIndex]function)
+		m.funcs = make(map[funcIndex]Func)
 	}
-	m.funcs[index] = f
+	m.funcs[index] = f.fun
+	if k == lazy {
+		if m.queue == nil {
+			m.queue = make(map[funcIndex]function)
+		}
+		m.queue[index] = f
+	}
 	return index, nil
 }
 
-func (m *funcManager) mustRegister(f function) {
-	if _, err := m.register(f); err != nil {
+func (m *funcManager) mustRegister(k functionKind, f function) {
+	if _, err := m.register(k, f); err != nil {
 		panic(err)
 	}
 }
@@ -398,11 +404,11 @@ func (m *funcManager) mustRegister(f function) {
 func (m *funcManager) get(i funcIndex) Func {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	return m.funcs[i].fun
+	return m.funcs[i]
 }
 
-func (m *funcManager) defineLazy(e Env) error {
-	for i, f := range m.copyLazy() {
+func (m *funcManager) defineQueued(e Env) error {
+	for i, f := range m.drainQueue() {
 		if _, err := f.define(e, i); err != nil {
 			return err
 		}
@@ -416,20 +422,19 @@ func (m *funcManager) delete(i funcIndex) {
 	delete(m.funcs, i)
 }
 
-func (m *funcManager) copyLazy() map[funcIndex]function {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	r := make(map[funcIndex]function, len(m.funcs))
-	for i, f := range m.funcs {
-		if f.kind == lazy {
-			r[i] = f
-		}
+func (m *funcManager) drainQueue() map[funcIndex]function {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	r := make(map[funcIndex]function, len(m.queue))
+	for i, f := range m.queue {
+		r[i] = f
 	}
+	m.queue = nil
 	return r
 }
 
 var funcs funcManager
 
 func init() {
-	OnInit(funcs.defineLazy)
+	OnInit(funcs.defineQueued)
 }
