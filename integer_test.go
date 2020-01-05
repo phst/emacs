@@ -28,9 +28,10 @@ func init() {
 }
 
 func intRoundtrip(e Env) error {
+	canOverflow := MajorVersion() < 27
 	f := func(a int64) bool {
 		v, err := Int(a).Emacs(e)
-		if e.IsOverflowError(err) {
+		if canOverflow && e.IsOverflowError(err) {
 			return true
 		}
 		if err != nil {
@@ -51,9 +52,10 @@ func intRoundtrip(e Env) error {
 }
 
 func bigIntRoundtrip(e Env) error {
+	canOverflow := MajorVersion() < 27
 	f := func(a *BigInt) bool {
 		v, err := a.Emacs(e)
-		if e.IsOverflowError(err) {
+		if canOverflow && e.IsOverflowError(err) {
 			return true
 		}
 		if err != nil {
