@@ -21,6 +21,19 @@ import (
 	"sync/atomic"
 )
 
+// MajorVersion returns the major version of the Emacs instance in which the
+// module is loaded.  It can only be called after the module has been loaded.
+// Module functions and functions registered by OnInit can call MajorVersion if
+// they have been called from Emacs.  MajorVersion panics if the module isn’t
+// yet initialized.
+func MajorVersion() int {
+	v := majorVersion.load()
+	if v == 0 {
+		panic("module not yet initialized")
+	}
+	return v
+}
+
 // Stores the Emacs major version.
 type versionManager struct{ version int32 }
 
