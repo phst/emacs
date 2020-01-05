@@ -29,14 +29,14 @@ import (
 // https://golang.org/cmd/cgo/#hdr-C_references_to_Go.
 
 //export go_emacs_trampoline
-func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) C.struct_trampoline_result {
+func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) (r C.struct_trampoline_result) {
 	// We can’t use environments from other threads, so make sure that we
 	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	e := Env{env}
 	// Don’t allow Go panics to crash Emacs.
-	defer protect(e)
+	defer protect(e, &r.base)
 	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
 	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
 	defer gc.inhibit(e).restore(e)
@@ -60,7 +60,7 @@ func go_emacs_finalizer(data C.uint64_t) {
 	funcs.delete(funcIndex(data))
 }
 
-func protect(e Env) {
+func protect(e Env, r *C.struct_result_base_with_optional_error_info) {
 	if x := recover(); x != nil {
 		// Because to Go runtime calls deferred functions in the call
 		// frame of the panic, this stack trace will be useful.  This
@@ -69,7 +69,7 @@ func protect(e Env) {
 		// the Cgo entry point, the Emacs stack trace ends at the
 		// module interface.
 		debug.PrintStack()
-		e.signal(errPanic.Error(String(fmt.Sprint(x))))
+		*r = e.signal(errPanic.Error(String(fmt.Sprint(x))))
 	}
 }
 

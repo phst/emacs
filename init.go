@@ -77,14 +77,14 @@ func (m *initManager) copy() []InitFunc {
 }
 
 //export go_emacs_init
-func go_emacs_init(env *C.emacs_env) C.struct_init_result {
+func go_emacs_init(env *C.emacs_env) (r C.struct_init_result) {
 	// We can’t use environments from other threads, so make sure that we
 	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	e := Env{env}
 	// Don’t allow Go panics to crash Emacs.
-	defer protect(e)
+	defer protect(e, &r.base)
 	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
 	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
 	defer gc.inhibit(e).restore(e)
