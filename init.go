@@ -56,9 +56,6 @@ func (m *initManager) register(i InitFunc) {
 }
 
 func (m *initManager) run(e Env) error {
-	if err := majorVersion.init(e); err != nil {
-		return err
-	}
 	inits := m.copy()
 	for _, i := range inits {
 		if err := i(e); err != nil {
@@ -85,8 +82,12 @@ func go_emacs_init(env *C.emacs_env) (r C.struct_init_result) {
 	e := Env{env}
 	// Don’t allow Go panics to crash Emacs.
 	defer protect(e, &r.base)
+	if err := majorVersion.init(e); err != nil {
+		return C.struct_init_result{e.signal(err)}
+	}
 	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
-	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
+	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.  Note that this
+	// needs to happen after initializing the major version.
 	defer gc.inhibit(e).restore(e)
 	err := inits.run(e)
 	return C.struct_init_result{e.signal(err)}
