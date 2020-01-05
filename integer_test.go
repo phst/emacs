@@ -35,7 +35,7 @@ func intRoundtrip(e Env) error {
 			return true
 		}
 		if err != nil {
-			log.Printf("couldn’t convert integer %d to Emacs: %s", a, e.Message(err))
+			log.Printf("couldn’t convert integer %[1]d (%#[1]x) to Emacs: %[2]s", a, e.Message(err))
 			return true
 		}
 		b, err := e.Int(v)
@@ -44,7 +44,7 @@ func intRoundtrip(e Env) error {
 			return false
 		}
 		if a != b {
-			log.Printf("integer roundtrip: got %d, want %d", b, a)
+			log.Printf("integer roundtrip: got %[1]d (%#[1]x), want %[2]d (%#[2]x)", b, a)
 		}
 		return a == b
 	}
@@ -60,7 +60,7 @@ func bigIntRoundtrip(e Env) error {
 		}
 		a := (*big.Int)(i)
 		if err != nil {
-			log.Printf("couldn’t convert big integer %s to Emacs: %s", a, e.Message(err))
+			log.Printf("couldn’t convert big integer %s (0x%s) to Emacs: %s", a, a.Text(16), e.Message(err))
 			return false
 		}
 		b := new(big.Int)
@@ -70,7 +70,7 @@ func bigIntRoundtrip(e Env) error {
 		}
 		equal := a.Cmp(b) == 0
 		if !equal {
-			log.Printf("big integer roundtrip: got %s, want %s", b, a)
+			log.Printf("big integer roundtrip: got %s (0x%s), want %s (0x%s)", b, b.Text(16), a, a.Text(16))
 		}
 		return equal
 	}
