@@ -195,3 +195,5 @@ func (e Env) Go(v Value, p interface{}) error {
 
 func castToIn(v reflect.Value) In   { return v.Interface().(In) }
 func castToOut(v reflect.Value) Out { return v.Interface().(Out) }
+func valueIn(v reflect.Value) In    { return v.Interface().(Value) }
+func valueOut(v reflect.Value) Out  { return v.Addr().Interface().(*Value) }

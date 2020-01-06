@@ -173,6 +173,7 @@ var valueTypes = map[reflect.Type]inOutFuncs{
 	reflect.TypeOf(time.Second): {durationIn, durationOut},
 }
 var specialTypes = map[reflect.Type]inOutFuncs{
+	reflect.TypeOf(Value{}):                    {valueIn, valueOut},
 	reflect.TypeOf((*interface{})(nil)).Elem(): {dynamicIn, nil},
 	reflect.TypeOf(big.Int{}):                  {bigIntIn, bigIntOut},
 }
