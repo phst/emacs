@@ -239,22 +239,29 @@ type Iter struct {
 //	}
 //
 // See Dolist for a simpler iteration method.
-func (e Env) Iter(list Value, elem Out, err *error) Iter {
-	i := Iter{e, list, elem, err}
-	i.Next()
+func (e Env) Iter(list Value, elem Out, err *error) *Iter {
+	i := &Iter{e, list, elem, err}
+	i.setElem()
 	return i
 }
 
 // Ok returns whether the iterator is still valid.  It is valid if no error is
 // set and there are still elements left in the list.
-func (i Iter) Ok() bool {
+func (i *Iter) Ok() bool {
 	return *i.err == nil && i.env.IsNotNil(i.tail)
 }
 
 // Next sets the elem passed to Env.Iter to the next element in the list.  If
 // Next fails, it sets the error passed to Env.Iter, and Ok will return false.
-func (i Iter) Next() {
-	*i.err = i.env.UnconsOut(i.tail, i.elem, &i.tail)
+func (i *Iter) Next() {
+	i.tail, *i.err = i.env.Cdr(i.tail)
+	i.setElem()
+}
+
+func (i *Iter) setElem() {
+	if i.Ok() {
+		*i.err = i.env.CarOut(i.tail, i.elem)
+	}
 }
 
 // Dolist calls f for each element in list.  It returns an error if list is not

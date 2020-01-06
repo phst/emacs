@@ -14,7 +14,10 @@
 
 package emacs
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 func ExampleIter() {
 	// Assumes that env is a valid Env value.
@@ -47,3 +50,53 @@ func ExampleEnv_Dolist() {
 }
 
 var list Value // invalid, for exposition only
+
+func init() {
+	ERTTest(nilIter)
+	ERTTest(listIter)
+}
+
+func nilIter(e Env) error {
+	list, err := e.Nil()
+	if err != nil {
+		return err
+	}
+	var got Int
+	iter := e.Iter(list, &got, &err)
+	if iter.Ok() {
+		return errors.New("iterator for nil is OK")
+	}
+	if err != nil {
+		return fmt.Errorf("iterator returned error %s", e.Message(err))
+	}
+	return nil
+}
+
+func listIter(e Env) error {
+	list, err := e.List(Int(10), Int(20), Int(30))
+	if err != nil {
+		return err
+	}
+	var got Int
+	iter := e.Iter(list, &got, &err)
+	wantElems := []Int{10, 20, 30}
+	for i, want := range wantElems {
+		if !iter.Ok() {
+			return fmt.Errorf("index %d: iterator is not OK", i)
+		}
+		if err != nil {
+			return fmt.Errorf("index %d: got error %s", i, e.Message(err))
+		}
+		if got != want {
+			return fmt.Errorf("index %d: got %d, want %d", i, got, want)
+		}
+		iter.Next()
+	}
+	if iter.Ok() {
+		return errors.New("after iteration: iterator is still OK")
+	}
+	if err != nil {
+		return fmt.Errorf("after iteration: got error %s", e.Message(err))
+	}
+	return nil
+}
