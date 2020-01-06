@@ -24,6 +24,7 @@ import (
 
 func init() {
 	ERTTest(reflectRoundtrip)
+	ERTTest(reflectValue)
 	ERTTest(reflectInterface)
 }
 
@@ -46,6 +47,31 @@ func reflectRoundtrip(e Env) error {
 		return equal
 	}
 	return quick.Check(f, &quick.Config{MaxCountScale: 10})
+}
+
+func reflectValue(e Env) error {
+	a, err := Int(123).Emacs(e)
+	if err != nil {
+		return fmt.Errorf("couldn’t convert integer to Emacs: %s", e.Message(err))
+	}
+	r := Reflect(reflect.ValueOf(a))
+	b, err := r.Emacs(e)
+	if err != nil {
+		return fmt.Errorf("couldn’t convert reflected value %#v to Emacs: %s", reflect.Value(r), e.Message(err))
+	}
+	if !e.Eq(a, b) {
+		return fmt.Errorf("got %v, want %v", b, a)
+	}
+
+	s := Reflect(reflect.ValueOf(new(Value)))
+	if err := s.FromEmacs(e, b); err != nil {
+		return fmt.Errorf("couldn’t convert reflected value from Emacs: %s", e.Message(err))
+	}
+	c := *reflect.Value(s).Interface().(*Value)
+	if !e.Eq(b, c) {
+		return fmt.Errorf("got %v, want %v", c, b)
+	}
+	return nil
 }
 
 func reflectInterface(e Env) error {
