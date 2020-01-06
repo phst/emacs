@@ -106,7 +106,9 @@ func randomType(rand *rand.Rand, size int) reflect.Type {
 		panic("negative size")
 	}
 	// The commented-out kinds are type kinds that this library doesn’t
-	// support (yet).
+	// support (yet).  In addition, we don’t generate the 64-bit integral
+	// types to avoid overflow errors if either Emacs or emacs-module.h
+	// doesn’t support big integers.
 	kinds := []reflect.Kind{
 		// reflect.Invalid,
 		reflect.Bool,
@@ -114,12 +116,12 @@ func randomType(rand *rand.Rand, size int) reflect.Type {
 		reflect.Int8,
 		reflect.Int16,
 		reflect.Int32,
-		reflect.Int64,
-		reflect.Uint,
+		// reflect.Int64,
+		// reflect.Uint,
 		reflect.Uint8,
 		reflect.Uint16,
 		reflect.Uint32,
-		reflect.Uint64,
+		// reflect.Uint64,
 		// reflect.Uintptr,
 		reflect.Float32,
 		reflect.Float64,
