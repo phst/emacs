@@ -22,5 +22,6 @@ export CGO_CFLAGS := -pedantic-errors -Werror -Wall -Wextra \
 check: go-test
 
 go-test: *.go *.h
+	bazel test --test_output=errors ...
 	go vet
 	golint -set_exit_status -min_confidence=0.3
