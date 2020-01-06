@@ -15,6 +15,7 @@
 package emacs
 
 import (
+	"fmt"
 	"math/big"
 	"reflect"
 	"time"
@@ -28,7 +29,7 @@ type Reflect reflect.Value
 func (r Reflect) Emacs(e Env) (Value, error) {
 	v := reflect.Value(r)
 	if !v.IsValid() {
-		return Value{}, WrongTypeArgument("go-valid-reflect-p", String(v.String()))
+		return Value{}, WrongTypeArgument("go-valid-reflect-p", String(fmt.Sprintf("%#v", v)))
 	}
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
@@ -45,7 +46,7 @@ func (r Reflect) Emacs(e Env) (Value, error) {
 func (r Reflect) FromEmacs(e Env, v Value) error {
 	s := reflect.Value(r)
 	if !s.IsValid() {
-		return WrongTypeArgument("go-valid-reflect-p", String(s.String()))
+		return WrongTypeArgument("go-valid-reflect-p", String(fmt.Sprintf("%#v", s)))
 	}
 	conv, err := OutFuncFor(s.Type())
 	if err != nil {
