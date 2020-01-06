@@ -234,8 +234,51 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 	return d.name, d.call, arity, d.doc
 }
 
-// Option is an option for Export, AutoFunc, and ERTTest.  Its implementations
-// are Name, Anonymous, Doc, and Usage.
+// AutoLambda returns a Lambda object that exports the given function to Emacs
+// as an anonymous lambda function.  When calling the exported function from
+// Emacs, arguments and return values are converted as described in the package
+// documentation.
+//
+// The function may accept any number of arguments.  Optionally, the first
+// argument may be of type Env.  In this case, Emacs passes a live environment
+// value that you can use to interact with Emacs.  All other arguments are
+// converted from Emacs as described in the package documentation.  If not all
+// arguments are convertible from Emacs values, AutoLambda panics.
+//
+// The function must return either zero, one, or two results.  If the last or
+// only result is of type error, a non-nil value causes Emacs to trigger a
+// non-local exit as appropriate.  There may be at most one non-error result.
+// Its value will be converted to an Emacs value as described in the package
+// documentation.  If the type of the non-error result can’t be converted to an
+// Emacs value, AutoLambda panics.  If there are invalid result patterns,
+// AutoLambda panics.
+//
+// The function is always anonymous.  Any Name option in opts is ignored.
+//
+// By default, the function has no documentation string.  To add one, pass a
+// Doc option.
+//
+// You can call AutoLambda safely from multiple goroutines.
+func AutoLambda(f interface{}, opts ...Option) Lambda {
+	_, fun, arity, doc := AutoFunc(f, opts...)
+	return Lambda{fun, arity, doc}
+}
+
+// Lambda represents an anonymous function.  When converting to Emacs, it
+// exports Fun as an Emacs lambda function.
+type Lambda struct {
+	Fun   Func
+	Arity Arity
+	Doc   Doc
+}
+
+// Emacs returns a new function object for the given Go function.
+func (l Lambda) Emacs(e Env) (Value, error) {
+	return e.ExportFunc("", l.Fun, l.Arity, l.Doc)
+}
+
+// Option is an option for Export, AutoFunc, AutoLambda, and ERTTest.  Its
+// implementations are Name, Anonymous, Doc, and Usage.
 type Option interface {
 	apply(*exportAuto)
 }
