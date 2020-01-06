@@ -75,7 +75,7 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 	if name == "" {
 		panic("empty function name")
 	}
-	funcs.mustRegister(lazy, function{Lambda{fun, arity, doc}, name})
+	funcs.mustEnqueue(&function{Lambda{fun, arity, doc}, name, 0})
 }
 
 // Export exports a Go function to Emacs.  Unlike the global Export function,
@@ -122,12 +122,11 @@ func (e Env) Export(fun interface{}, opts ...Option) (Value, error) {
 // the new function.  If doc is empty, the function won’t have a documentation
 // string.
 func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error) {
-	f := function{Lambda{fun, arity, doc}, name}
-	i, err := funcs.register(eager, f)
-	if err != nil {
+	f := &function{Lambda{fun, arity, doc}, name, 0}
+	if err := funcs.register(f); err != nil {
 		return Value{}, err
 	}
-	return f.define(e, i)
+	return f.define(e)
 }
 
 // AutoFunc converts an arbitrary Go function to a Func.  When calling the
@@ -370,25 +369,19 @@ func (d exportAuto) call(e Env, args []Value) (Value, error) {
 	return e.Nil()
 }
 
-type functionKind int
-
-const (
-	// Function is defined eagerly, directly after registration.  Don’t
-	// define it (twice) on module loading.
-	eager functionKind = iota
-
-	// Function is defined lazily.  It’s registered, but can only be
-	// defined when the module is being loaded.
-	lazy
-)
-
 type function struct {
 	Lambda
 	name  Name
+	index funcIndex
 }
 
-func (f function) define(e Env, index funcIndex) (Value, error) {
-	v, err := e.makeFunction(f.Arity, f.Doc, uint64(index))
+func (f *function) Define(e Env) error {
+	_, err := f.define(e)
+	return err
+}
+
+func (f *function) define(e Env) (Value, error) {
+	v, err := e.makeFunction(f.Arity, f.Doc, uint64(f.index))
 	if err != nil {
 		return Value{}, err
 	}
@@ -406,68 +399,60 @@ func (f function) define(e Env, index funcIndex) (Value, error) {
 type funcIndex uint64
 
 type funcManager struct {
-	mu       sync.RWMutex
-	initDone bool
-	funcs    map[funcIndex]Func
-	next     funcIndex
-	queue    map[funcIndex]function
-	names    map[Name]struct{}
+	mu    sync.RWMutex
+	base  *Manager
+	funcs map[funcIndex]Func
+	next  funcIndex
 }
 
-func (m *funcManager) register(k functionKind, f function) (funcIndex, error) {
-	if f.name == "" {
-		return m.registerUnnamed(k, f)
-	}
-	return m.registerNamed(k, f)
-}
-
-func (m *funcManager) registerNamed(k functionKind, f function) (funcIndex, error) {
-	if err := f.name.validate(); err != nil {
-		return 0, err
-	}
+func (m *funcManager) enqueue(f *function) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if _, dup := m.names[f.name]; dup {
-		return 0, fmt.Errorf("duplicate definition of %s", f.name)
+	// We split the actions performed under the lock into a preparation
+	// phase (which shouldn’t modify state) and a registration phase (which
+	// shouldn’t fail) to simulate a transaction across this object and the
+	// base Manager.
+	if err := m.prepareLocked(); err != nil {
+		return err
 	}
-	index, err := m.registerLocked(k, f)
-	if err != nil {
-		return 0, err
+	if err := m.base.Enqueue(f.name, f); err != nil {
+		return err
 	}
-	if m.names == nil {
-		m.names = make(map[Name]struct{})
-	}
-	m.names[f.name] = struct{}{}
-	return index, nil
+	m.registerLocked(f)
+	return nil
 }
 
-func (m *funcManager) registerUnnamed(k functionKind, f function) (funcIndex, error) {
+func (m *funcManager) register(f *function) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.registerLocked(k, f)
+	if err := m.prepareLocked(); err != nil {
+		return err
+	}
+	m.registerLocked(f)
+	return nil
 }
 
-func (m *funcManager) registerLocked(k functionKind, f function) (funcIndex, error) {
+func (m *funcManager) prepareLocked() error {
+	if m.next == math.MaxUint64 {
+		// This is very unlikely, but could happen if users create and
+		// leak lots of functions in an unbounded loop.
+		return errors.New("too many functions")
+	}
+	return nil
+}
+
+func (m *funcManager) registerLocked(f *function) {
 	index := m.next
-	if index == math.MaxUint64 {
-		return 0, errors.New("too many functions")
-	}
 	m.next++
 	if m.funcs == nil {
 		m.funcs = make(map[funcIndex]Func)
 	}
-	m.funcs[index] = f.fun
-	if k == lazy {
-		if m.queue == nil {
-			m.queue = make(map[funcIndex]function)
-		}
-		m.queue[index] = f
-	}
-	return index, nil
+	m.funcs[index] = f.Fun
+	f.index = index
 }
 
-func (m *funcManager) mustRegister(k functionKind, f function) {
-	if _, err := m.register(k, f); err != nil {
+func (m *funcManager) mustEnqueue(f *function) {
+	if err := m.enqueue(f); err != nil {
 		panic(err)
 	}
 }
@@ -478,38 +463,12 @@ func (m *funcManager) get(i funcIndex) Func {
 	return m.funcs[i]
 }
 
-func (m *funcManager) defineQueued(e Env) error {
-	for i, f := range m.drainQueue() {
-		if _, err := f.define(e, i); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (m *funcManager) delete(i funcIndex) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	delete(m.funcs, i)
 }
 
-func (m *funcManager) drainQueue() map[funcIndex]function {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.initDone {
-		panic("queued functions are already defined")
-	}
-	r := make(map[funcIndex]function, len(m.queue))
-	for i, f := range m.queue {
-		r[i] = f
-	}
-	m.queue = nil
-	m.initDone = true
-	return r
-}
+var funcs = funcManager{base: NewManager(RequireUniqueName | DefineOnInit)}
 
-var funcs funcManager
 
-func init() {
-	OnInit(funcs.defineQueued)
-}
