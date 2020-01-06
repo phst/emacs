@@ -46,7 +46,7 @@ func reflectRoundtrip(e Env) error {
 		}
 		return equal
 	}
-	return quick.Check(f, &quick.Config{MaxCountScale: 10})
+	return quick.Check(f, nil)
 }
 
 func reflectValue(e Env) error {
