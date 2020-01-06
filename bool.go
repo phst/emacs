@@ -65,7 +65,7 @@ func (e Env) IsNil(v Value) bool {
 
 // Support for reflected bool values.
 
-func boolIn(v reflect.Value) In   { return Bool(reflect.Value(v).Bool()) }
+func boolIn(v reflect.Value) In   { return Bool(v.Bool()) }
 func boolOut(v reflect.Value) Out { return reflectBool(v) }
 
 type reflectBool reflect.Value
