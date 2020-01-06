@@ -75,7 +75,7 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 	if name == "" {
 		panic("empty function name")
 	}
-	funcs.mustRegister(lazy, function{name, fun, arity, doc})
+	funcs.mustRegister(lazy, function{Lambda{fun, arity, doc}, name})
 }
 
 // Export exports a Go function to Emacs.  Unlike the global Export function,
@@ -122,7 +122,7 @@ func (e Env) Export(fun interface{}, opts ...Option) (Value, error) {
 // the new function.  If doc is empty, the function won’t have a documentation
 // string.
 func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error) {
-	f := function{name, fun, arity, doc}
+	f := function{Lambda{fun, arity, doc}, name}
 	i, err := funcs.register(eager, f)
 	if err != nil {
 		return Value{}, err
@@ -383,14 +383,12 @@ const (
 )
 
 type function struct {
+	Lambda
 	name  Name
-	fun   Func
-	arity Arity
-	doc   Doc
 }
 
 func (f function) define(e Env, index funcIndex) (Value, error) {
-	v, err := e.makeFunction(f.arity, f.doc, uint64(index))
+	v, err := e.makeFunction(f.Arity, f.Doc, uint64(index))
 	if err != nil {
 		return Value{}, err
 	}
