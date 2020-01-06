@@ -24,6 +24,7 @@ func init() {
 	emacs.ExampleVar()
 	emacs.ExampleError()
 	emacs.ExampleERTTest()
+	emacs.ExampleManager()
 }
 
 func main() {
