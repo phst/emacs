@@ -102,8 +102,10 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 //
 // By default, Export derives the function’s name from its Go name by
 // Lisp-casing it.  For example, MyFunc becomes my-func.  To specify a
-// different name, pass a Name option.  If there’s no name or the name is
-// already registered, Export panics.
+// different name, pass a Name option.  To make the function anonymous, pass an
+// Anonymous option.  If there’s no name and the function isn’t anonymous,
+// AutoFunc panics.  If the name of a non-anonymous function is already
+// registered, Export panics.
 //
 // By default, the function has no documentation string.  To add one, pass a
 // Doc option.
@@ -148,7 +150,9 @@ func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error
 //
 // By default, Export derives the function’s name from its Go name by
 // Lisp-casing it.  For example, MyFunc becomes my-func.  To specify a
-// different name, pass a Name option.  If there’s no name, AutoFunc panics.
+// different name, pass a Name option.  To make the function anonymous, pass an
+// Anonymous option.  If there’s no name and the function isn’t anonymous,
+// AutoFunc panics.
 //
 // By default, the function has no documentation string.  To add one, pass a
 // Doc option.
@@ -163,17 +167,22 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 	for _, opt := range opts {
 		opt.apply(&d)
 	}
-	if d.name == "" {
+	anon := d.flag&exportAnonymous != 0
+	if !anon && d.name == "" {
 		d.name = lispName(v)
+	}
+	if anon && d.name != "" {
+		panic(fmt.Errorf("function %s declared as anonymous, but has a name", d.name))
 	}
 	t := v.Type()
 	numIn := t.NumIn()
-	d.hasEnv = numIn > 0 && t.In(0) == envType
+	hasEnv := numIn > 0 && t.In(0) == envType
 	offset := 0
-	if d.hasEnv {
+	if hasEnv {
 		offset = 1
 	}
 	var arity Arity
+	var hasErr bool
 	if t.IsVariadic() {
 		numIn--
 		arity.Min = numIn - offset
@@ -198,16 +207,19 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 	switch t.NumOut() {
 	case 0:
 	case 1:
-		d.hasErr = t.Out(0) == errorType
-		hasRet = !d.hasErr
+		hasErr = t.Out(0) == errorType
+		hasRet = !hasErr
 	case 2:
 		if t.Out(1) != errorType {
 			panic(fmt.Errorf("function %s: second result must be error, but is %s", d.name, t.Out(1)))
 		}
-		d.hasErr = true
+		hasErr = true
 		hasRet = true
 	default:
 		panic(fmt.Errorf("function %s: too many results", d.name))
+	}
+	if hasEnv {
+		d.flag |= exportHasEnv
 	}
 	if hasRet {
 		conv, err := InFuncFor(t.Out(0))
@@ -216,28 +228,45 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 		}
 		d.outConv = conv
 	}
+	if hasErr {
+		d.flag |= exportHasErr
+	}
 	return d.name, d.call, arity, d.doc
 }
 
-// Option is an option for Export and ERTTest.  Its implementations are Name,
-// Doc, and Usage.
+// Option is an option for Export, AutoFunc, and ERTTest.  Its implementations
+// are Name, Anonymous, Doc, and Usage.
 type Option interface {
 	apply(*exportAuto)
 }
 
-func (n Name) apply(o *exportAuto)  { o.name = n }
-func (d Doc) apply(o *exportAuto)   { o.doc = d }
-func (u Usage) apply(o *exportAuto) { o.doc = o.doc.WithUsage(u) }
+// Anonymous is an Option that tells AutoFunc and friends that the new function
+// should be anonymous.  Anonymous is mutually exclusive with Name; if both are
+// given, AutoFunc panics.
+type Anonymous struct{}
+
+func (Anonymous) apply(o *exportAuto) { o.flag |= exportAnonymous }
+func (n Name) apply(o *exportAuto)    { o.name = n }
+func (d Doc) apply(o *exportAuto)     { o.doc = d }
+func (u Usage) apply(o *exportAuto)   { o.doc = o.doc.WithUsage(u) }
 
 type exportAuto struct {
-	fun            reflect.Value
-	name           Name
-	doc            Doc
-	hasEnv, hasErr bool
-	inConv         []OutFunc
-	varConv        OutFunc
-	outConv        InFunc
+	fun     reflect.Value
+	flag    exportFlag
+	name    Name
+	doc     Doc
+	inConv  []OutFunc
+	varConv OutFunc
+	outConv InFunc
 }
+
+type exportFlag uint
+
+const (
+	exportAnonymous exportFlag = 1 << iota
+	exportHasEnv
+	exportHasErr
+)
 
 func lispName(fun reflect.Value) Name {
 	name := runtime.FuncForPC(fun.Pointer()).Name()
@@ -267,7 +296,7 @@ func (d exportAuto) call(e Env, args []Value) (Value, error) {
 	t := d.fun.Type()
 	in := make([]reflect.Value, t.NumIn())
 	offset := 0
-	if d.hasEnv {
+	if d.flag&exportHasEnv != 0 {
 		offset = 1
 		in[0] = reflect.ValueOf(e)
 	}
@@ -287,7 +316,7 @@ func (d exportAuto) call(e Env, args []Value) (Value, error) {
 		in[j] = r
 	}
 	out := d.fun.Call(in)
-	if d.hasErr {
+	if d.flag&exportHasErr != 0 {
 		if err, ok := out[len(out)-1].Interface().(error); ok && err != nil {
 			return Value{}, err
 		}
