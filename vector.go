@@ -17,7 +17,10 @@ package emacs
 // #include "wrappers.h"
 import "C"
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 // Vector represents an Emacs vector.
 type Vector []In
@@ -174,7 +177,10 @@ func (g getVector) FromEmacs(e Env, v Value) error {
 	if err != nil {
 		return err
 	}
-	s := reflect.MakeSlice(g.Type(), n, n)
+	s, err := makeGoVector(g.Type(), n)
+	if err != nil {
+		return err
+	}
 	for i := 0; i < n; i++ {
 		if err := e.VecGetOut(v, i, g.elem(s.Index(i))); err != nil {
 			return err
@@ -182,4 +188,18 @@ func (g getVector) FromEmacs(e Env, v Value) error {
 	}
 	g.Set(s)
 	return nil
+}
+
+func makeGoVector(t reflect.Type, n int) (reflect.Value, error) {
+	switch t.Kind() {
+	case reflect.Array:
+		if t.Len() != n {
+			return reflect.Value{}, fmt.Errorf("incompatible types: Go array has %d elements, but Emacs vector has %d elements", t.Len(), n)
+		}
+		return reflect.New(t).Elem(), nil
+	case reflect.Slice:
+		return reflect.MakeSlice(t, n, n), nil
+	default:
+		panic(fmt.Errorf("unexpected vector type %s", t))
+	}
 }

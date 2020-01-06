@@ -169,7 +169,19 @@ func (r reflectString) FromEmacs(e Env, v Value) error {
 	return nil
 }
 
-func bytesIn(v reflect.Value) In   { return Bytes(reflect.Value(v).Bytes()) }
+func bytesIn(v reflect.Value) In {
+	switch v.Kind() {
+	case reflect.Array:
+		r := make(Bytes, v.Len())
+		reflect.Copy(reflect.ValueOf(r), v)
+		return r
+	case reflect.Slice:
+		return Bytes(v.Bytes())
+	default:
+		panic(fmt.Errorf("unexpected bytes type %s", v.Type()))
+	}
+}
+
 func bytesOut(v reflect.Value) Out { return reflectBytes(v) }
 
 type reflectBytes reflect.Value
@@ -179,6 +191,17 @@ func (r reflectBytes) FromEmacs(e Env, v Value) error {
 	if err != nil {
 		return err
 	}
-	reflect.Value(r).SetBytes(b)
+	switch v := reflect.Value(r); v.Kind() {
+	case reflect.Array:
+		n := len(b)
+		if n != v.Len() {
+			return fmt.Errorf("incompatible array length: Go array has length %d, but Emacs string has length %d", v.Len(), n)
+		}
+		reflect.Copy(v, reflect.ValueOf(b))
+	case reflect.Slice:
+		v.SetBytes(b)
+	default:
+		panic(fmt.Errorf("unexpected bytes type %s", v.Type()))
+	}
 	return nil
 }
