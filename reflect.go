@@ -47,9 +47,6 @@ func (r Reflect) FromEmacs(e Env, v Value) error {
 	if !s.IsValid() {
 		return WrongTypeArgument("go-valid-reflect-p", String(s.String()))
 	}
-	if s.Kind() == reflect.Interface {
-		s = s.Elem()
-	}
 	conv, err := OutFuncFor(s.Type())
 	if err != nil {
 		return err
