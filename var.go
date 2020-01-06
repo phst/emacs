@@ -14,17 +14,12 @@
 
 package emacs
 
-import (
-	"fmt"
-	"sync"
-)
-
 // Var arranges for an Emacs dynamic variable to be defined once the module is
 // loaded.  If doc is empty, the variable won’t have a documentation string.
 // Var panics if the name is empty or already registered.  Var returns name so
 // you can assign it directly to a Go variable if you want.
 func Var(name Name, init In, doc Doc) Name {
-	vars.mustRegister(variable{name, init, doc})
+	vars.MustEnqueue(name, variable{name, init, doc})
 	return name
 }
 
@@ -33,10 +28,7 @@ func Var(name Name, init In, doc Doc) Name {
 // panicking.
 func (e Env) Var(name Name, init In, doc Doc) error {
 	v := variable{name, init, doc}
-	if err := vars.register(v); err != nil {
-		return err
-	}
-	return v.define(e)
+	return vars.RegisterAndDefine(e, name, v)
 }
 
 // Defvar calls the Emacs special form defvar.
@@ -52,58 +44,8 @@ type variable struct {
 	doc  Doc
 }
 
-func (v variable) define(e Env) error {
+func (v variable) Define(e Env) error {
 	return e.Defvar(v.name, v.init, v.doc)
 }
 
-type varManager struct {
-	mu    sync.Mutex
-	vars  []variable
-	names map[Name]struct{}
-}
-
-func (m *varManager) register(v variable) error {
-	if err := v.name.validate(); err != nil {
-		return err
-	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if _, dup := m.names[v.name]; dup {
-		return fmt.Errorf("duplicate variable name %s", v.name)
-	}
-	m.vars = append(m.vars, v)
-	if m.names == nil {
-		m.names = make(map[Name]struct{})
-	}
-	m.names[v.name] = struct{}{}
-	return nil
-}
-
-func (m *varManager) mustRegister(v variable) {
-	if err := m.register(v); err != nil {
-		panic(err)
-	}
-}
-
-func (m *varManager) define(e Env) error {
-	for _, v := range m.copy() {
-		if err := v.define(e); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (m *varManager) copy() []variable {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	r := make([]variable, len(m.vars))
-	copy(r, m.vars)
-	return r
-}
-
-var vars varManager
-
-func init() {
-	OnInit(vars.define)
-}
+var vars = NewManager(RequireName | RequireUniqueName | DefineOnInit)

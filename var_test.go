@@ -20,7 +20,7 @@ func ExampleVar() {
 	// Var panics when trying to export a variable name twice.
 	defer func() { fmt.Println("panic:", recover()) }()
 	Var("go-var", nil, "")
-	// Output: panic: duplicate variable name go-var
+	// Output: panic: duplicate name go-var
 }
 
 var _ = Var("go-var", String("hi"), "Example variable.")
