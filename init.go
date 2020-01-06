@@ -18,10 +18,7 @@ package emacs
 // #include "wrappers.h"
 import "C"
 
-import (
-	"runtime"
-	"sync"
-)
+import "runtime"
 
 // InitFunc is an initializer function that should be run during module
 // initialization.  Use OnInit to register InitFunc functions.  If an
@@ -39,38 +36,15 @@ func OnInit(i InitFunc) {
 	if i == nil {
 		panic("nil initializer")
 	}
-	inits.register(i)
+	inits.MustEnqueue("", initFunc(i))
 }
 
-type initManager struct {
-	mu    sync.Mutex
-	inits []InitFunc
-}
+var inits Manager
 
-var inits initManager
+type initFunc InitFunc
 
-func (m *initManager) register(i InitFunc) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.inits = append(m.inits, i)
-}
-
-func (m *initManager) run(e Env) error {
-	inits := m.copy()
-	for _, i := range inits {
-		if err := i(e); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (m *initManager) copy() []InitFunc {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	r := make([]InitFunc, len(m.inits))
-	copy(r, m.inits)
-	return r
+func (i initFunc) Define(e Env) error {
+	return i(e)
 }
 
 //export go_emacs_init
@@ -89,7 +63,7 @@ func go_emacs_init(env *C.emacs_env) (r C.struct_init_result) {
 	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.  Note that this
 	// needs to happen after initializing the major version.
 	defer gc.inhibit(e).restore(e)
-	err := inits.run(e)
+	err := inits.DefineQueued(e)
 	return C.struct_init_result{e.signal(err)}
 }
 
