@@ -94,7 +94,7 @@ type HashOut struct {
 // hash test eq may contain two keys that are equal when converted to Go
 // strings.  In such a case, FromEmacs returns an error.
 func (h *HashOut) FromEmacs(e Env, v Value) error {
-	pairs, err := e.Call("map-pairs", v)
+	pairs, err := e.mapPairs(v)
 	if err != nil {
 		return err
 	}
@@ -154,6 +154,15 @@ func (e Env) Puthash(key, value In, table Value) error {
 	return err
 }
 
+func (e Env) mapPairs(v Value) (Value, error) {
+	// map-pairs isn’t preloaded or autoloaded, so we have to
+	// (require 'map) explicitly.
+	if _, err := e.Call("require", Symbol("map")); err != nil {
+		return Value{}, err
+	}
+	return e.Call("map-pairs", v)
+}
+
 type hashIn struct {
 	test       HashTest
 	key, value InFunc
@@ -194,7 +203,7 @@ type getHash struct {
 }
 
 func (g getHash) FromEmacs(e Env, v Value) error {
-	pairs, err := e.Call("map-pairs", v)
+	pairs, err := e.mapPairs(v)
 	if err != nil {
 		return err
 	}
