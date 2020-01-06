@@ -21,7 +21,6 @@ import "C"
 import (
 	"fmt"
 	"strings"
-	"sync"
 )
 
 // Error is an error that causes to signal an error with the given symbol and
@@ -61,7 +60,10 @@ type ErrorSymbol struct {
 // module.  DefineError panics if name or message is empty, or if name is
 // duplicate.
 func DefineError(name Name, message string, parents ...ErrorSymbol) ErrorSymbol {
-	errorSymbols.mustRegister(errorSymbol{name, message, parents})
+	if message == "" {
+		panic(fmt.Errorf("empty error message for error symbol %s", name))
+	}
+	errorSymbols.MustEnqueue(name, errorSymbol{name, message, parents})
 	return ErrorSymbol{name, message}
 }
 
@@ -69,11 +71,11 @@ func DefineError(name Name, message string, parents ...ErrorSymbol) ErrorSymbol 
 // a live environment, defines the error symbol immediately, and returns errors
 // instead of panicking.
 func (e Env) DefineError(name Name, message string, parents ...ErrorSymbol) (ErrorSymbol, error) {
-	s := errorSymbol{name, message, parents}
-	if err := errorSymbols.register(s); err != nil {
-		return ErrorSymbol{}, err
+	if message == "" {
+		return ErrorSymbol{}, fmt.Errorf("empty error message for error symbol %s", name)
 	}
-	if err := s.define(e); err != nil {
+	s := errorSymbol{name, message, parents}
+	if err := errorSymbols.RegisterAndDefine(e, name, s); err != nil {
 		return ErrorSymbol{}, err
 	}
 	return ErrorSymbol{name, message}, nil
@@ -264,7 +266,7 @@ type errorSymbol struct {
 	parents []ErrorSymbol
 }
 
-func (s errorSymbol) define(e Env) error {
+func (s errorSymbol) Define(e Env) error {
 	parents := make(List, len(s.parents))
 	for i, p := range s.parents {
 		parents[i] = p
@@ -273,57 +275,4 @@ func (s errorSymbol) define(e Env) error {
 	return err
 }
 
-type errorManager struct {
-	mu    sync.Mutex
-	syms  []errorSymbol
-	names map[Name]struct{}
-}
-
-func (m *errorManager) register(s errorSymbol) error {
-	if err := s.name.validate(); err != nil {
-		return err
-	}
-	if s.message == "" {
-		return fmt.Errorf("empty error message for error symbol %s", s.name)
-	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if _, dup := m.names[s.name]; dup {
-		return fmt.Errorf("duplicate error symbol %s", s.name)
-	}
-	m.syms = append(m.syms, s)
-	if m.names == nil {
-		m.names = make(map[Name]struct{})
-	}
-	m.names[s.name] = struct{}{}
-	return nil
-}
-
-func (m *errorManager) mustRegister(s errorSymbol) {
-	if err := m.register(s); err != nil {
-		panic(err)
-	}
-}
-
-func (m *errorManager) define(e Env) error {
-	for _, s := range m.copy() {
-		if err := s.define(e); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (m *errorManager) copy() []errorSymbol {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	r := make([]errorSymbol, len(m.syms))
-	copy(r, m.syms)
-	return r
-}
-
-var errorSymbols errorManager
-
-func init() {
-	OnInit(errorSymbols.define)
-}
+var errorSymbols = NewManager(RequireName | RequireUniqueName | DefineOnInit)
