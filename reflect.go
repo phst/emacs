@@ -32,7 +32,11 @@ func (r Reflect) Emacs(e Env) (Value, error) {
 		return Value{}, WrongTypeArgument("go-valid-reflect-p", String(fmt.Sprintf("%#v", v)))
 	}
 	if v.Kind() == reflect.Interface {
-		v = v.Elem()
+		u := v.Elem()
+		if !u.IsValid() {
+			return Value{}, WrongTypeArgument("go-not-nil-p", String(fmt.Sprintf("%#v", v)))
+		}
+		v = u
 	}
 	fun, err := InFuncFor(v.Type())
 	if err != nil {
