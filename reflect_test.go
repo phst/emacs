@@ -112,7 +112,7 @@ func randomType(rand *rand.Rand, size int) reflect.Type {
 	kinds := []reflect.Kind{
 		// reflect.Invalid,
 		reflect.Bool,
-		reflect.Int,
+		// reflect.Int,
 		reflect.Int8,
 		reflect.Int16,
 		reflect.Int32,
