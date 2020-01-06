@@ -30,7 +30,7 @@ func (t HashTest) Emacs(e Env) (Value, error) {
 	return Symbol(t).Emacs(e)
 }
 
-// Predefined hashtable tests.
+// Predefined hashtable tests.  To define your own test, use RegisterHashTest.
 const (
 	Eq    HashTest = "eq"
 	Eql   HashTest = "eql"
@@ -39,7 +39,8 @@ const (
 
 // HashTestFor returns a hashtable test that is appropriate for the given type.
 // It returns Eq for integral types, Eql for floating-point types, and Equal
-// otherwise.
+// otherwise.  HashTestFor ignores custom hash tests registered with
+// RegisterHashTest.
 func HashTestFor(t reflect.Type) HashTest {
 	switch t.Kind() {
 	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -49,6 +50,27 @@ func HashTestFor(t reflect.Type) HashTest {
 	default:
 		return Equal
 	}
+}
+
+// RegisterHashTest registers a new custom hash table test.  The name must be a
+// unique nonempty name for the test, and hash must define the hash function
+// and equality predicate.  RegisterHashTest returns name.
+func RegisterHashTest(name HashTest, hash CustomHasher) HashTest {
+	customHashTests.MustEnqueue(Name(name), customHashTest{name, hash})
+	return name
+}
+
+// CustomHasher defines the hashing and equality functions for a custom hash
+// test.  Use RegisterHashTest to register such a custom hash test.  The
+// hashing and equality functions must be compatible, i. e., if Equal(e, a, b)
+// is true, then Hash(e, a) = Hash(e, b) must be fulfilled.
+type CustomHasher interface {
+	// Hash returns a hash code for the given value.
+	Hash(Env, Value) (int64, error)
+
+	// Equal returns whether the given values are considered equal
+	// according to this hash test.
+	Equal(Env, Value, Value) (bool, error)
 }
 
 // Hash represents the data for an Emacs hashtable.
@@ -223,4 +245,18 @@ func (g getHash) FromEmacs(e Env, v Value) error {
 	}
 	g.Set(m)
 	return nil
+}
+
+var customHashTests = NewManager(RequireName | RequireUniqueName | DefineOnInit)
+
+type customHashTest struct {
+	name HashTest
+	hash CustomHasher
+}
+
+func (t customHashTest) Define(e Env) error {
+	test := AutoLambda(t.hash.Equal, Doc("Hash equality function for "+t.name), Usage("a b"))
+	hash := AutoLambda(t.hash.Hash, Doc("Hash function for "+t.name), Usage("o"))
+	_, err := e.Call("define-hash-table-test", t.name, test, hash)
+	return err
 }

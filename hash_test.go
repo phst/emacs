@@ -16,12 +16,16 @@ package emacs
 
 import (
 	"fmt"
+	"hash/fnv"
+	"io"
 	"reflect"
+	"sync/atomic"
 )
 
 func init() {
 	ERTTest(hashRoundtripEmpty)
 	ERTTest(hashRoundtripFloatString)
+	ERTTest(customHasher)
 }
 
 func hashRoundtripEmpty(e Env) error {
@@ -59,4 +63,63 @@ func hashRoundtripFloatString(e Env) error {
 		return fmt.Errorf("got %#v, want %#v", got, want)
 	}
 	return nil
+}
+
+func customHasher(e Env) error {
+	callsBefore := fnvHasher.loadCalls()
+	in := map[In]In{
+		String("hello"): Int(123),
+		String("world"): Int(456),
+	}
+	hash := Hash{fnvHashTest, in}
+	if _, err := hash.Emacs(e); err != nil {
+		return err
+	}
+	callsAfter := fnvHasher.loadCalls()
+	gotCalls := callsAfter - callsBefore
+	wantCalls := uint64(len(in))
+	if gotCalls < wantCalls {
+		return fmt.Errorf("not enough calls to Go hasher (got %d, want at least %d)", gotCalls, wantCalls)
+	}
+	return nil
+}
+
+var (
+	fnvHasher   = new(stringHash)
+	fnvHashTest = RegisterHashTest("go-fnv", fnvHasher)
+)
+
+// stringHash is a CustomHasher that hashes strings using the Fowler–Noll–Vo
+// hash function.  It also records how often it has been called.
+type stringHash struct{ calls uint64 }
+
+func (h *stringHash) Hash(e Env, v Value) (int64, error) {
+	atomic.AddUint64(&h.calls, 1)
+	s, err := e.Str(v)
+	if err != nil {
+		return 0, err
+	}
+	// We use a 32-bit hasher to avoid integer overflows in Emacsen that
+	// don’t support big integers.
+	hash := fnv.New32()
+	if _, err := io.WriteString(hash, s); err != nil {
+		return 0, err
+	}
+	return int64(hash.Sum32()), nil
+}
+
+func (h *stringHash) Equal(e Env, a, b Value) (bool, error) {
+	s, err := e.Str(a)
+	if err != nil {
+		return false, err
+	}
+	t, err := e.Str(b)
+	if err != nil {
+		return false, err
+	}
+	return s == t, nil
+}
+
+func (h *stringHash) loadCalls() uint64 {
+	return atomic.LoadUint64(&h.calls)
 }
