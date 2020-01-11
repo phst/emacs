@@ -149,21 +149,13 @@ func (m makeVector) Emacs(e Env) (Value, error) {
 	if !m.IsValid() {
 		return Value{}, WrongTypeArgument("go-valid-reflect-p", String(m.String()))
 	}
-	init, err := e.Nil()
-	if err != nil {
-		return Value{}, err
-	}
 	n := m.Len()
-	r, err := e.MakeVector(n, init)
+	r, err := e.MakeVector(n, Nil)
 	if err != nil {
 		return Value{}, err
 	}
 	for i := 0; i < n; i++ {
-		o, err := m.elem(m.Index(i)).Emacs(e)
-		if err != nil {
-			return Value{}, err
-		}
-		if err := e.VecSet(r, i, o); err != nil {
+		if err := e.VecSetIn(r, i, m.elem(m.Index(i))); err != nil {
 			return Value{}, err
 		}
 	}
