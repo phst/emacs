@@ -116,6 +116,15 @@ func (e Env) VecSet(v Value, i int, elem Value) error {
 	return e.checkVoid(C.vec_set(e.raw(), v.r, C.int64_t(i), elem.r))
 }
 
+// VecSetIn sets the i-th element of the given Emacs vector.
+func (e Env) VecSetIn(v Value, i int, elem In) error {
+	u, err := elem.Emacs(e)
+	if err != nil {
+		return err
+	}
+	return e.VecSet(v, i, u)
+}
+
 // VecSize returns the size of the given Emacs vector.
 func (e Env) VecSize(v Value) (int, error) {
 	r := C.vec_size(e.raw(), v.r)
