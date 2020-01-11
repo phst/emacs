@@ -136,7 +136,7 @@ func (i *BigInt) FromEmacs(e Env, v Value) error {
 	return e.BigInt(v, (*big.Int)(i))
 }
 
-func intIn(v reflect.Value) In   { return Int(reflect.Value(v).Int()) }
+func intIn(v reflect.Value) In   { return Int(v.Int()) }
 func intOut(v reflect.Value) Out { return reflectInt(v) }
 
 type reflectInt reflect.Value
@@ -154,7 +154,7 @@ func (r reflectInt) FromEmacs(e Env, v Value) error {
 	return nil
 }
 
-func uintIn(v reflect.Value) In   { return Uint(reflect.Value(v).Uint()) }
+func uintIn(v reflect.Value) In   { return Uint(v.Uint()) }
 func uintOut(v reflect.Value) Out { return reflectUint(v) }
 
 type reflectUint reflect.Value

@@ -49,7 +49,7 @@ func (e Env) Float(v Value) (float64, error) {
 	return float64(r.value), nil
 }
 
-func floatIn(v reflect.Value) In   { return Float(reflect.Value(v).Float()) }
+func floatIn(v reflect.Value) In   { return Float(v.Float()) }
 func floatOut(v reflect.Value) Out { return reflectFloat(v) }
 
 type reflectFloat reflect.Value
