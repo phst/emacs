@@ -91,7 +91,7 @@ func (u *UnpackVector) FromEmacs(e Env, v Value) error {
 
 // MakeVector creates and returns an Emacs vector of size n.  It initializes
 // all elements to init.
-func (e Env) MakeVector(n int, init Value) (Value, error) {
+func (e Env) MakeVector(n int, init In) (Value, error) {
 	return e.Call("make-vector", Int(n), init)
 }
 
