@@ -20,8 +20,6 @@ package emacs
 // }
 import "C"
 
-import "reflect"
-
 // Bool is a type with underlying type bool that knows how to convert itself to
 // and from an Emacs value.
 type Bool bool
@@ -61,16 +59,4 @@ func (e Env) IsNotNil(v Value) bool {
 // IsNil returns true if and only if the given Emacs value is nil.
 func (e Env) IsNil(v Value) bool {
 	return !e.IsNotNil(v)
-}
-
-// Support for reflected bool values.
-
-func boolIn(v reflect.Value) In   { return Bool(v.Bool()) }
-func boolOut(v reflect.Value) Out { return reflectBool(v) }
-
-type reflectBool reflect.Value
-
-func (r reflectBool) FromEmacs(e Env, v Value) error {
-	reflect.Value(r).SetBool(e.IsNotNil(v))
-	return nil
 }

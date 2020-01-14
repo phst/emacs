@@ -78,7 +78,7 @@ func Import(name Name, fp interface{}) {
 	}
 	if numOut == 2 {
 		r.retType = t.Out(0)
-		conv, err := OutFuncFor(t.Out(0))
+		conv, err := OutFuncFor(reflect.PtrTo(t.Out(0)))
 		if err != nil {
 			panic(fmt.Errorf("can’t import %s; don’t know how to convert result: %s", name, err))
 		}
@@ -128,8 +128,8 @@ func (i importAuto) call(in []reflect.Value) (out []reflect.Value) {
 	if i.retType == nil {
 		ret = Ignore{}
 	} else {
-		o := reflect.New(i.retType).Elem()
-		out = append(out, o)
+		o := reflect.New(i.retType)
+		out = append(out, o.Elem())
 		ret = i.outConv(o)
 	}
 	err := e.CallOut(i.name, ret, args...)

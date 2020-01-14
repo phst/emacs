@@ -229,21 +229,22 @@ func (g getHash) FromEmacs(e Env, v Value) error {
 	if err != nil {
 		return err
 	}
-	t := g.Type()
+	u := g.Elem()
+	t := u.Type()
 	m := reflect.MakeMap(t)
 	f := func(elem Value) error {
-		key := reflect.New(t.Key()).Elem()
-		val := reflect.New(t.Elem()).Elem()
+		key := reflect.New(t.Key())
+		val := reflect.New(t.Elem())
 		if err := e.UnconsOut(elem, g.key(key), g.value(val)); err != nil {
 			return err
 		}
-		m.SetMapIndex(key, val)
+		m.SetMapIndex(key.Elem(), val.Elem())
 		return nil
 	}
 	if err := e.Dolist(pairs, f); err != nil {
 		return err
 	}
-	g.Set(m)
+	u.Set(m)
 	return nil
 }
 

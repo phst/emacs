@@ -196,7 +196,7 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 		arity.Max = arity.Min
 	}
 	for i := offset; i < numIn; i++ {
-		conv, err := OutFuncFor(t.In(i))
+		conv, err := OutFuncFor(reflect.PtrTo(t.In(i)))
 		if err != nil {
 			panic(fmt.Errorf("function %s: don’t know how to convert argument %d: %s", d.name, i, err))
 		}
@@ -351,11 +351,11 @@ func (d exportAuto) call(e Env, args []Value) (Value, error) {
 		} else {
 			conv = d.varConv
 		}
-		r := reflect.New(t.In(j)).Elem()
+		r := reflect.New(t.In(j))
 		if err := conv(r).FromEmacs(e, a); err != nil {
 			return Value{}, err
 		}
-		in[j] = r
+		in[j] = r.Elem()
 	}
 	out := d.fun.Call(in)
 	if d.flag&exportHasErr != 0 {

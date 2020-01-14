@@ -17,7 +17,6 @@ package emacs
 import (
 	"fmt"
 	"math"
-	"reflect"
 	"time"
 )
 
@@ -123,9 +122,3 @@ func (e Env) extractTime(v Value) (s int64, ns int, err error) {
 	r := C.extract_time(e.raw(), v.r)
 	return int64(r.value.tv_sec), int(r.value.tv_nsec), e.check(r.base)
 }
-
-func timeIn(v reflect.Value) In   { return Time(v.Interface().(time.Time)) }
-func timeOut(v reflect.Value) Out { return (*Time)(v.Interface().(*time.Time)) }
-
-func durationIn(v reflect.Value) In   { return Duration(v.Interface().(time.Duration)) }
-func durationOut(v reflect.Value) Out { return (*Duration)(v.Interface().(*time.Duration)) }

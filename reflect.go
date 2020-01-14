@@ -73,16 +73,16 @@ func InFuncFor(t reflect.Type) (InFunc, error) {
 	if t.Implements(inType) {
 		return castToIn, nil
 	}
-	if in := specialTypes[t].in; in != nil {
-		return in, nil
+	if u := valueTypes[t]; u != nil {
+		return func(v reflect.Value) In { return castToIn(v.Convert(u)) }, nil
 	}
-	if in := valueTypes[t].in; in != nil {
-		return in, nil
+	if u := pointerTypes[t]; u != nil {
+		return func(v reflect.Value) In { return castToIn(v.Convert(u)) }, nil
 	}
 	switch t.Kind() {
 	case reflect.Array, reflect.Slice:
 		if t.Elem().Kind() == reflect.Uint8 {
-			return bytesIn, nil
+			return byteArrayIn, nil
 		}
 		elem, err := InFuncFor(t.Elem())
 		if err != nil {
@@ -99,16 +99,12 @@ func InFuncFor(t reflect.Type) (InFunc, error) {
 			return nil, err
 		}
 		return hashIn{HashTestFor(t.Key()), key, value}.call, nil
-	case reflect.Bool:
-		return boolIn, nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return intIn, nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return uintIn, nil
 	case reflect.Float32, reflect.Float64:
 		return floatIn, nil
-	case reflect.String:
-		return stringIn, nil
 	default:
 		return nil, WrongTypeArgument("go-known-type-p", String(t.String()))
 	}
@@ -120,39 +116,45 @@ func OutFuncFor(t reflect.Type) (OutFunc, error) {
 	if t.Implements(outType) {
 		return castToOut, nil
 	}
-	if out := specialTypes[t].out; out != nil {
-		return out, nil
+	if u := pointerTypes[t]; u != nil {
+		return func(v reflect.Value) Out { return castToOut(v.Convert(u)) }, nil
+	}
+	if t.Kind() != reflect.Ptr {
+		return nil, WrongTypeArgument("go-pointer-type-p", String(t.String()))
+	}
+	t = t.Elem()
+	if u := valueTypes[t]; u != nil {
+		f := func(v reflect.Value) Out {
+			return castToOut(v.Convert(reflect.PtrTo(u)))
+		}
+		return f, nil
 	}
 	switch t.Kind() {
 	case reflect.Array, reflect.Slice:
 		if t.Elem().Kind() == reflect.Uint8 {
-			return bytesOut, nil
+			return byteArrayOut, nil
 		}
-		elem, err := OutFuncFor(t.Elem())
+		elem, err := OutFuncFor(reflect.PtrTo(t.Elem()))
 		if err != nil {
 			return nil, err
 		}
 		return vectorOut{elem}.call, nil
 	case reflect.Map:
-		key, err := OutFuncFor(t.Key())
+		key, err := OutFuncFor(reflect.PtrTo(t.Key()))
 		if err != nil {
 			return nil, err
 		}
-		value, err := OutFuncFor(t.Elem())
+		value, err := OutFuncFor(reflect.PtrTo(t.Elem()))
 		if err != nil {
 			return nil, err
 		}
 		return hashOut{key, value}.call, nil
-	case reflect.Bool:
-		return boolOut, nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return intOut, nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return uintOut, nil
 	case reflect.Float32, reflect.Float64:
 		return floatOut, nil
-	case reflect.String:
-		return stringOut, nil
 	default:
 		return nil, WrongTypeArgument("go-known-type-p", String(t.String()))
 	}
@@ -168,16 +170,21 @@ var (
 	outType = reflect.TypeOf((*Out)(nil)).Elem()
 )
 
-var valueTypes = map[reflect.Type]inOutFuncs{
-	reflect.TypeOf(time.Time{}): {timeIn, timeOut},
-	reflect.TypeOf(time.Second): {durationIn, durationOut},
-}
-var specialTypes = map[reflect.Type]inOutFuncs{
-	reflect.TypeOf(Value{}):                    {valueIn, valueOut},
-	reflect.TypeOf((*interface{})(nil)).Elem(): {dynamicIn, nil},
-	reflect.TypeOf(big.Int{}):                  {bigIntIn, bigIntOut},
+// Map basic types to aliases that support Emacs.  Each value has to be a
+// defined type with the corresponding key as underlying type.  The value types
+// have to implement In, and pointers to them have to implement Out.
+var valueTypes = map[reflect.Type]reflect.Type{
+	reflect.TypeOf(bool(false)):      reflect.TypeOf(Bool(false)),
+	reflect.TypeOf(""):               reflect.TypeOf(String("")),
+	reflect.TypeOf(([]byte)(nil)):    reflect.TypeOf(Bytes(nil)),
+	reflect.TypeOf(time.Time{}):      reflect.TypeOf(Time{}),
+	reflect.TypeOf(time.Duration(0)): reflect.TypeOf(Duration(0)),
 }
 
-func dynamicIn(v reflect.Value) In {
-	return Reflect(v)
+// Map basic types to aliases that support Emacs.  Each value type has to be
+// convertible to its corresponding key type.  The value types have to
+// implement both In and Out.  This is a variant of valueTypes for types that
+// are always used as pointers.
+var pointerTypes = map[reflect.Type]reflect.Type{
+	reflect.TypeOf((*big.Int)(nil)): reflect.TypeOf((*BigInt)(nil)),
 }

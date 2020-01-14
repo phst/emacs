@@ -59,6 +59,6 @@ func (r reflectFloat) FromEmacs(e Env, v Value) error {
 	if err != nil {
 		return err
 	}
-	reflect.Value(r).SetFloat(f)
+	reflect.Value(r).Elem().SetFloat(f)
 	return nil
 }

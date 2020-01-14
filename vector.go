@@ -174,20 +174,21 @@ type getVector struct {
 }
 
 func (g getVector) FromEmacs(e Env, v Value) error {
+	u := g.Elem()
 	n, err := e.VecSize(v)
 	if err != nil {
 		return err
 	}
-	s, err := makeGoVector(g.Type(), n)
+	s, err := makeGoVector(u.Type(), n)
 	if err != nil {
 		return err
 	}
 	for i := 0; i < n; i++ {
-		if err := e.VecGetOut(v, i, g.elem(s.Index(i))); err != nil {
+		if err := e.VecGetOut(v, i, g.elem(s.Index(i).Addr())); err != nil {
 			return err
 		}
 	}
-	g.Set(s)
+	u.Set(s)
 	return nil
 }
 

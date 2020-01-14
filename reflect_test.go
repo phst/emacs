@@ -17,9 +17,12 @@ package emacs
 import (
 	"fmt"
 	"log"
+	"math/big"
 	"math/rand"
 	"reflect"
+	"testing"
 	"testing/quick"
+	"time"
 )
 
 func init() {
@@ -35,14 +38,16 @@ func reflectRoundtrip(e Env) error {
 			log.Printf("couldn’t convert reflected value %#v to Emacs: %s", reflect.Value(a), e.Message(err))
 			return false
 		}
-		b := Reflect(reflect.New(reflect.Value(a).Type()).Elem())
-		if err := b.FromEmacs(e, v); err != nil {
+		want := reflect.Value(a)
+		p := Reflect(reflect.New(want.Type()))
+		if err := p.FromEmacs(e, v); err != nil {
 			log.Printf("couldn’t convert reflected value from Emacs: %s", e.Message(err))
 			return false
 		}
-		equal := reflect.DeepEqual(reflect.Value(a).Interface(), reflect.Value(b).Interface())
+		got := reflect.Value(p).Elem()
+		equal := reflect.DeepEqual(got.Interface(), want.Interface())
 		if !equal {
-			log.Printf("reflected value roundtrip: got %#v, want %#v", reflect.Value(b), reflect.Value(a))
+			log.Printf("reflected value roundtrip: got %#v, want %#v", got, want)
 		}
 		return equal
 	}
@@ -188,5 +193,77 @@ func randomType(rand *rand.Rand, size int) reflect.Type {
 		return reflect.TypeOf("")
 	default:
 		panic("this can’t happen")
+	}
+}
+
+func TestInOutFunc(t *testing.T) {
+	type want uint
+	const (
+		inErr want = 1 << iota
+		outErr
+	)
+	var temp interface{} = 1
+	for _, tc := range []struct {
+		val interface{}
+		want
+	}{
+		{Value{}, 0},
+		{false, 0},
+		{true, 0},
+		{int(1), 0},
+		{float32(1), 0},
+		{"hi", 0},
+		{time.Unix(1, 0), 0},
+		{time.Second, 0},
+		{[0]int{}, 0},
+		{[1]int{1}, 0},
+		{[]int{}, 0},
+		{[]int{1}, 0},
+		{map[string]float64{}, 0},
+		{map[string]float64{"hi": 1}, 0},
+		{big.Int{}, inErr},
+		{big.NewInt(1), outErr},
+		{temp, 0},
+		{func() {}, inErr | outErr},
+		{struct{ F int }{1}, inErr | outErr},
+	} {
+		t.Run(fmt.Sprintf("%#v", tc.val), func(t *testing.T) {
+			inVal := reflect.ValueOf(tc.val)
+			inType := inVal.Type()
+			t.Run(fmt.Sprintf("InFuncFor(%s)", inType), func(t *testing.T) {
+				inFunc, err := InFuncFor(inType)
+				gotErr := err != nil
+				wantErr := tc.want&inErr != 0
+				switch {
+				case gotErr && !wantErr:
+					t.Fatalf("got error %s", err)
+				case !gotErr && wantErr:
+					t.Fatalf("got %#v, want error", inFunc)
+				case gotErr && wantErr:
+					return
+				}
+				if inFunc(inVal) == nil {
+					t.Error("got nil")
+				}
+			})
+			outVal := reflect.New(inType)
+			outType := outVal.Type()
+			t.Run(fmt.Sprintf("OutFuncFor(%s)", outType), func(t *testing.T) {
+				outFunc, err := OutFuncFor(outType)
+				gotErr := err != nil
+				wantErr := tc.want&outErr != 0
+				switch {
+				case gotErr && !wantErr:
+					t.Fatalf("got error %s", err)
+				case !gotErr && wantErr:
+					t.Fatalf("got %#v, want error", outFunc)
+				case gotErr && wantErr:
+					return
+				}
+				if outFunc(outVal) == nil {
+					t.Error("got nil")
+				}
+			})
+		})
 	}
 }

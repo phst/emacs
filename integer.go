@@ -146,7 +146,7 @@ func (r reflectInt) FromEmacs(e Env, v Value) error {
 	if err != nil {
 		return err
 	}
-	s := reflect.Value(r)
+	s := reflect.Value(r).Elem()
 	if s.OverflowInt(i) {
 		return OverflowError(fmt.Sprint(i))
 	}
@@ -164,13 +164,10 @@ func (r reflectUint) FromEmacs(e Env, v Value) error {
 	if err != nil {
 		return err
 	}
-	s := reflect.Value(r)
+	s := reflect.Value(r).Elem()
 	if s.OverflowUint(i) {
 		return OverflowError(fmt.Sprint(i))
 	}
 	s.SetUint(i)
 	return nil
 }
-
-func bigIntIn(v reflect.Value) In   { return (*BigInt)(v.Interface().(*big.Int)) }
-func bigIntOut(v reflect.Value) Out { return (*BigInt)(v.Interface().(*big.Int)) }
