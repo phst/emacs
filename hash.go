@@ -116,23 +116,22 @@ type HashOut struct {
 // hash test eq may contain two keys that are equal when converted to Go
 // strings.  In such a case, FromEmacs returns an error.
 func (h *HashOut) FromEmacs(e Env, v Value) error {
-	pairs, err := e.mapPairs(v)
-	if err != nil {
-		return err
-	}
 	m := make(map[Out]Out)
-	f := func(elem Value) error {
+	f := func(rawKey, rawVal Value) error {
 		key, val := h.New()
-		if err := e.UnconsOut(elem, key, val); err != nil {
+		if err := key.FromEmacs(e, rawKey); err != nil {
+			return err
+		}
+		if err := val.FromEmacs(e, rawVal); err != nil {
 			return err
 		}
 		if _, dup := m[key]; dup {
-			return duplicateKey.Error(Car{elem}, v)
+			return duplicateKey.Error(rawKey, v)
 		}
 		m[key] = val
 		return nil
 	}
-	if err := e.Dolist(pairs, f); err != nil {
+	if err := e.Maphash(f, v); err != nil {
 		return err
 	}
 	h.Data = m
@@ -176,13 +175,16 @@ func (e Env) Puthash(key, value In, table Value) error {
 	return err
 }
 
-func (e Env) mapPairs(v Value) (Value, error) {
-	// map-pairs isn’t preloaded or autoloaded, so we have to
-	// (require 'map) explicitly.
-	if _, err := e.Call("require", Symbol("map")); err != nil {
-		return Value{}, err
+// Maphash calls fun for each key–value pair in table.  The order is arbitrary.
+// If table is modified during iteration, the results are unpredictable.
+func (e Env) Maphash(fun func(key, val Value) error, table Value) error {
+	fv, delete, err := e.Lambda(fun)
+	if err != nil {
+		return err
 	}
-	return e.Call("map-pairs", v)
+	defer delete()
+	_, err = e.Call("maphash", fv, table)
+	return err
 }
 
 type hashIn struct {
@@ -225,23 +227,22 @@ type getHash struct {
 }
 
 func (g getHash) FromEmacs(e Env, v Value) error {
-	pairs, err := e.mapPairs(v)
-	if err != nil {
-		return err
-	}
 	u := g.Elem()
 	t := u.Type()
 	m := reflect.MakeMap(t)
-	f := func(elem Value) error {
+	f := func(rawKey, rawVal Value) error {
 		key := reflect.New(t.Key())
+		if err := g.key(key).FromEmacs(e, rawKey); err != nil {
+			return err
+		}
 		val := reflect.New(t.Elem())
-		if err := e.UnconsOut(elem, g.key(key), g.value(val)); err != nil {
+		if err := g.value(val).FromEmacs(e, rawVal); err != nil {
 			return err
 		}
 		m.SetMapIndex(key.Elem(), val.Elem())
 		return nil
 	}
-	if err := e.Dolist(pairs, f); err != nil {
+	if err := e.Maphash(f, v); err != nil {
 		return err
 	}
 	u.Set(m)
