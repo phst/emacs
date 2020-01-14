@@ -30,6 +30,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -49,7 +50,12 @@ func (s String) Emacs(e Env) (Value, error) {
 	if !utf8.ValidString(string(s)) {
 		return Value{}, WrongTypeArgument("valid-string-p", String(fmt.Sprintf("%+q", s)))
 	}
-	return e.checkValue(C.make_string(e.raw(), string(s)+"\x00"))
+	if strings.ContainsRune(string(s), '\r') {
+		return e.Let("inhibit-eol-conversion", T, func() (Value, error) {
+			return e.makeString(string(s))
+		})
+	}
+	return e.makeString(string(s))
 }
 
 // FromEmacs sets *s to the string stored in v.  It returns an error if v is
@@ -81,6 +87,10 @@ func (e Env) Str(v Value) (string, error) {
 		return "", WrongTypeArgument("valid-string-p", v)
 	}
 	return s, nil
+}
+
+func (e Env) makeString(s string) (Value, error) {
+	return e.checkValue(C.make_string(e.raw(), s+"\x00"))
 }
 
 // FormatMessage calls the Emacs function format-message with the given format
