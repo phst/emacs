@@ -276,6 +276,60 @@ func (l Lambda) Emacs(e Env) (Value, error) {
 	return e.ExportFunc("", l.Fun, l.Arity, l.Doc)
 }
 
+// Lambda exports the given function to Emacs as an anonymous lambda function.
+// Unlike the global AutoLambda function, Env.Lambda requires a live
+// environment and defines the Emacs function immediately.  When calling the
+// exported function from Emacs, arguments and return values are converted as
+// described in the package documentation and the documentation for the
+// AutoLambda function.
+//
+// When you don’t need the function any more, unregister it by calling the
+// returned DeleteFunc function (typically using defer).  If you don’t call the
+// delete function, the function will remain registered and require a bit of
+// memory.  After calling the delete function, calling the function from Emacs
+// panics.
+//
+// The function is always anonymous.  Any Name option in opts is ignored.
+//
+// By default, the function has no documentation string.  To add one, pass a
+// Doc option.
+//
+// You can call Lambda safely from multiple goroutines.
+func (e Env) Lambda(fun interface{}, opts ...Option) (Value, DeleteFunc, error) {
+	l := AutoLambda(fun, opts...)
+	return e.LambdaFunc(l.Fun, l.Arity, l.Doc)
+}
+
+// LambdaFunc exports the given function to Emacs as an anonymous lambda
+// function.  Unlike the global Lambda function, Env.LambdaFunc requires a live
+// environment and defines the Emacs function immediately.  Unlike Lambda,
+// functions registered by LambdaFunc don’t automatically convert their
+// arguments and return values to and from Emacs.
+//
+// When you don’t need the function any more, unregister it by calling the
+// returned DeleteFunc function (typically using defer).  If you don’t call the
+// delete function, the function will remain registered and require a bit of
+// memory.  After calling the delete function, calling the function from Emacs
+// panics.
+//
+// You can call LambdaFunc safely from multiple goroutines.
+func (e Env) LambdaFunc(fun Func, arity Arity, doc Doc) (Value, DeleteFunc, error) {
+	f := &function{Lambda{fun, arity, doc}, "", 0}
+	if err := funcs.register(f); err != nil {
+		return Value{}, nil, err
+	}
+	v, err := f.define(e)
+	if err != nil {
+		return Value{}, nil, err
+	}
+	return v, func() { funcs.delete(f.index) }, nil
+}
+
+// DeleteFunc is a function returned by Env.Lambda and Env.LambdaFunc.  Call
+// this function to delete the created function.  After deletion the function
+// can’t be called any more from Emacs.
+type DeleteFunc func()
+
 // Option is an option for Export, AutoFunc, AutoLambda, and ERTTest.  Its
 // implementations are Name, Anonymous, Doc, and Usage.
 type Option interface {
@@ -460,7 +514,11 @@ func (m *funcManager) mustEnqueue(f *function) {
 func (m *funcManager) get(i funcIndex) Func {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	return m.funcs[i]
+	fun, ok := m.funcs[i]
+	if !ok {
+		panic(fmt.Errorf("attempt to access deleted function with index %d", i))
+	}
+	return fun
 }
 
 func (m *funcManager) delete(i funcIndex) {
