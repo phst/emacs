@@ -38,6 +38,39 @@ func (e Env) Defvar(name Name, init In, doc Doc) error {
 	return err
 }
 
+// Let locally binds the variable to the value within body.  This is like the
+// Emacs Lisp let special form.  Let returns the value and error returned by
+// body, unless some other error occurs.
+func (e Env) Let(variable Name, value In, body func() (Value, error)) (Value, error) {
+	return e.LetMany([]Binding{{variable, value}}, body)
+}
+
+// LetMany locally binds the given variables value within body.  This is like
+// the Emacs Lisp let special form.  Let returns the value and error returned
+// by body, unless some other error occurs.
+func (e Env) LetMany(bindings []Binding, body func() (Value, error)) (Value, error) {
+	fun, delete, err := e.Lambda(body)
+	if err != nil {
+		return Value{}, err
+	}
+	defer delete()
+	binds := make(List, len(bindings))
+	for i, b := range bindings {
+		binds[i] = List{b.Variable, b.Value}
+	}
+	return e.Call("eval", List{
+		Symbol("let"),
+		binds,
+		List{Symbol("funcall"), fun},
+	}, T)
+}
+
+// Binding describes a variable binding for LetMany.
+type Binding struct {
+	Variable Name
+	Value    In
+}
+
 type variable struct {
 	name Name
 	init In
