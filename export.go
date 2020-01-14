@@ -528,5 +528,3 @@ func (m *funcManager) delete(i funcIndex) {
 }
 
 var funcs = funcManager{base: NewManager(RequireUniqueName | DefineOnInit)}
-
-
