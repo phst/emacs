@@ -202,6 +202,9 @@ type makeHash struct {
 }
 
 func (m makeHash) Emacs(e Env) (Value, error) {
+	if !m.IsValid() {
+		return Value{}, WrongTypeArgument("go-valid-reflect-p", String(m.String()))
+	}
 	r, err := e.MakeHash(m.test, m.Len())
 	if err != nil {
 		return Value{}, err
