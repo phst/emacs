@@ -186,7 +186,7 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 		numIn--
 		arity.Min = numIn - offset
 		arity.Max = -1
-		conv, err := OutFuncFor(t.In(numIn).Elem())
+		conv, err := OutFuncFor(reflect.PtrTo(t.In(numIn).Elem()))
 		if err != nil {
 			panic(fmt.Errorf("function %s: don’t know how to convert variadic type: %s", d.name, err))
 		}
@@ -390,22 +390,27 @@ var (
 
 func (d exportAuto) call(e Env, args []Value) (Value, error) {
 	t := d.fun.Type()
-	in := make([]reflect.Value, t.NumIn())
 	offset := 0
 	if d.flag&exportHasEnv != 0 {
 		offset = 1
+	}
+	in := make([]reflect.Value, len(args)+offset)
+	if offset == 1 {
 		in[0] = reflect.ValueOf(e)
 	}
 	numIn := len(d.inConv)
 	for i, a := range args {
 		j := i + offset
 		var conv OutFunc
+		var u reflect.Type
 		if i < numIn {
 			conv = d.inConv[i]
+			u = t.In(j)
 		} else {
 			conv = d.varConv
+			u = t.In(t.NumIn() - 1).Elem()
 		}
-		r := reflect.New(t.In(j))
+		r := reflect.New(u)
 		if err := conv(r).FromEmacs(e, a); err != nil {
 			return Value{}, err
 		}

@@ -20,7 +20,7 @@ import (
 )
 
 func ExampleExport() {
-	Export(goUppercase, Doc("Return the uppercase version of STRING.").WithUsage("string"))
+	Export(goUppercase, Doc("Concatenate STRINGS and return the uppercase version of the result.").WithUsage("strings"))
 
 	// Export panics when encountering an invalid type.
 	defer func() { fmt.Println("panic:", recover()) }()
@@ -32,8 +32,8 @@ func ExampleExport() {
 // Once Emacs has successfully loaded the module, Emacs Lisp code can call
 // exampleFunc under the name go-uppercase.  For example, (go-uppercase "hi")
 // will return "HI".
-func goUppercase(s string) string {
-	return strings.ToUpper(s)
+func goUppercase(s ...string) string {
+	return strings.ToUpper(strings.Join(s, " "))
 }
 
 func init() {

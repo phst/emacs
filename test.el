@@ -24,13 +24,14 @@
 (require 'help)
 
 (ert-deftest go-uppercase ()
-  (should (equal (go-uppercase "hi") "HI"))
-  (should (equal (documentation #'go-uppercase)
-                 "Return the uppercase version of STRING.
+  (should (equal (go-uppercase "hello" "world") "HELLO WORLD"))
+  (should (equal
+           (documentation #'go-uppercase)
+           "Concatenate STRINGS and return the uppercase version of the result.
 
-\(fn string)"))
+\(fn strings)"))
   (should (equal (help-function-arglist #'go-uppercase :preserve-names)
-                 '(string))))
+                 '(strings))))
 
 (ert-deftest go-print-now ()
   (should (string-prefix-p "It is " (go-print-now "It is %F %T %Z"))))
