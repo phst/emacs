@@ -27,9 +27,9 @@ http_archive(
 http_archive(
     name = "emacs_module_header_master",
     build_file = "@//:header_master.BUILD",
-    sha256 = "296256c7c5050c0671530a8fb0f23380b1488829497a2bb4ad02c101dab90cb2",
-    strip_prefix = "emacs-9bbf17539826a040eda45e88aabd358ed44fabf7/src",
-    urls = ["https://git.savannah.gnu.org/cgit/emacs.git/snapshot/emacs-9bbf17539826a040eda45e88aabd358ed44fabf7.tar.gz"],
+    sha256 = "0ff2f2008b891943fe65193a15af57384f541ad92b01912fd37045c806a5b3f6",
+    strip_prefix = "emacs-1b2547de23ef6bcab9ec791878178f5ade99bd19/src",
+    urls = ["https://git.savannah.gnu.org/cgit/emacs.git/snapshot/emacs-1b2547de23ef6bcab9ec791878178f5ade99bd19.tar.gz"],
 )
 
 http_archive(
