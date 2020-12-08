@@ -44,7 +44,10 @@ emacs_module(
 go_binary(
     name = "genheader",
     srcs = ["genheader/main.go"],
-    visibility = ["@emacs_module_header_master//:__pkg__"],
+    visibility = [
+        "@emacs_module_header//:__pkg__",
+        "@emacs_module_header_master//:__pkg__",
+    ],
 )
 
 nogo(

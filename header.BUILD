@@ -22,6 +22,33 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+VERSIONS = [
+    25,
+    26,
+    27,
+]
+
+filegroup(
+    name = "snippets",
+    srcs = ["module-env-{}.h".format(ver) for ver in VERSIONS],
+)
+
+genrule(
+    name = "gen_header",
+    srcs = [
+        "emacs-module.h.in",
+        ":snippets",
+    ],
+    outs = ["emacs-module.h"],
+    cmd = (
+        "$(location @com_github_phst_emacs//:genheader)" +
+        " --template=$(location emacs-module.h.in)" +
+        " --output=$@" +
+        " -- $(locations :snippets)"
+    ),
+    tools = ["@com_github_phst_emacs//:genheader"],
+)
+
 # Local Variables:
 # mode: bazel
 # End:
