@@ -27,13 +27,13 @@ static_assert((time_t)1.5 == 1, "unsupported architecture");
 static_assert(LONG_MAX >= 1000000000, "unsupported architecture");
 
 struct timespec_result extract_time(emacs_env *env, emacs_value value) {
-    struct timespec_result result;
-    result.value = env->extract_time(env, value);
-    result.base = check(env);
-    return result;
+  struct timespec_result result;
+  result.value = env->extract_time(env, value);
+  result.base = check(env);
+  return result;
 }
 
 struct value_result make_time(emacs_env *env, struct timespec time) {
   assert(time.tv_nsec >= 0 && time.tv_nsec < 1000000000);
-    return check_value(env, env->make_time(env, time));
+  return check_value(env, env->make_time(env, time));
 }
