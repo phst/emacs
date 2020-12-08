@@ -27,7 +27,7 @@ int emacs_module_init(struct emacs_runtime *rt) {
     return 1;
   }
   emacs_env *env = rt->get_environment(rt);
-  if ((size_t)env->size < sizeof(struct emacs_env_26)) {
+  if ((size_t)env->size < sizeof(struct emacs_env_27)) {
     return 2;
   }
   struct init_result result = go_emacs_init(env);

@@ -59,10 +59,6 @@ func go_emacs_init(env *C.emacs_env) (r C.struct_init_result) {
 	if err := majorVersion.init(e); err != nil {
 		return C.struct_init_result{e.signal(err)}
 	}
-	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
-	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.  Note that this
-	// needs to happen after initializing the major version.
-	defer gc.inhibit(e).restore(e)
 	err := inits.DefineQueued(e)
 	return C.struct_init_result{e.signal(err)}
 }

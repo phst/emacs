@@ -18,7 +18,6 @@
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <time.h>
 
 #include "wrappers.h"
@@ -28,56 +27,13 @@ static_assert((time_t)1.5 == 1, "unsupported architecture");
 static_assert(LONG_MAX >= 1000000000, "unsupported architecture");
 
 struct timespec_result extract_time(emacs_env *env, emacs_value value) {
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
-  if ((size_t)env->size > offsetof(emacs_env, extract_time)) {
     struct timespec_result result;
     result.value = env->extract_time(env, value);
     result.base = check(env);
     return result;
-  }
-#endif
-  emacs_value list =
-      env->funcall(env, env->intern(env, "seconds-to-time"), 1, &value);
-  emacs_value car = env->intern(env, "car");
-  emacs_value cdr = env->intern(env, "cdr");
-  intmax_t parts[4] = {0};
-  for (int i = 0; i < 4; ++i) {
-    parts[i] = env->extract_integer(env, env->funcall(env, car, 1, &list));
-    list = env->funcall(env, cdr, 1, &list);
-    if (!env->is_not_nil(env, list)) break;
-  }
-  struct timespec time;
-  assert(parts[1] >= 0 && parts[1] <= 0x10000);
-  if (__builtin_mul_overflow(parts[0], 0x10000, &time.tv_sec) ||
-      __builtin_add_overflow(time.tv_sec, parts[1], &time.tv_sec)) {
-    return (struct timespec_result){overflow_error(env), {0, 0}};
-  }
-  assert(parts[2] >= 0 && parts[2] < 1000000);
-  assert(parts[3] >= 0 && parts[3] < 1000000);
-  time.tv_nsec = (long)parts[2] * 1000 + (long)parts[3] / 1000;
-  return (struct timespec_result){{emacs_funcall_exit_return, NULL, NULL},
-                                  time};
 }
 
 struct value_result make_time(emacs_env *env, struct timespec time) {
   assert(time.tv_nsec >= 0 && time.tv_nsec < 1000000000);
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
-  if ((size_t)env->size > offsetof(emacs_env, make_time)) {
     return check_value(env, env->make_time(env, time));
-  }
-#endif
-  imaxdiv_t seconds = imaxdiv(time.tv_sec, 0x10000);
-  if (seconds.rem < 0) {
-    --seconds.quot;
-    seconds.rem += 0x10000;
-  }
-  assert(seconds.rem >= 0 && seconds.rem <= 0x10000);
-  ldiv_t nanos = ldiv(time.tv_nsec, 1000);
-  assert(nanos.quot >= 0 && nanos.quot < 1000000);
-  assert(nanos.rem >= 0 && nanos.rem < 1000000);
-  emacs_value args[] = {env->make_integer(env, seconds.quot),
-                        env->make_integer(env, seconds.rem),
-                        env->make_integer(env, nanos.quot),
-                        env->make_integer(env, nanos.rem * 1000)};
-  return funcall(env, env->intern(env, "list"), 4, args);
 }

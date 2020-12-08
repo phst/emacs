@@ -37,9 +37,6 @@ func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value,
 	e := Env{env}
 	// Don’t allow Go panics to crash Emacs.
 	defer protect(e, &r.base)
-	// Inhibit Emacs garbage collector on Emacs 26 and below to work around
-	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=31238.
-	defer gc.inhibit(e).restore(e)
 	fun := funcs.get(funcIndex(data))
 	var in []Value
 	if nargs > 0 {

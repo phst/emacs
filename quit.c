@@ -23,16 +23,6 @@
 bool should_quit(emacs_env *env) { return env->should_quit(env); }
 
 struct void_result process_input(emacs_env *env) {
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
-  static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
-  if ((size_t)env->size > offsetof(emacs_env, process_input)) {
     env->process_input(env);
-    return check_void(env);
-  }
-#endif
-  if (env->should_quit(env)) {
-    env->non_local_exit_signal(env, env->intern(env, "quit"),
-                               env->intern(env, "nil"));
-  }
   return check_void(env);
 }

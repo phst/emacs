@@ -33,11 +33,6 @@ func TestEmacs(t *testing.T) {
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	// Set HOME to a nonempty value to work around
-	// https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36263.  Remove this
-	// once that bug is either fixed on Emacs 26, or we don’t support Emacs
-	// 26 any more.
-	cmd.Env = append(os.Environ(), "HOME=/")
 	if err := cmd.Run(); err != nil {
 		t.Errorf("Emacs failed: %v", err)
 	}

@@ -32,13 +32,11 @@ static_assert(LONG_MIN >= INT64_MIN, "unsupported architecture");
 static_assert(LONG_MAX <= INT64_MAX, "unsupported architecture");
 static_assert(ULONG_MAX <= UINT64_MAX, "unsupported architecture");
 
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
 // Rule out padding bits.
 static_assert((sizeof(emacs_limb_t) == 4 && EMACS_LIMB_MAX == 0xFFFFFFFF) ||
               (sizeof(emacs_limb_t) == 8 && EMACS_LIMB_MAX == 0xFFFFFFFFFFFFFFFF),
               "unsupported architecture");
 static_assert(sizeof(emacs_limb_t) < PTRDIFF_MAX, "unsupported architecture");
-#endif
 
 struct integer_result extract_integer(emacs_env *env, emacs_value value) {
   return check_integer(env, env->extract_integer(env, value));
@@ -46,8 +44,6 @@ struct integer_result extract_integer(emacs_env *env, emacs_value value) {
 
 struct big_integer_result extract_big_integer(emacs_env *env,
                                               emacs_value value) {
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
-  if ((size_t)env->size > offsetof(emacs_env, extract_big_integer)) {
     int sign;
     ptrdiff_t count;
     bool ok = env->extract_big_integer(env, value, &sign, &count, NULL);
@@ -82,29 +78,6 @@ struct big_integer_result extract_big_integer(emacs_env *env,
     }
     return (struct big_integer_result){
         {emacs_funcall_exit_return, NULL, NULL}, sign, bytes, (int)size};
-  }
-#endif
-  struct integer_result i = extract_integer(env, value);
-  if (i.base.exit != emacs_funcall_exit_return || i.value == 0) {
-    return (struct big_integer_result){i.base, 0, NULL, 0};
-  }
-  uint64_t u;
-  // Set u = abs(i.value).  See https://stackoverflow.com/a/17313717.
-  if (i.value > 0) {
-    u = (uint64_t)i.value;
-  } else {
-    u = -(uint64_t)i.value;
-  }
-  uint8_t *bytes = malloc(sizeof u);
-  if (bytes == NULL) {
-    return (struct big_integer_result){out_of_memory(env), 0, NULL, 0};
-  }
-  int sign = i.value > 0 ? 1 : -1;
-  for (size_t j = 0; j < sizeof u; ++j) {
-    bytes[sizeof u - j - 1] = (uint8_t)(u >> (j * CHAR_BIT));
-  }
-  return (struct big_integer_result){
-      {emacs_funcall_exit_return, NULL, NULL}, sign, bytes, sizeof u};
 }
 
 struct value_result make_integer(emacs_env *env, int64_t value) {
@@ -115,8 +88,6 @@ struct value_result make_big_integer(emacs_env *env, int sign,
                                      const uint8_t *data, int64_t count) {
   assert(sign != 0);
   assert(count > 0);
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 27
-  if ((size_t)env->size > offsetof(emacs_env, make_big_integer)) {
     ptrdiff_t limb_size = (ptrdiff_t)sizeof(emacs_limb_t);
     if (count > INT64_MAX - limb_size || count > PTRDIFF_MAX - limb_size) {
       return (struct value_result){overflow_error(env), NULL};
@@ -141,9 +112,4 @@ struct value_result make_big_integer(emacs_env *env, int sign,
         check_value(env, env->make_big_integer(env, sign, nlimbs, magnitude));
     free(magnitude);
     return result;
-  }
-#endif
-  // The code below always calls make_integer if possible, so this can only
-  // overflow.
-  return (struct value_result){overflow_error(env), NULL};
 }

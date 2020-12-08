@@ -73,8 +73,7 @@ def emacs_module(name, srcs, header, test_srcs):
         out = select(
             {
                 ":linux": None,
-                # Work around https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.
-                ":macos": bin_name + ".so",
+                ":macos": None,
             },
             no_match_error = "unsupported platform",
         ),

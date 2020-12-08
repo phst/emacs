@@ -28,12 +28,8 @@ func init() {
 }
 
 func intRoundtrip(e Env) error {
-	canOverflow := MajorVersion() < 27
 	f := func(a int64) bool {
 		v, err := Int(a).Emacs(e)
-		if canOverflow && e.IsOverflowError(err) {
-			return true
-		}
 		if err != nil {
 			log.Printf("couldn’t convert integer %[1]d (%#[1]x) to Emacs: %[2]s", a, e.Message(err))
 			return true
@@ -52,15 +48,9 @@ func intRoundtrip(e Env) error {
 }
 
 func bigIntRoundtrip(e Env) error {
-	canOverflow := MajorVersion() < 27
 	f := func(i *BigInt) bool {
 		a := (*big.Int)(i)
 		v, err := i.Emacs(e)
-		// Note that integers that don’t fit into an int64 can overflow
-		// in Emacs 27 if emacs-module.h doesn’t have make_big_integer.
-		if (canOverflow || !a.IsInt64()) && e.IsOverflowError(err) {
-			return true
-		}
 		if err != nil {
 			log.Printf("couldn’t convert big integer %s (0x%s) to Emacs: %s", a, a.Text(16), e.Message(err))
 			return false
