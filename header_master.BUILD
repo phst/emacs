@@ -49,6 +49,7 @@ genrule(
     ),
     tools = ["@com_github_phst_emacs//:genheader"],
 )
+
 # Local Variables:
 # mode: bazel-build
 # End:
