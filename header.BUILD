@@ -50,5 +50,5 @@ genrule(
 )
 
 # Local Variables:
-# mode: bazel
+# mode: bazel-build
 # End:

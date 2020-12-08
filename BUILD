@@ -74,5 +74,5 @@ config_setting(
 )
 
 # Local Variables:
-# mode: bazel
+# mode: bazel-build
 # End:
