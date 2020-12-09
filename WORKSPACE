@@ -62,5 +62,5 @@ load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_depen
 buildifier_dependencies()
 
 # Local Variables:
-# mode: bazel
+# mode: bazel-workspace
 # End:
