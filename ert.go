@@ -60,6 +60,10 @@ func (e Env) ERTTest(fun ERTTestFunc, opts ...Option) error {
 // The test calls the Go function fun.  It succeeds if fun returns nil.  This
 // is the Go equivalent of the ert-deftest macro.
 func (e Env) ERTDeftest(name Name, fun Func, doc Doc) error {
+	// Make sure the ERT library is available.
+	if _, err := e.Call("require", Symbol("ert")); err != nil {
+		return err
+	}
 	// The Emacs function itself is anonymous and undocumented.
 	f, err := e.ExportFunc("", fun, Arity{}, "")
 	if err != nil {
