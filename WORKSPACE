@@ -36,6 +36,13 @@ http_archive(
 )
 
 http_archive(
+    name = "bazel_skylib",
+    sha256 = "28f81e36692e1d87823623a99966b2daf85af3fdc1b40f98e37bd5294f3dd185",
+    strip_prefix = "bazel-skylib-1.0.3",
+    urls = ["https://github.com/bazelbuild/bazel-skylib/archive/1.0.3.zip"],
+)
+
+http_archive(
     name = "io_bazel_rules_go",
     sha256 = "e88471aea3a3a4f19ec1310a55ba94772d087e9ce46e41ae38ecebe17935de7b",
     urls = [
@@ -56,6 +63,23 @@ http_archive(
     strip_prefix = "buildtools-0.29.0",
     urls = ["https://github.com/bazelbuild/buildtools/archive/0.29.0.zip"],
 )
+
+http_archive(
+    name = "phst_rules_elisp",
+    sha256 = "af0aa7678c2fa20763f7b62ca00b8fee281fa9b1b75ffc1bafc9053d6e104cd1",
+    strip_prefix = "rules_elisp-40a00be6f01ae65faac89ab467cfe222c9c08304",
+    urls = ["https://github.com/phst/rules_elisp/archive/40a00be6f01ae65faac89ab467cfe222c9c08304.zip"],
+)
+
+load(
+    "@phst_rules_elisp//elisp:repositories.bzl",
+    "rules_elisp_dependencies",
+    "rules_elisp_toolchains",
+)
+
+rules_elisp_dependencies()
+
+rules_elisp_toolchains()
 
 load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
 

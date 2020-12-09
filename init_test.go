@@ -17,8 +17,11 @@ package emacs
 import "fmt"
 
 func ExampleOnInit() {
-	OnInit(func(Env) error {
-		_, err := fmt.Println("Hi from Go!")
+	OnInit(func(e Env) error {
+		if _, err := fmt.Println("Hi from Go!"); err != nil {
+			return err
+		}
+		_, err := e.Call("provide", Symbol("example-module"))
 		return err
 	})
 }

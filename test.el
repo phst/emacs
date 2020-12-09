@@ -20,6 +20,8 @@
 
 ;;; Code:
 
+(require 'example-module)
+
 (require 'ert)
 (require 'help)
 
