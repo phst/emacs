@@ -30,7 +30,7 @@ TEST_SRCS = glob(["*_test.go"])
 emacs_module(
     name = "stable",
     srcs = SRCS,
-    header = "@emacs_module_header//:header",
+    header = "@phst_rules_elisp//emacs:module_header",
     test_srcs = TEST_SRCS,
 )
 

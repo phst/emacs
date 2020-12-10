@@ -17,17 +17,6 @@ workspace(name = "com_github_phst_emacs")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
-    name = "emacs_module_header",
-    build_file = "@//:header.BUILD",
-    sha256 = "4a4c128f915fc937d61edfc273c98106711b540c9be3cd5d2e2b9b5b2f172e41",
-    strip_prefix = "emacs-27.1/src/",
-    urls = [
-        "https://ftpmirror.gnu.org/emacs/emacs-27.1.tar.xz",
-        "https://ftp.gnu.org/gnu/emacs/emacs-27.1.tar.xz",
-    ],
-)
-
-http_archive(
     name = "emacs_module_header_master",
     build_file = "@//:header_master.BUILD",
     sha256 = "0ff2f2008b891943fe65193a15af57384f541ad92b01912fd37045c806a5b3f6",
