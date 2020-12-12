@@ -58,3 +58,35 @@ struct value_result make_string_impl(emacs_env *env, const char *data,
   }
   return check_value(env, env->make_string(env, data, (ptrdiff_t)size));
 }
+
+struct value_result make_unibyte_string(emacs_env *env, const void *data,
+                                        int64_t size) {
+  static_assert(CHAR_BIT == 8, "unsupported architecture");
+  static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
+  assert(size >= 0);
+  if (size > PTRDIFF_MAX) {
+    return (struct value_result){overflow_error(env), NULL};
+  }
+#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
+  if ((size_t)env->size > offsetof(emacs_env, make_unibyte_string)) {
+    static_assert(CHAR_MAX - CHAR_MIN + 1 == 0x100, "unsupported architecture");
+    return check_value(env, env->make_unibyte_string(env, data, size));
+  }
+#endif
+  static_assert(UCHAR_MAX == 0xFF, "unsupported architecture");
+  const unsigned char *bytes = data;
+  emacs_value *args = calloc(size, sizeof *args);
+  if (args == NULL && size > 0) {
+    return (struct value_result){out_of_memory(env), NULL};
+  }
+  for (ptrdiff_t i = 0; i < size; ++i) {
+    static_assert(INT64_MAX >= UCHAR_MAX, "unsupported architecture");
+    struct value_result byte = make_integer(env, bytes[i]);
+    if (byte.base.exit != emacs_funcall_exit_return) return byte;
+    args[i] = byte.value;
+  }
+  emacs_value result = env->funcall(env, env->intern(env, "unibyte-string"),
+                                    size, args);
+  free(args);
+  return check_value(env, result);
+}

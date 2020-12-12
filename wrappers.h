@@ -137,6 +137,8 @@ struct string_result copy_string_contents(emacs_env *env, emacs_value value);
 
 struct value_result make_string_impl(emacs_env *env, const char *data,
                                      size_t size);
+struct value_result make_unibyte_string(emacs_env *env, const void *data,
+                                        int64_t size);
 
 // symbol_name must be ASCII-only without embedded null characters.
 struct value_result intern_impl(emacs_env *env, const char *symbol_name);

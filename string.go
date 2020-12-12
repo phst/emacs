@@ -115,11 +115,10 @@ type Bytes []byte
 // Emacs creates an Emacs unibyte string value representing the given bytes.
 // It always makes a copy of the byte slice.
 func (b Bytes) Emacs(e Env) (Value, error) {
-	args := make([]In, len(b))
-	for i, b := range b {
-		args[i] = Int(b)
+	if len(b) == 0 {
+		return e.checkValue(C.make_unibyte_string(e.raw(), nil, 0))
 	}
-	return e.Call("unibyte-string", args...)
+	return e.checkValue(C.make_unibyte_string(e.raw(), unsafe.Pointer(&b[0]), C.int64_t(len(b))))
 }
 
 // FromEmacs sets *b to the unibyte string stored in v.  It returns an error if
