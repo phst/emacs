@@ -92,11 +92,13 @@ def emacs_module(name, srcs, header, test_srcs):
         name = bin_name,
         srcs = ["//:example/main.go"],
         # Output the module with a fixed name so that (require 'example-module)
-        # works.
+        # works.  Note that we use the .so suffix on macOS as well due to
+        # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.  We can switch
+        # to .dylib once we drop support for Emacs 27.
         out = select(
             {
                 ":linux": paths.join(name, "example-module.so"),
-                ":macos": paths.join(name, "example-module.dylib"),
+                ":macos": paths.join(name, "example-module.so"),
             },
             no_match_error = "unsupported platform",
         ),
