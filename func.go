@@ -14,7 +14,7 @@
 
 package emacs
 
-// #include <emacs-module.h>
+// #include "emacs-module.h"
 // #include "wrappers.h"
 // struct value_result make_function(emacs_env *env,
 //                                   int64_t min_arity, int64_t max_arity,

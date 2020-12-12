@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "emacs-module.h"
 #include "wrappers.h"
-
-#include <emacs-module.h>
 
 struct value_result intern_impl(emacs_env *env, const char* data) {
   return check_value(env, env->intern(env, data));

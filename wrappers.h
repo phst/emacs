@@ -19,11 +19,12 @@
 #error "This library requires ISO C11 or later"
 #endif
 
-#include <emacs-module.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <time.h>
+
+#include "emacs-module.h"
 
 #if !defined __has_attribute
 #error "This library requires __has_attribute"

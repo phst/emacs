@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include <assert.h>
-#include <emacs-module.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <time.h>
 
+#include "emacs-module.h"
 #include "wrappers.h"
 
 static_assert(PTRDIFF_MAX <= SIZE_MAX, "unsupported architecture");

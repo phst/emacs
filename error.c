@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <emacs-module.h>
+#include "emacs-module.h"
 
 struct result_base check(emacs_env *env) {
   struct result_base result;

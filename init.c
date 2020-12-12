@@ -18,7 +18,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <emacs-module.h>
+#include "emacs-module.h"
 
 static_assert(PTRDIFF_MAX <= SIZE_MAX, "unsupported architecture");
 

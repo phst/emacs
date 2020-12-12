@@ -13,11 +13,11 @@
 // limitations under the License.
 
 #include <assert.h>
-#include <emacs-module.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
+#include "emacs-module.h"
 #include "wrappers.h"
 
 bool should_quit(emacs_env *env) { return env->should_quit(env); }

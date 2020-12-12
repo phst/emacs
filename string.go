@@ -17,7 +17,7 @@ package emacs
 // #include <assert.h>
 // #include <stddef.h>
 // #include <stdlib.h>
-// #include <emacs-module.h>
+// #include "emacs-module.h"
 // #include "wrappers.h"
 // struct value_result make_string(emacs_env *env, _GoString_ contents) {
 //   size_t size = _GoStringLen(contents);

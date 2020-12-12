@@ -13,10 +13,10 @@
 // limitations under the License.
 
 #include <assert.h>
-#include <emacs-module.h>
 #include <stddef.h>
 #include <stdint.h>
 
+#include "emacs-module.h"
 #include "wrappers.h"
 
 static_assert(PTRDIFF_MIN == INT64_MIN, "unsupported architecture");

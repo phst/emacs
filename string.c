@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include <assert.h>
-#include <emacs-module.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "emacs-module.h"
 #include "wrappers.h"
 
 static_assert(CHAR_BIT == 8, "unsupported architecture");

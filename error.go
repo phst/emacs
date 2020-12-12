@@ -14,7 +14,7 @@
 
 package emacs
 
-// #include <emacs-module.h>
+// #include "emacs-module.h"
 // #include "wrappers.h"
 import "C"
 

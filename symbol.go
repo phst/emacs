@@ -14,7 +14,7 @@
 
 package emacs
 
-// #include <emacs-module.h>
+// #include "emacs-module.h"
 // #include "wrappers.h"
 // struct value_result intern(emacs_env *env, _GoString_ symbol_name) {
 //   return intern_impl(env, _GoStringPtr(symbol_name));
