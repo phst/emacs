@@ -164,6 +164,9 @@ struct uintptr_result {
 
 struct uintptr_result open_channel(emacs_env *env, emacs_value value);
 
+struct void_result make_interactive(emacs_env *env, emacs_value function,
+                                    emacs_value spec);
+
 // Sets the nonlocal exit state of env according to result.  Call this only
 // directly before returning control to Emacs.
 void handle_nonlocal_exit(emacs_env *env,

@@ -165,3 +165,9 @@ func (e Env) Funcall(fun Value, args []Value) (Value, error) {
 	}
 	return e.checkValue(C.funcall(e.raw(), fun.r, C.int64_t(nargs), ptr))
 }
+
+// MakeInteractive sets the interactive specification of the given function.
+// The function must refer to a module function.
+func (e Env) MakeInteractive(fun, spec Value) error {
+	return e.checkVoid(C.make_interactive(e.raw(), fun.r, spec.r))
+}

@@ -56,3 +56,18 @@ struct value_result make_function_impl(emacs_env *env, int64_t min_arity,
 #endif
   return check_value(env, value);
 }
+
+struct void_result make_interactive(emacs_env *env, emacs_value function,
+                                    emacs_value spec) {
+  struct void_result result;
+#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
+  static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
+  if ((size_t)env->size > offsetof(emacs_env, make_interactive)) {
+    env->make_interactive(env, function, spec);
+    result.base = check(env);
+    return result;
+  }
+#endif
+  result.base = unimplemented(env);
+  return result;
+}
