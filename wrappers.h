@@ -157,6 +157,13 @@ struct value_result make_time(emacs_env *env, struct timespec time);
 bool should_quit(emacs_env *env);
 struct void_result process_input(emacs_env *env);
 
+struct uintptr_result {
+  struct result_base base;
+  uintptr_t value;
+};
+
+struct uintptr_result open_channel(emacs_env *env, emacs_value value);
+
 // Sets the nonlocal exit state of env according to result.  Call this only
 // directly before returning control to Emacs.
 void handle_nonlocal_exit(emacs_env *env,
@@ -164,5 +171,6 @@ void handle_nonlocal_exit(emacs_env *env,
 
 struct result_base out_of_memory(emacs_env *env);
 struct result_base overflow_error(emacs_env *env);
+struct result_base unimplemented(emacs_env *env);
 
 #endif

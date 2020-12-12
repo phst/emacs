@@ -80,3 +80,9 @@ struct result_base overflow_error(emacs_env *env) {
                              env->intern(env, "nil"));
   return check(env);
 }
+
+struct result_base unimplemented(emacs_env *env) {
+  env->non_local_exit_signal(env, env->intern(env, "go-unimplemented-error"),
+                             env->intern(env, "nil"));
+  return check(env);
+}

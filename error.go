@@ -258,7 +258,10 @@ func (e Env) checkValue(r C.struct_value_result) (Value, error) {
 	return Value{r.value}, e.check(r.base)
 }
 
-var baseError = DefineError("go-error", "Generic Go error")
+var (
+	baseError          = DefineError("go-error", "Generic Go error")
+	unimplementedError = DefineError("go-unimplemented-error", "Unimplemented Go function", baseError)
+)
 
 type errorSymbol struct {
 	name    Name
