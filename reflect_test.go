@@ -148,6 +148,10 @@ func randomType(rand *rand.Rand, size int) reflect.Type {
 			// reflect.Struct,
 		)
 	}
+	// How fast to shrink non-scalar types.  Must be greater than 1.  If
+	// this is too small, the test is likely to time out.
+	const factor = 10
+	size /= factor
 	kind := kinds[rand.Intn(len(kinds))]
 	switch kind {
 	case reflect.Bool:
@@ -179,16 +183,16 @@ func randomType(rand *rand.Rand, size int) reflect.Type {
 	case reflect.Float64:
 		return reflect.TypeOf(float64(0))
 	case reflect.Array:
-		return reflect.ArrayOf(rand.Intn(50), randomType(rand, size-1))
+		return reflect.ArrayOf(rand.Intn(50), randomType(rand, size))
 	case reflect.Map:
-		key := randomType(rand, size-1)
+		key := randomType(rand, size)
 		for !key.Comparable() {
-			key = randomType(rand, size-1)
+			key = randomType(rand, size)
 		}
-		elem := randomType(rand, size-1)
+		elem := randomType(rand, size)
 		return reflect.MapOf(key, elem)
 	case reflect.Slice:
-		return reflect.SliceOf(randomType(rand, size-1))
+		return reflect.SliceOf(randomType(rand, size))
 	case reflect.String:
 		return reflect.TypeOf("")
 	default:
