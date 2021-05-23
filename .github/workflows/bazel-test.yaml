@@ -42,7 +42,7 @@ jobs:
         run: |
           bazel test \
             --test_output=errors \
-            --extra_toolchains=//elisp:emacs_${{matrix.version}}_toolchain \
+            --extra_toolchains=@phst_rules_elisp//elisp:emacs_${{matrix.version}}_toolchain \
             -- //...
 
   bazel-versions:
