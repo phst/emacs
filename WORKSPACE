@@ -51,9 +51,11 @@ go_register_toolchains(
 
 http_archive(
     name = "com_github_bazelbuild_buildtools",
-    sha256 = "05eb52437fb250c7591dd6cbcfd1f9b5b61d85d6b20f04b041e0830dd1ab39b3",
-    strip_prefix = "buildtools-0.29.0",
-    urls = ["https://github.com/bazelbuild/buildtools/archive/0.29.0.zip"],
+    sha256 = "932160d5694e688cb7a05ac38efba4b9a90470c75f39716d85fb1d2f95eec96d",
+    strip_prefix = "buildtools-4.0.1/",
+    urls = [
+        "https://github.com/bazelbuild/buildtools/archive/refs/tags/4.0.1.zip",  # 2021-02-27
+    ],
 )
 
 http_archive(
