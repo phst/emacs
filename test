@@ -67,7 +67,7 @@ run || exit
 # Test versioned toolchains.
 for version in "${versions[@]}"; do
   if is_supported "${version}"; then
-    toolchain="//elisp:emacs_${version}_toolchain"
+    toolchain="@phst_rules_elisp//elisp:emacs_${version}_toolchain"
     run --extra_toolchains="${toolchain}" || exit
   fi
 done
