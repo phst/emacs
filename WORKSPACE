@@ -1,4 +1,4 @@
-# Copyright 2019 Google LLC
+# Copyright 2019, 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,19 @@ go_register_toolchains(
     nogo = "@//:nogo",
     version = "1.16",
 )
+
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "f6042eef01551cee4c663a11c3f429c06360a1f51daa9f4772bf3f13d24cde1f",
+    strip_prefix = "protobuf-3.17.2/",
+    urls = [
+        "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.17.2.zip",  # 2021-06-02
+    ],
+)
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
 
 http_archive(
     name = "com_github_bazelbuild_buildtools",
