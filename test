@@ -34,7 +34,6 @@ export CGO_CFLAGS="-isystem ${bin_dir}/external/gnu_emacs_27.2
   -Wno-language-extension-token"
 
 go vet || exit
-golint -set_exit_status -min_confidence=0.3 || exit
 
 versions=(27.{1,2})
 readonly versions
