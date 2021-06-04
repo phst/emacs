@@ -62,10 +62,6 @@ To build and run all tests, install [Bazel][] and run
 bazel test //...
 ```
 
-To run `go vet` and `golint`, run
-
-```shell
-make check
-```
+To run `go vet` and `golint`, run the `test` script in the workspace root.
 
 [Bazel]: https://bazel.build/
