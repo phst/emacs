@@ -62,13 +62,15 @@ buildifier:
   endif
 
 vet: module-header.log
-	dir="$$(sed -E -n -e 's|^  (.+)/emacs-module\.h$$|\1|p' -- '$<')" \
+	set -x \
+	  && dir="$$(sed -E -n -e 's|^  (.+)/emacs-module\.h$$|\1|p' -- '$<')" \
 	  && dir="$$(realpath -e -- "$${dir}")" \
 	  && CGO_CFLAGS="$(CGO_CFLAGS) -isystem $${dir}" $(GO) $(GOFLAGS) vet
 
 module-header.log:
         # Ensure that emacs-module.h exists, for the “go vet” command above.
-	query='filter(":emacs-module.h$$", kind(" file$$", deps(@phst_rules_elisp//emacs:module_header)))' \
+	set -x \
+	  && query='filter(":emacs-module.h$$", kind(" file$$", deps(@phst_rules_elisp//emacs:module_header)))' \
 	  && target="$$($(BAZEL) query $(BAZELFLAGS) -- "$${query}")" \
 	  && $(BAZEL) build $(BAZELFLAGS) -- "$${target}" &> '$@'
 	cat -- '$@'
