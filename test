@@ -50,7 +50,7 @@ esac
 readonly unsupported
 
 is_supported() {
-  for version in "${unsupported[@]}"; do
+  for version in "${unsupported[@]+"${unsupported[@]}"}"; do
     [[ "$1" == "${version}" ]] && return 1
   done
 }
