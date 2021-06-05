@@ -71,6 +71,7 @@ module-header.log:
 	query='filter(":emacs-module.h$$", kind(" file$$", deps(@phst_rules_elisp//emacs:module_header)))' \
 	  && target="$$($(BAZEL) query $(BAZELFLAGS) -- "$${query}")" \
 	  && $(BAZEL) build $(BAZELFLAGS) -- "$${target}" &> '$@'
+	cat -- '$@'
 
 check:
 	$(BAZEL) test --test_output=errors $(BAZELFLAGS) -- //...
