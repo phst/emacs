@@ -19,6 +19,7 @@ jobs:
   bazel-versions:
     name: All supported Bazel versions
     strategy:
+      fail-fast: false
       matrix:
         # We don’t use the GitHub matrix support for the Emacs toolchain to
         # allow Bazel to cache intermediate results between the test runs.
