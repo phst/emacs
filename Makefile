@@ -61,12 +61,16 @@ buildifier:
     $(warn Buildifier not supported on Bazel $(bazel_major))
   endif
 
-vet:
-        # Ensure that emacs-module.h exists, for the “go vet” command below.
-	$(BAZEL) build $(BAZELFLAGS) -- '@gnu_emacs_27.2//:emacs-module.h'
-	bin_dir="$$($(BAZEL) info bazel-bin)" \
-	  && CGO_CFLAGS="$(CGO_CFLAGS) -isystem $${bin_dir}/external/gnu_emacs_27.2" \
-	  $(GO) $(GOFLAGS) vet
+vet: module-header.log
+	dir="$$(sed -E -n -e 's|^  (.+)/emacs-module\.h$$|\1|p' -- '$<')" \
+	  && dir="$$(realpath -e -- "$${dir}")" \
+	  && CGO_CFLAGS="$(CGO_CFLAGS) -isystem $${dir}" $(GO) $(GOFLAGS) vet
+
+module-header.log:
+        # Ensure that emacs-module.h exists, for the “go vet” command above.
+	query='filter(":emacs-module.h$$", kind(" file$$", deps(@phst_rules_elisp//emacs:module_header)))' \
+	  && target="$$($(BAZEL) query $(BAZELFLAGS) -- "$${query}")" \
+	  && $(BAZEL) build $(BAZELFLAGS) -- "$${target}" &> '$@'
 
 check:
 	$(BAZEL) test --test_output=errors $(BAZELFLAGS) -- //...
@@ -74,4 +78,4 @@ check:
 $(versions):
 	$(MAKE) check BAZELFLAGS='$(BAZELFLAGS) --extra_toolchains=@phst_rules_elisp//elisp:emacs_$@_toolchain'
 
-.PHONY: all buildifier vet check $(versions)
+.PHONY: all buildifier vet module-header.log check $(versions)
