@@ -1,4 +1,4 @@
-# Copyright 2019 Google LLC
+# Copyright 2019, 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier", "buildifier_test")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "nogo")
 load(":def.bzl", "emacs_module")
 
@@ -61,6 +61,21 @@ buildifier(
     lint_mode = "warn",
     lint_warnings = ["all"],
     mode = "fix",
+)
+
+buildifier_test(
+    name = "buildifier_test",
+    srcs = [
+        "BUILD",
+        "WORKSPACE",
+    ] + glob([
+        "*.BUILD",
+        "*.WORKSPACE",
+        "*.bazel",
+        "*.bzl",
+    ]),
+    lint_mode = "warn",
+    mode = "check",
 )
 
 config_setting(

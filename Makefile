@@ -37,21 +37,7 @@ endif
 
 versions := $(filter-out $(unsupported),$(versions))
 
-bazel_major := $(shell $(BAZEL) --version | sed -E -n -e 's/^bazel ([[:digit:]]+)\..*$$/\1/p')
-
-# The Buildifier target doesn’t work well on old Bazel versions.
-buildifier_supported := $(shell test $(bazel_major) -ge 4 && echo yes)
-
-all: buildifier check $(versions)
-
-buildifier:
-  ifeq ($(buildifier_supported),yes)
-	$(BAZEL) run $(BAZELFLAGS) -- \
-	  @com_github_bazelbuild_buildtools//buildifier \
-	  --mode=check --lint=warn -r -- "$${PWD}"
-  else
-    $(warn Buildifier not supported on Bazel $(bazel_major))
-  endif
+all: check $(versions)
 
 check:
 	$(BAZEL) test --test_output=errors $(BAZELFLAGS) -- //...
@@ -59,4 +45,4 @@ check:
 $(versions):
 	$(MAKE) check BAZELFLAGS='$(BAZELFLAGS) --extra_toolchains=@phst_rules_elisp//elisp:emacs_$@_toolchain'
 
-.PHONY: all buildifier check $(versions)
+.PHONY: all check $(versions)
