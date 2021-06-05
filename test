@@ -57,7 +57,7 @@ is_supported() {
 }
 
 run() {
-  (set -x; bazel test --test_output=errors "$@" -- //...)
+  (set -x; bazel test --test_output=errors "$@" -- //...) || return
   echo
 }
 
