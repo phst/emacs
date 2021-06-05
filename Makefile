@@ -20,14 +20,6 @@ SHELL := /bin/sh
 BAZEL := bazel
 BAZELFLAGS :=
 
-GO := go
-GOFLAGS :=
-
-CGO_CFLAGS := -pedantic-errors -Werror -Wall -Wextra \
-  -Wno-sign-compare \
-  -Wno-unused-parameter \
-  -Wno-language-extension-token
-
 # All potentially supported Emacs versions.
 versions := 27.1 27.2
 
@@ -50,7 +42,7 @@ bazel_major := $(shell $(BAZEL) --version | sed -E -n -e 's/^bazel ([[:digit:]]+
 # The Buildifier target doesn’t work well on old Bazel versions.
 buildifier_supported := $(shell test $(bazel_major) -ge 4 && echo yes)
 
-all: buildifier vet check $(versions)
+all: buildifier check $(versions)
 
 buildifier:
   ifeq ($(buildifier_supported),yes)
@@ -61,24 +53,10 @@ buildifier:
     $(warn Buildifier not supported on Bazel $(bazel_major))
   endif
 
-vet: module-header.log
-	set -x \
-	  && dir="$$(sed -E -n -e 's|^  (.+)/emacs-module\.h$$|\1|p' -- '$<')" \
-	  && dir="$$(realpath -e -- "$${dir}")" \
-	  && CGO_CFLAGS="$(CGO_CFLAGS) -isystem $${dir}" $(GO) $(GOFLAGS) vet
-
-module-header.log:
-        # Ensure that emacs-module.h exists, for the “go vet” command above.
-	set -x \
-	  && query='filter(":emacs-module.h$$", kind(" file$$", deps(@phst_rules_elisp//emacs:module_header)))' \
-	  && target="$$($(BAZEL) query $(BAZELFLAGS) -- "$${query}")" \
-	  && $(BAZEL) build $(BAZELFLAGS) -- "$${target}" &> '$@'
-	cat -- '$@'
-
 check:
 	$(BAZEL) test --test_output=errors $(BAZELFLAGS) -- //...
 
 $(versions):
 	$(MAKE) check BAZELFLAGS='$(BAZELFLAGS) --extra_toolchains=@phst_rules_elisp//elisp:emacs_$@_toolchain'
 
-.PHONY: all buildifier vet module-header.log check $(versions)
+.PHONY: all buildifier check $(versions)
