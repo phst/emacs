@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,9 +68,6 @@ func (d Doc) SplitUsage() (actualDoc Doc, hasUsage bool, usage Usage) {
 	}
 	actualDoc = d[:result[0]]
 	hasUsage = true
-	// n := 1
-	// pair := result[2*n : 2*n+2]
-	// beg, end := pair[0], pair[1]
 	if i, j := result[2], result[3]; i >= 0 {
 		usage = Usage(strings.Trim(s[i:j], " "))
 	}
