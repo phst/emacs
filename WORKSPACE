@@ -26,9 +26,11 @@ http_archive(
 
 http_archive(
     name = "bazel_skylib",
-    sha256 = "28f81e36692e1d87823623a99966b2daf85af3fdc1b40f98e37bd5294f3dd185",
-    strip_prefix = "bazel-skylib-1.0.3",
-    urls = ["https://github.com/bazelbuild/bazel-skylib/archive/1.0.3.zip"],
+    sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
+    urls = [
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+    ],
 )
 
 http_archive(
