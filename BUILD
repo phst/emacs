@@ -13,8 +13,8 @@
 # limitations under the License.
 
 load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier", "buildifier_test")
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "nogo")
-load(":def.bzl", "emacs_module")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "nogo")
+load(":def.bzl", "COPTS", "emacs_module")
 
 SRCS = glob(
     [
@@ -26,6 +26,16 @@ SRCS = glob(
 )
 
 TEST_SRCS = glob(["*_test.go"])
+
+go_library(
+    name = "go_default_library",
+    srcs = SRCS,
+    cdeps = ["@phst_rules_elisp//emacs:module_header"],
+    cgo = True,
+    copts = COPTS,
+    importpath = "github.com/phst/emacs",
+    visibility = ["//visibility:public"],
+)
 
 emacs_module(
     name = "stable",

@@ -1,4 +1,4 @@
-# Copyright 2019 Google LLC
+# Copyright 2019, 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
 
-_COPTS = [
+COPTS = [
     "-Werror",
     "-Wall",
     "-Wconversion",
@@ -48,7 +48,7 @@ def emacs_module(name, srcs, header, test_srcs):
         srcs = srcs,
         cdeps = [header],
         cgo = True,
-        copts = _COPTS,
+        copts = COPTS,
         importpath = "github.com/phst/emacs",
     )
     bin_name = "_" + name + "_example"
