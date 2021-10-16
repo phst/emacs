@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,6 +45,24 @@ type initFunc InitFunc
 
 func (i initFunc) Define(e Env) error {
 	return i(e)
+}
+
+// Provide arranges for (provide feature) to be called on module
+// initialization.
+func Provide(feature Name) {
+	if feature == "" {
+		panic("empty feature name")
+	}
+	provides.MustEnqueue(feature, provide(feature))
+}
+
+var provides = NewManager(RequireName | RequireUniqueName | DefineOnInit)
+
+type provide Name
+
+func (p provide) Define(e Env) error {
+	_, err := e.Call("provide", Name(p))
+	return err
 }
 
 //export go_emacs_init

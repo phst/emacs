@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,12 @@ import "fmt"
 
 func ExampleOnInit() {
 	OnInit(func(e Env) error {
-		if _, err := fmt.Println("Hi from Go!"); err != nil {
-			return err
-		}
-		_, err := e.Call("provide", Symbol("example-module"))
+		_, err := fmt.Println("Hi from Go!")
 		return err
 	})
 }
 
 func init() {
 	ExampleOnInit()
+	Provide("example-module")
 }
