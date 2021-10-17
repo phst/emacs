@@ -47,24 +47,6 @@ func (i initFunc) Define(e Env) error {
 	return i(e)
 }
 
-// Provide arranges for (provide feature) to be called on module
-// initialization.
-func Provide(feature Name) {
-	if feature == "" {
-		panic("empty feature name")
-	}
-	provides.MustEnqueue(feature, provide(feature))
-}
-
-var provides = NewManager(RequireName | RequireUniqueName | DefineOnInit)
-
-type provide Name
-
-func (p provide) Define(e Env) error {
-	_, err := e.Call("provide", Name(p))
-	return err
-}
-
 //export go_emacs_init
 func go_emacs_init(env *C.emacs_env) (r C.struct_init_result) {
 	// We can’t use environments from other threads, so make sure that we
