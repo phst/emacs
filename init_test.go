@@ -25,5 +25,4 @@ func ExampleOnInit() {
 
 func init() {
 	ExampleOnInit()
-	Provide("example-module")
 }
