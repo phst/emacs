@@ -63,5 +63,14 @@
   (should (equal (help-function-arglist #'mersenne-prime-p :preserve-names)
                  '(n))))
 
+(ert-deftest file ()
+  (let ((filename (make-temp-file "go-emacs-" nil ".txt")))
+    (unwind-protect
+        (let ((handle (create-go-file (file-name-unquote filename))))
+          (unwind-protect
+              (should (eql (write-go-file handle "hi") 2))
+            (close-go-file handle)))
+      (delete-file filename))))
+
 
 ;;; test.el ends here

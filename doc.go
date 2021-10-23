@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -116,6 +116,14 @@ OverflowError.
 Variables
 
 You can use Var to define a dynamic variable.
+
+User pointers and handles
+
+This package intentionally doesn’t support wrapping pointers to arbitrary Go
+values in Emacs user pointer objects.  Attempting to do that wouldn’t work well
+with Go’s garbage collection and CGo’s pointer-passing rules; see
+https://pkg.go.dev/cmd/cgo#hdr-Passing_pointers.  Instead, prefer using
+handles, e.g. simple integers as map keys.  See the “Handles” example.
 
 Long-running operations
 
