@@ -1,6 +1,6 @@
 ;;; test.el --- unit tests -*- lexical-binding: t; -*-
 
-;; Copyright 2019 Google LLC
+;; Copyright 2019, 2021 Google LLC
 ;;
 ;; Licensed under the Apache License, Version 2.0 (the "License");
 ;; you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 
 (require 'ert)
 (require 'help)
+
+(require 'aio)
 
 (ert-deftest go-uppercase ()
   (should (equal (go-uppercase "hello" "world") "HELLO WORLD"))
@@ -72,5 +74,33 @@
             (close-go-file handle)))
       (delete-file filename))))
 
+(defvar async-promises (make-hash-table))
+
+(ert-deftest async ()
+  (let ((handle (mersenne-prime-async-p 4423))
+        (promise (aio-promise)))
+    (message "Registering promise for handle %d" handle)
+    (puthash handle promise async-promises)
+    (should (aio-wait-for promise))))
+
+(make-network-process :name "async-client"
+                      :service (async-socket)
+                      :family 'local
+                      :coding 'no-conversion
+                      :nowait t
+                      :noquery t
+                      :filter #'async-filter)
+
+(defun async-filter (process output)
+  (message "Received output %S for process %s" output process)
+  (cl-loop with table = async-promises
+           for (handle value error) across (async-flush)
+           for promise = (cl-the aio-promise (gethash handle table))
+           do
+           (remhash handle table)
+           (message "Resolving promise with handle %d" handle)
+           (aio-resolve promise (if error
+                                    (lambda () (signal (car error) (cdr error)))
+                                  (lambda () value)))))
 
 ;;; test.el ends here

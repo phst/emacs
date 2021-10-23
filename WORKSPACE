@@ -96,6 +96,16 @@ rules_elisp_dependencies()
 
 rules_elisp_toolchains()
 
+http_archive(
+    name = "aio",
+    build_file = "//:aio.BUILD",
+    sha256 = "63e3170f2d720995b318bc1feb8414fca3dea16cb707f24a981f3f0cade3fcbf",
+    strip_prefix = "emacs-aio-da93523e235529fa97d6f251319d9e1d6fc24a41/",
+    urls = [
+        "https://github.com/skeeto/emacs-aio/archive/da93523e235529fa97d6f251319d9e1d6fc24a41.zip",  # 2020-06-10
+    ],
+)
+
 load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
 
 buildifier_dependencies()

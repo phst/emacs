@@ -81,7 +81,10 @@ def emacs_module(name, srcs, header, test_srcs):
         size = "medium",
         timeout = "short",
         srcs = [test_el],
-        deps = [elisp_lib_name],
+        deps = [
+            elisp_lib_name,
+            "@aio",
+        ],
     )
     elisp_library(
         name = elisp_lib_name,

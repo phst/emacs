@@ -132,6 +132,12 @@ pending input and to check whether the user wants to quit the operation.  If
 so, you should cancel the operation as soon as possible.  See the documentation
 of ProcessInput for a concrete example.
 
+As an alternative, this package provides limited support for asynchronous
+operations.  Such operations are represented using the AsyncHandle type.  You
+can use the Async type to create and manage asynchronous operations.  Async
+requires a way to notify Emacs about a pending asynchronous result; this
+package supports notification using pipes or sockets.
+
 Initialization
 
 If you want to run code while Emacs is loading the module, use OnInit to
