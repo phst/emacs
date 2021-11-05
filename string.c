@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,7 +82,10 @@ struct value_result make_unibyte_string(emacs_env *env, const void *data,
   for (ptrdiff_t i = 0; i < size; ++i) {
     static_assert(INT64_MAX >= UCHAR_MAX, "unsupported architecture");
     struct value_result byte = make_integer(env, bytes[i]);
-    if (byte.base.exit != emacs_funcall_exit_return) return byte;
+    if (byte.base.exit != emacs_funcall_exit_return) {
+      free(args);
+      return byte;
+    }
     args[i] = byte.value;
   }
   emacs_value result = env->funcall(env, env->intern(env, "unibyte-string"),
