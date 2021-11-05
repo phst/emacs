@@ -159,12 +159,7 @@ struct value_result make_time(emacs_env *env, struct timespec time);
 bool should_quit(emacs_env *env);
 struct void_result process_input(emacs_env *env);
 
-struct uintptr_result {
-  struct result_base base;
-  uintptr_t value;
-};
-
-struct uintptr_result open_channel(emacs_env *env, emacs_value value);
+struct integer_result open_channel(emacs_env *env, emacs_value value);
 
 struct void_result make_interactive(emacs_env *env, emacs_value function,
                                     emacs_value spec);

@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2020, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import "C"
 
 import (
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -29,6 +30,10 @@ func (e Env) OpenPipe(process Value) (*os.File, error) {
 	i := C.open_channel(e.raw(), process.r)
 	if err := e.check(i.base); err != nil {
 		return nil, err
+	}
+	const maxUintptr = ^uintptr(0)
+	if i.value < 0 || i.value > math.MaxInt || uint64(i.value) > uint64(maxUintptr) {
+		return nil, fmt.Errorf("file descriptor %d out of range", i.value)
 	}
 	fd := uintptr(i.value)
 	return os.NewFile(fd, fmt.Sprintf("/dev/fd/%d", fd)), nil

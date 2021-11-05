@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2020, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,19 +20,16 @@
 #include "emacs-module.h"
 #include "wrappers.h"
 
-struct uintptr_result open_channel(emacs_env *env, emacs_value value) {
-  struct uintptr_result result;
+static_assert(UINTPTR_MAX == UINT64_MAX, "unsupported architecture");
+
+struct integer_result open_channel(emacs_env *env, emacs_value value) {
 #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
   static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
   if ((size_t)env->size > offsetof(emacs_env, open_channel)) {
-    int fd = env->open_channel(env, value);
-    result.base = check(env);
-    static_assert(UINTPTR_MAX >= INT_MAX, "unsupported architecture");
-    result.value = fd < 0 ? UINTPTR_MAX : (uintptr_t)fd;
-    return result;
+    static_assert(INT64_MIN <= INT_MIN, "unsupported architecture");
+    static_assert(INT64_MAX >= INT_MAX, "unsupported architecture");
+    return check_integer(env, env->open_channel(env, value));
   }
 #endif
-  result.base = unimplemented(env);
-  result.value = UINTPTR_MAX;
-  return result;
+  return (struct integer_result){unimplemented(env), -1};
 }
