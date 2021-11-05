@@ -115,7 +115,7 @@ struct big_integer_result extract_big_integer(emacs_env *env,
                                               emacs_value value);
 struct value_result make_integer(emacs_env *env, int64_t value);
 
-// The number (and therefore sign) may not be zero.  sign must be −1, 0, or +1.
+// The number (and therefore sign) may not be zero.  sign must be −1 or +1.
 struct value_result make_big_integer(emacs_env *env, int sign,
                                      const uint8_t *data, int64_t size);
 
