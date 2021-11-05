@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ static emacs_value trampoline(emacs_env *env, ptrdiff_t nargs,
 
 #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
 static void finalizer(void *data) {
-  go_emacs_finalizer((uintptr_t)data);
+  go_emacs_function_finalizer((uintptr_t)data);
 }
 #endif
 

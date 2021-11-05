@@ -52,8 +52,8 @@ func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value,
 	return C.struct_trampoline_result{e.signal(err), v.r}
 }
 
-//export go_emacs_finalizer
-func go_emacs_finalizer(data C.uint64_t) {
+//export go_emacs_function_finalizer
+func go_emacs_function_finalizer(data C.uint64_t) {
 	funcs.delete(funcIndex(data))
 }
 
