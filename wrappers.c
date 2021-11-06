@@ -343,7 +343,7 @@ struct phst_emacs_value_result phst_emacs_make_time(emacs_env *env,
 bool phst_emacs_should_quit(emacs_env *env) { return env->should_quit(env); }
 
 struct phst_emacs_void_result phst_emacs_process_input(emacs_env *env) {
-    env->process_input(env);
+  env->process_input(env);
   return check_void(env);
 }
 
