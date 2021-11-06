@@ -310,8 +310,6 @@ struct void_result process_input(emacs_env *env) {
   return check_void(env);
 }
 
-static_assert(UINTPTR_MAX == UINT64_MAX, "unsupported architecture");
-
 struct integer_result open_channel(emacs_env *env, emacs_value value) {
 #if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
   static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
