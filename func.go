@@ -16,12 +16,14 @@ package emacs
 
 // #include "emacs-module.h"
 // #include "wrappers.h"
-// struct value_result make_function(emacs_env *env,
-//                                   int64_t min_arity, int64_t max_arity,
-//                                   _GoString_ documentation, uint64_t data) {
+// struct phst_emacs_value_result phst_emacs_make_function(emacs_env *env,
+//                                                         int64_t min_arity,
+//                                                         int64_t max_arity,
+//                                                         _GoString_ documentation,
+//                                                         uint64_t data) {
 //   size_t length = _GoStringLen(documentation);
 //   const char *doc = length == 0 ? NULL : _GoStringPtr(documentation);
-//   return make_function_impl(env, min_arity, max_arity, doc, data);
+//   return phst_emacs_make_function_impl(env, min_arity, max_arity, doc, data);
 // }
 import "C"
 
@@ -144,7 +146,7 @@ func (e Env) makeFunction(arity Arity, doc Doc, data uint64) (Value, error) {
 		}
 		doc += "\x00"
 	}
-	return e.checkValue(C.make_function(e.raw(), min, max, string(doc), C.uint64_t(data)))
+	return e.checkValue(C.phst_emacs_make_function(e.raw(), min, max, string(doc), C.uint64_t(data)))
 }
 
 // Funcall calls the Emacs function fun with the given arguments.  Both
@@ -160,11 +162,11 @@ func (e Env) Funcall(fun Value, args []Value) (Value, error) {
 		}
 		ptr = &rawArgs[0]
 	}
-	return e.checkValue(C.funcall(e.raw(), fun.r, C.int64_t(nargs), ptr))
+	return e.checkValue(C.phst_emacs_funcall(e.raw(), fun.r, C.int64_t(nargs), ptr))
 }
 
 // MakeInteractive sets the interactive specification of the given function.
 // The function must refer to a module function.
 func (e Env) MakeInteractive(fun, spec Value) error {
-	return e.checkVoid(C.make_interactive(e.raw(), fun.r, spec.r))
+	return e.checkVoid(C.phst_emacs_make_interactive(e.raw(), fun.r, spec.r))
 }

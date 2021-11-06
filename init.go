@@ -47,8 +47,8 @@ func (i initFunc) Define(e Env) error {
 	return i(e)
 }
 
-//export go_emacs_init
-func go_emacs_init(env *C.emacs_env) (r C.struct_init_result) {
+//export phst_emacs_init
+func phst_emacs_init(env *C.emacs_env) (r C.struct_phst_emacs_init_result) {
 	// We can’t use environments from other threads, so make sure that we
 	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
@@ -57,10 +57,10 @@ func go_emacs_init(env *C.emacs_env) (r C.struct_init_result) {
 	// Don’t allow Go panics to crash Emacs.
 	defer protect(e, &r.base)
 	if err := majorVersion.init(e); err != nil {
-		return C.struct_init_result{e.signal(err)}
+		return C.struct_phst_emacs_init_result{e.signal(err)}
 	}
 	err := inits.DefineQueued(e)
-	return C.struct_init_result{e.signal(err)}
+	return C.struct_phst_emacs_init_result{e.signal(err)}
 }
 
 //export plugin_is_GPL_compatible

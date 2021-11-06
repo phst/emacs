@@ -15,7 +15,7 @@
 package emacs
 
 // #include "emacs-module.h"
-// bool is_not_nil(emacs_env *env, emacs_value value) {
+// bool phst_emacs_is_not_nil(emacs_env *env, emacs_value value) {
 //   return env->is_not_nil(env, value);
 // }
 import "C"
@@ -53,7 +53,7 @@ func (b *Bool) FromEmacs(e Env, v Value) error {
 
 // IsNotNil returns false if and only if the given Emacs value is nil.
 func (e Env) IsNotNil(v Value) bool {
-	return bool(C.is_not_nil(e.raw(), v.r))
+	return bool(C.phst_emacs_is_not_nil(e.raw(), v.r))
 }
 
 // IsNil returns true if and only if the given Emacs value is nil.

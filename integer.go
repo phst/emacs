@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ type Int int64
 // Emacs creates an Emacs value representing the given integer.  It returns an
 // error if the integer value is too big for Emacs.
 func (i Int) Emacs(e Env) (Value, error) {
-	return e.checkValue(C.make_integer(e.raw(), C.int64_t(i)))
+	return e.checkValue(C.phst_emacs_make_integer(e.raw(), C.int64_t(i)))
 }
 
 // FromEmacs sets *i to the integer stored in v.  It returns an error if v is
@@ -50,14 +50,14 @@ func (i *Int) FromEmacs(e Env, v Value) error {
 // Int returns the integer stored in v.  It returns an error if v is not an
 // integer, or if it doesn’t fit into an int64.
 func (e Env) Int(v Value) (int64, error) {
-	i := C.extract_integer(e.raw(), v.r)
+	i := C.phst_emacs_extract_integer(e.raw(), v.r)
 	return int64(i.value), e.check(i.base)
 }
 
 // BigInt sets z to the integer stored in v.  It returns an error if v is not
 // an integer.
 func (e Env) BigInt(v Value, z *big.Int) error {
-	r := C.extract_big_integer(e.raw(), v.r)
+	r := C.phst_emacs_extract_big_integer(e.raw(), v.r)
 	if err := e.check(r.base); err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (i *BigInt) Emacs(e Env) (Value, error) {
 		return Int(b.Int64()).Emacs(e)
 	}
 	p := b.Bytes()
-	return e.checkValue(C.make_big_integer(e.raw(), C.int(b.Sign()), (*C.uint8_t)(&p[0]), C.int64_t(len(p))))
+	return e.checkValue(C.phst_emacs_make_big_integer(e.raw(), C.int(b.Sign()), (*C.uint8_t)(&p[0]), C.int64_t(len(p))))
 }
 
 // FromEmacs sets *i to the integer stored in v.  It returns an error if v is

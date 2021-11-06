@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package emacs
 // #include <stdlib.h>
 // #include "emacs-module.h"
 // #include "wrappers.h"
-// struct value_result make_string(emacs_env *env, _GoString_ contents) {
+// struct phst_emacs_value_result phst_emacs_make_string(emacs_env *env,
+//                                                       _GoString_ contents) {
 //   size_t size = _GoStringLen(contents);
 //   assert(size > 0);
-//   return make_string_impl(env, _GoStringPtr(contents), size - 1);
+//   return phst_emacs_make_string_impl(env, _GoStringPtr(contents), size - 1);
 // }
 import "C"
 
@@ -74,7 +75,7 @@ func (s *String) FromEmacs(e Env, v Value) error {
 // named String to avoid confusion with the String method of the Stringer
 // interface.
 func (e Env) Str(v Value) (string, error) {
-	r := C.copy_string_contents(e.raw(), v.r)
+	r := C.phst_emacs_copy_string_contents(e.raw(), v.r)
 	if err := e.check(r.base); err != nil {
 		return "", err
 	}
@@ -90,7 +91,7 @@ func (e Env) Str(v Value) (string, error) {
 }
 
 func (e Env) makeString(s string) (Value, error) {
-	return e.checkValue(C.make_string(e.raw(), s+"\x00"))
+	return e.checkValue(C.phst_emacs_make_string(e.raw(), s+"\x00"))
 }
 
 // FormatMessage calls the Emacs function format-message with the given format
@@ -116,9 +117,9 @@ type Bytes []byte
 // It always makes a copy of the byte slice.
 func (b Bytes) Emacs(e Env) (Value, error) {
 	if len(b) == 0 {
-		return e.checkValue(C.make_unibyte_string(e.raw(), nil, 0))
+		return e.checkValue(C.phst_emacs_make_unibyte_string(e.raw(), nil, 0))
 	}
-	return e.checkValue(C.make_unibyte_string(e.raw(), unsafe.Pointer(&b[0]), C.int64_t(len(b))))
+	return e.checkValue(C.phst_emacs_make_unibyte_string(e.raw(), unsafe.Pointer(&b[0]), C.int64_t(len(b))))
 }
 
 // FromEmacs sets *b to the unibyte string stored in v.  It returns an error if

@@ -27,7 +27,7 @@ import (
 // process must have been created with make-pipe-process.  You can write to the
 // returned pipe to provide input to the pipe process.
 func (e Env) OpenPipe(process Value) (*os.File, error) {
-	i := C.open_channel(e.raw(), process.r)
+	i := C.phst_emacs_open_channel(e.raw(), process.r)
 	if err := e.check(i.base); err != nil {
 		return nil, err
 	}

@@ -28,8 +28,8 @@ import (
 // The trampoline must be defined in a separate file.  See
 // https://golang.org/cmd/cgo/#hdr-C_references_to_Go.
 
-//export go_emacs_trampoline
-func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) (r C.struct_trampoline_result) {
+//export phst_emacs_trampoline
+func phst_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) (r C.struct_phst_emacs_trampoline_result) {
 	// We can’t use environments from other threads, so make sure that we
 	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
 	runtime.LockOSThread()
@@ -49,11 +49,11 @@ func go_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value,
 		}
 	}
 	v, err := fun(e, in)
-	return C.struct_trampoline_result{e.signal(err), v.r}
+	return C.struct_phst_emacs_trampoline_result{e.signal(err), v.r}
 }
 
-//export go_emacs_function_finalizer
-func go_emacs_function_finalizer(data C.uint64_t) {
+//export phst_emacs_function_finalizer
+func phst_emacs_function_finalizer(data C.uint64_t) {
 	funcs.delete(funcIndex(data))
 }
 

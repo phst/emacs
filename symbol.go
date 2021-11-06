@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@ package emacs
 
 // #include "emacs-module.h"
 // #include "wrappers.h"
-// struct value_result intern(emacs_env *env, _GoString_ symbol_name) {
-//   return intern_impl(env, _GoStringPtr(symbol_name));
+// struct phst_emacs_value_result phst_emacs_intern(emacs_env *env,
+//                                                  _GoString_ symbol_name) {
+//   return phst_emacs_intern_impl(env, _GoStringPtr(symbol_name));
 // }
 import "C"
 
@@ -133,5 +134,5 @@ func (e Env) Nil() (Value, error) {
 // internASCII interns the ASCII symbol s in the default obarray.  s must not
 // contain non-ASCII characters or null bytes.
 func (e Env) internASCII(s Symbol) (Value, error) {
-	return e.checkValue(C.intern(e.raw(), string(s)+"\x00"))
+	return e.checkValue(C.phst_emacs_intern(e.raw(), string(s)+"\x00"))
 }

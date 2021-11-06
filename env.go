@@ -16,7 +16,7 @@ package emacs
 
 // #include <stdbool.h>
 // #include "emacs-module.h"
-// bool eq(emacs_env *env, emacs_value a, emacs_value b) {
+// bool phst_emacs_eq(emacs_env *env, emacs_value a, emacs_value b) {
 //   return env->eq(env, a, b);
 // }
 import "C"
@@ -33,7 +33,7 @@ type Env struct{ ptr *C.emacs_env }
 // Eq returns true if and only if the two values represent the same Emacs
 // object.
 func (e Env) Eq(a, b Value) bool {
-	return a == b || bool(C.eq(e.raw(), a.r, b.r))
+	return a == b || bool(C.phst_emacs_eq(e.raw(), a.r, b.r))
 }
 
 // Eval evaluates form using the Emacs function eval.  The binding is always

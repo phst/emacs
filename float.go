@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ type Float float64
 
 // Emacs creates an Emacs value representing the given floating-point number.
 func (f Float) Emacs(e Env) (Value, error) {
-	return e.checkValue(C.make_float(e.raw(), C.double(f)))
+	return e.checkValue(C.phst_emacs_make_float(e.raw(), C.double(f)))
 }
 
 // FromEmacs sets *f to the floating-point number stored in v.  It returns an
@@ -42,7 +42,7 @@ func (f *Float) FromEmacs(e Env, v Value) error {
 // Float returns the floating-point number stored in v.  It returns an error if
 // v is not a floating-point value.
 func (e Env) Float(v Value) (float64, error) {
-	r := C.extract_float(e.raw(), v.r)
+	r := C.phst_emacs_extract_float(e.raw(), v.r)
 	if err := e.check(r.base); err != nil {
 		return 0, err
 	}

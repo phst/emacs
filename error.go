@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ func (e Env) signal(err error) C.struct_result_base_with_optional_error_info {
 // is set in r, check returns nil.  If a signal is set in r, check returns an
 // error of dynamic type Signal.  If a throw is set in r, check returns an
 // error of dynamic type Throw.
-func (e Env) check(r C.struct_result_base) error {
+func (e Env) check(r C.struct_phst_emacs_result_base) error {
 	switch r.exit {
 	case C.emacs_funcall_exit_return:
 		return nil
@@ -248,13 +248,13 @@ func (e Env) check(r C.struct_result_base) error {
 }
 
 // checkVoid is like check, but takes a struct void_result for convenience.
-func (e Env) checkVoid(r C.struct_void_result) error {
+func (e Env) checkVoid(r C.struct_phst_emacs_void_result) error {
 	return e.check(r.base)
 }
 
 // checkValue is like check, but takes a struct value_result and returns v for
 // convenience.
-func (e Env) checkValue(r C.struct_value_result) (Value, error) {
+func (e Env) checkValue(r C.struct_phst_emacs_value_result) (Value, error) {
 	return Value{r.value}, e.check(r.base)
 }
 

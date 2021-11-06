@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import "C"
 //
 // Deprecated: Use ProcessInput instead.
 func (e Env) ShouldQuit() bool {
-	return bool(C.should_quit(e.raw()))
+	return bool(C.phst_emacs_should_quit(e.raw()))
 }
 
 // ProcessInput processes pending input and returns whether the user has
@@ -34,5 +34,5 @@ func (e Env) ShouldQuit() bool {
 // Note that processing input can run arbitrary Lisp code, so don’t rely on
 // global state staying the same after calling ProcessInput.
 func (e Env) ProcessInput() error {
-	return e.checkVoid(C.process_input(e.raw()))
+	return e.checkVoid(C.phst_emacs_process_input(e.raw()))
 }

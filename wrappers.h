@@ -40,7 +40,7 @@ __attribute__((__visibility__("default"))) int
 emacs_module_init(struct emacs_runtime *rt);
 
 // Result of non_local_exit_get.
-struct result_base {
+struct phst_emacs_result_base {
   enum emacs_funcall_exit exit;
   emacs_value error_symbol;
   emacs_value error_data;
@@ -56,104 +56,125 @@ struct result_base_with_optional_error_info {
 
 // Wrapper types for all possible return types.
 
-struct void_result {
-  struct result_base base;
+struct phst_emacs_void_result {
+  struct phst_emacs_result_base base;
 };
 
-
-struct init_result {
+struct phst_emacs_init_result {
   struct result_base_with_optional_error_info base;
 };
 
-struct init_result go_emacs_init(emacs_env *env);
+struct phst_emacs_init_result phst_emacs_init(emacs_env *env);
 
-struct value_result {
-  struct result_base base;
+struct phst_emacs_value_result {
+  struct phst_emacs_result_base base;
   emacs_value value;
 };
 
-
-struct trampoline_result {
+struct phst_emacs_trampoline_result {
   struct result_base_with_optional_error_info base;
   emacs_value value;
 };
 
-struct trampoline_result go_emacs_trampoline(emacs_env *env, int64_t nargs,
-                                             emacs_value *args, uint64_t data);
-void go_emacs_function_finalizer(uint64_t data);
+struct phst_emacs_trampoline_result phst_emacs_trampoline(emacs_env *env,
+                                                          int64_t nargs,
+                                                          emacs_value *args,
+                                                          uint64_t data);
+void phst_emacs_function_finalizer(uint64_t data);
 
-struct value_result funcall(emacs_env *env, emacs_value function, int64_t nargs,
-                            emacs_value *args);
-struct value_result make_function_impl(emacs_env *env, int64_t min_arity,
-                                       int64_t max_arity,
-                                       const char *documentation,
-                                       uint64_t data);
+struct phst_emacs_value_result phst_emacs_funcall(emacs_env *env,
+                                                  emacs_value function,
+                                                  int64_t nargs,
+                                                  emacs_value *args);
+struct phst_emacs_value_result phst_emacs_make_function_impl(emacs_env *env,
+                                                             int64_t min_arity,
+                                                             int64_t max_arity,
+                                                             const char *documentation,
+                                                             uint64_t data);
 
-struct integer_result {
-  struct result_base base;
+struct phst_emacs_integer_result {
+  struct phst_emacs_result_base base;
   int64_t value;
 };
 
-
-struct big_integer_result {
-  struct result_base base;
+struct phst_emacs_big_integer_result {
+  struct phst_emacs_result_base base;
   int sign;            // −1, 0, or +1
   const uint8_t *data; // allocated with malloc iff successful and sign ≠ 0
   int size;            // int because of GoSlice signature
 };
 
-struct integer_result extract_integer(emacs_env *env, emacs_value value);
-struct big_integer_result extract_big_integer(emacs_env *env,
-                                              emacs_value value);
-struct value_result make_integer(emacs_env *env, int64_t value);
+struct phst_emacs_integer_result phst_emacs_extract_integer(emacs_env *env,
+                                                            emacs_value value);
+struct phst_emacs_big_integer_result phst_emacs_extract_big_integer(emacs_env *env,
+                                                                    emacs_value value);
+struct phst_emacs_value_result phst_emacs_make_integer(emacs_env *env,
+                                                       int64_t value);
 
 // The number (and therefore sign) may not be zero.  sign must be −1 or +1.
-struct value_result make_big_integer(emacs_env *env, int sign,
-                                     const uint8_t *data, int64_t size);
+struct phst_emacs_value_result phst_emacs_make_big_integer(emacs_env *env,
+                                                           int sign,
+                                                           const uint8_t *data,
+                                                           int64_t size);
 
-struct float_result {
-  struct result_base base;
+struct phst_emacs_float_result {
+  struct phst_emacs_result_base base;
   double value;
 };
 
-struct float_result extract_float(emacs_env *env, emacs_value value);
-struct value_result make_float(emacs_env *env, double value);
+struct phst_emacs_float_result phst_emacs_extract_float(emacs_env *env,
+                                                        emacs_value value);
+struct phst_emacs_value_result phst_emacs_make_float(emacs_env *env,
+                                                     double value);
 
-struct string_result {
-  struct result_base base;
+struct phst_emacs_string_result {
+  struct phst_emacs_result_base base;
   const char *data;  // allocated with malloc iff successful and size > 0
   int size;          // int because of GoStringN signature
 };
 
-struct string_result copy_string_contents(emacs_env *env, emacs_value value);
+struct phst_emacs_string_result phst_emacs_copy_string_contents(emacs_env *env,
+                                                                emacs_value value);
 
-struct value_result make_string_impl(emacs_env *env, const char *data,
-                                     size_t size);
-struct value_result make_unibyte_string(emacs_env *env, const void *data,
-                                        int64_t size);
+struct phst_emacs_value_result phst_emacs_make_string_impl(emacs_env *env,
+                                                           const char *data,
+                                                           size_t size);
+struct phst_emacs_value_result phst_emacs_make_unibyte_string(emacs_env *env,
+                                                              const void *data,
+                                                              int64_t size);
 
 // symbol_name must be ASCII-only without embedded null characters.
-struct value_result intern_impl(emacs_env *env, const char *symbol_name);
+struct phst_emacs_value_result phst_emacs_intern_impl(emacs_env *env,
+                                                      const char *symbol_name);
 
-struct value_result vec_get(emacs_env *env, emacs_value vec, int64_t i);
-struct void_result vec_set(emacs_env *env, emacs_value vec, int64_t i,
-                           emacs_value val);
-struct integer_result vec_size(emacs_env *env, emacs_value vec);
+struct phst_emacs_value_result phst_emacs_vec_get(emacs_env *env,
+                                                  emacs_value vec,
+                                                  int64_t i);
+struct phst_emacs_void_result phst_emacs_vec_set(emacs_env *env,
+                                                 emacs_value vec,
+                                                 int64_t i,
+                                                 emacs_value val);
+struct phst_emacs_integer_result phst_emacs_vec_size(emacs_env *env,
+                                                     emacs_value vec);
 
-struct timespec_result {
-  struct result_base base;
+struct phst_emacs_timespec_result {
+  struct phst_emacs_result_base base;
   struct timespec value;
 };
 
-struct timespec_result extract_time(emacs_env *env, emacs_value value);
-struct value_result make_time(emacs_env *env, struct timespec time);
+struct phst_emacs_timespec_result phst_emacs_extract_time(emacs_env *env,
+                                                          emacs_value value);
+struct phst_emacs_value_result phst_emacs_make_time(emacs_env *env,
+                                                    struct timespec time);
 
-bool should_quit(emacs_env *env);
-struct void_result process_input(emacs_env *env);
+bool phst_emacs_should_quit(emacs_env *env);
+struct phst_emacs_void_result phst_emacs_process_input(emacs_env *env);
 
-struct integer_result open_channel(emacs_env *env, emacs_value value);
+struct phst_emacs_integer_result phst_emacs_open_channel(emacs_env *env,
+                                                         emacs_value value);
 
-struct void_result make_interactive(emacs_env *env, emacs_value function,
-                                    emacs_value spec);
+struct phst_emacs_void_result phst_emacs_make_interactive(emacs_env *env,
+                                                          emacs_value function,
+                                                          emacs_value spec);
 
 #endif

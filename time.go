@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -115,10 +115,10 @@ func (e Env) Duration(v Value) (time.Duration, error) {
 }
 
 func (e Env) makeTime(s int64, ns int) (Value, error) {
-	return e.checkValue(C.make_time(e.raw(), C.struct_timespec{C.time_t(s), C.long(ns)}))
+	return e.checkValue(C.phst_emacs_make_time(e.raw(), C.struct_timespec{C.time_t(s), C.long(ns)}))
 }
 
 func (e Env) extractTime(v Value) (s int64, ns int, err error) {
-	r := C.extract_time(e.raw(), v.r)
+	r := C.phst_emacs_extract_time(e.raw(), v.r)
 	return int64(r.value.tv_sec), int(r.value.tv_nsec), e.check(r.base)
 }
