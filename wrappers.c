@@ -53,7 +53,8 @@ int emacs_module_init(struct emacs_runtime *rt) {
   return 0;
 }
 
-struct result_base check(emacs_env *env) {
+// Checks for a nonlocal exit in env.  Clears and returns it.
+static struct result_base check(emacs_env *env) {
   struct result_base result;
   result.exit =
       env->non_local_exit_get(env, &result.error_symbol, &result.error_data);
@@ -61,11 +62,11 @@ struct result_base check(emacs_env *env) {
   return result;
 }
 
-struct void_result check_void(emacs_env *env) {
+static struct void_result check_void(emacs_env *env) {
   return (struct void_result){check(env)};
 }
 
-struct value_result check_value(emacs_env *env, emacs_value value) {
+static struct value_result check_value(emacs_env *env, emacs_value value) {
   return (struct value_result){check(env), value};
 }
 
@@ -118,7 +119,7 @@ static_assert((sizeof(emacs_limb_t) == 4 && EMACS_LIMB_MAX == 0xFFFFFFFF) ||
               "unsupported architecture");
 static_assert(sizeof(emacs_limb_t) < PTRDIFF_MAX, "unsupported architecture");
 
-struct integer_result check_integer(emacs_env *env, int64_t value) {
+static struct integer_result check_integer(emacs_env *env, int64_t value) {
   return (struct integer_result){check(env), value};
 }
 

@@ -54,16 +54,12 @@ struct result_base_with_optional_error_info {
   emacs_value error_data;
 };
 
-// Checks for a nonlocal exit in env.  Clears and returns it.
-struct result_base check(emacs_env *env);
-
-// Wrapper types and functions for check for all possible return types.
+// Wrapper types for all possible return types.
 
 struct void_result {
   struct result_base base;
 };
 
-struct void_result check_void(emacs_env *env);
 
 struct init_result {
   struct result_base_with_optional_error_info base;
@@ -76,7 +72,6 @@ struct value_result {
   emacs_value value;
 };
 
-struct value_result check_value(emacs_env *env, emacs_value value);
 
 struct trampoline_result {
   struct result_base_with_optional_error_info base;
@@ -99,7 +94,6 @@ struct integer_result {
   int64_t value;
 };
 
-struct integer_result check_integer(emacs_env *env, int64_t value);
 
 struct big_integer_result {
   struct result_base base;
