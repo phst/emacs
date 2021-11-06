@@ -71,8 +71,6 @@ struct init_result {
 
 struct init_result go_emacs_init(emacs_env *env);
 
-bool eq(emacs_env *env, emacs_value a, emacs_value b);
-
 struct value_result {
   struct result_base base;
   emacs_value value;
