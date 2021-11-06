@@ -284,14 +284,9 @@ struct phst_emacs_value_result phst_emacs_make_unibyte_string(emacs_env *env,
     return (struct phst_emacs_value_result){out_of_memory(env), NULL};
   }
   for (ptrdiff_t i = 0; i < size; ++i) {
-    static_assert(INT64_MAX >= UCHAR_MAX, "unsupported architecture");
-    struct phst_emacs_value_result byte =
-      phst_emacs_make_integer(env, bytes[i]);
-    if (byte.base.exit != emacs_funcall_exit_return) {
-      free(args);
-      return byte;
-    }
-    args[i] = byte.value;
+    static_assert(INTMAX_MIN <= 0, "unsupported architecture");
+    static_assert(INTMAX_MAX >= UCHAR_MAX, "unsupported architecture");
+    args[i] = env->make_integer(env, bytes[i]);
   }
   emacs_value result = env->funcall(env, env->intern(env, "unibyte-string"),
                                     size, args);
