@@ -29,6 +29,15 @@ static_assert(PTRDIFF_MAX == INT64_MAX, "unsupported architecture");
 static_assert(UINTPTR_MAX == UINT64_MAX, "unsupported architecture");
 static_assert(PTRDIFF_MAX <= SIZE_MAX, "unsupported architecture");
 
+// Sets the nonlocal exit state of env according to result.  Call this only
+// directly before returning control to Emacs.
+static void handle_nonlocal_exit(emacs_env *env,
+                                 struct result_base_with_optional_error_info result);
+
+static struct result_base out_of_memory(emacs_env *env);
+static struct result_base overflow_error(emacs_env *env);
+static struct result_base unimplemented(emacs_env *env);
+
 int emacs_module_init(struct emacs_runtime *rt) {
   if ((size_t)rt->size < sizeof *rt) {
     return 1;
@@ -337,8 +346,8 @@ struct void_result make_interactive(emacs_env *env, emacs_value function,
   return result;
 }
 
-void handle_nonlocal_exit(emacs_env *env,
-                          struct result_base_with_optional_error_info result) {
+static void handle_nonlocal_exit(emacs_env *env,
+                                 struct result_base_with_optional_error_info result) {
   if (result.exit == emacs_funcall_exit_return) {
     return;
   }
@@ -360,7 +369,7 @@ void handle_nonlocal_exit(emacs_env *env,
   }
 }
 
-struct result_base out_of_memory(emacs_env *env) {
+static struct result_base out_of_memory(emacs_env *env) {
   const char *message = "Out of memory";
   size_t length = strlen(message);
   assert(length < PTRDIFF_MAX);
@@ -371,13 +380,13 @@ struct result_base out_of_memory(emacs_env *env) {
   return check(env);
 }
 
-struct result_base overflow_error(emacs_env *env) {
+static struct result_base overflow_error(emacs_env *env) {
   env->non_local_exit_signal(env, env->intern(env, "overflow-error"),
                              env->intern(env, "nil"));
   return check(env);
 }
 
-struct result_base unimplemented(emacs_env *env) {
+static struct result_base unimplemented(emacs_env *env) {
   env->non_local_exit_signal(env, env->intern(env, "go-unimplemented-error"),
                              env->intern(env, "nil"));
   return check(env);

@@ -164,13 +164,4 @@ struct integer_result open_channel(emacs_env *env, emacs_value value);
 struct void_result make_interactive(emacs_env *env, emacs_value function,
                                     emacs_value spec);
 
-// Sets the nonlocal exit state of env according to result.  Call this only
-// directly before returning control to Emacs.
-void handle_nonlocal_exit(emacs_env *env,
-                          struct result_base_with_optional_error_info result);
-
-struct result_base out_of_memory(emacs_env *env);
-struct result_base overflow_error(emacs_env *env);
-struct result_base unimplemented(emacs_env *env);
-
 #endif
