@@ -1,4 +1,4 @@
-# Copyright 2019, 2021 Google LLC
+# Copyright 2019, 2021, 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 
 load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier", "buildifier_test")
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "nogo")
+load("@io_bazel_rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "nogo")
 load(":def.bzl", "COPTS", "emacs_module")
 
 SRCS = glob(
@@ -62,8 +62,8 @@ go_binary(
 
 nogo(
     name = "nogo",
-    vet = True,
     visibility = ["//visibility:public"],
+    deps = TOOLS_NOGO,
 )
 
 buildifier(
