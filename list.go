@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,8 +73,8 @@ func (u *UnpackList) FromEmacs(e Env, v Value) error {
 	var o Value
 	var err error
 	for i := e.Iter(v, &o, &err); i.Ok(); i.Next() {
-		if err := s[n].FromEmacs(e, o); err != nil {
-			return err
+		if err1 := s[n].FromEmacs(e, o); err1 != nil {
+			return err1
 		}
 		n++
 		if n >= len(s) {
@@ -271,8 +271,8 @@ func (e Env) Dolist(list Value, f func(Value) error) error {
 	var elem Value
 	var err error
 	for i := e.Iter(list, &elem, &err); i.Ok(); i.Next() {
-		if err := f(elem); err != nil {
-			return err
+		if err1 := f(elem); err1 != nil {
+			return err1
 		}
 	}
 	return err
