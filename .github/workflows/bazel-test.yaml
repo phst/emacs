@@ -1,4 +1,4 @@
-# Copyright 2021 Google LLC
+# Copyright 2021, 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ jobs:
       matrix:
         # We don’t use the GitHub matrix support for the Emacs toolchain to
         # allow Bazel to cache intermediate results between the test runs.
-        version: [4.2.0, 4.2.1, 4.2.2, latest, rolling]
+        # We’d like to include “rolling” here, but that currently fails due to
+        # https://github.com/bazelbuild/bazel/issues/14626.
+        version: [4.2.0, 4.2.1, 4.2.2, latest]
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{matrix.os}}
     steps:
