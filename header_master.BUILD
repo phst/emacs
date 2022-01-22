@@ -1,4 +1,4 @@
-# Copyright 2019 Google LLC
+# Copyright 2019, 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ genrule(
     ],
     outs = ["emacs-module.h"],
     cmd = (
-        "$(location @com_github_phst_emacs//:genheader)" +
-        " --template=$(location emacs-module.h.in)" +
+        "$(execpath @com_github_phst_emacs//:genheader)" +
+        " --template=$(execpath emacs-module.h.in)" +
         " --output=$@" +
-        " -- $(locations :snippets)"
+        " -- $(execpaths :snippets)"
     ),
     tools = ["@com_github_phst_emacs//:genheader"],
 )
