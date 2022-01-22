@@ -24,7 +24,7 @@ jobs:
         # allow Bazel to cache intermediate results between the test runs.
         # We’d like to include “rolling” here, but that currently fails due to
         # https://github.com/bazelbuild/bazel/issues/14626.
-        version: [4.2.0, 4.2.1, 4.2.2, latest]
+        version: [4.2.0, 4.2.1, 4.2.2, 5.0.0, latest]
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{matrix.os}}
     steps:
