@@ -14,7 +14,11 @@
 
 package emacs
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"log"
+)
 
 func init() {
 	ERTTest(pipe)
@@ -45,12 +49,7 @@ func pipe(e Env) error {
 		return err
 	}
 	defer fd.Close()
-	if _, err := fd.WriteString("hi from Go"); err != nil {
-		return err
-	}
-	if err := fd.Close(); err != nil {
-		return err
-	}
+	go write(fd, "hi from Go")
 	for {
 		r, err := e.Call("accept-process-output", proc)
 		if err != nil {
@@ -69,4 +68,13 @@ func pipe(e Env) error {
 		return fmt.Errorf("got %q, want %q", got, want)
 	}
 	return nil
+}
+
+func write(w io.WriteCloser, s string) {
+	if _, err := io.WriteString(w, s); err != nil {
+		log.Printf("error writing to pipe: %s", err)
+	}
+	if err := w.Close(); err != nil {
+		log.Printf("error closing pipe: %s", err)
+	}
 }
