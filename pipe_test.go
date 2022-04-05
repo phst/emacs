@@ -53,8 +53,12 @@ func pipe(e Env) error {
 	if _, err = e.Call("accept-process-output", proc); err != nil {
 		return err
 	}
-	var got String
-	if err := e.CallOut("buffer-string", &got, buffer); err != nil {
+	v, err := e.Eval(List{Symbol("with-current-buffer"), buffer, List{Symbol("buffer-string")}})
+	if err != nil {
+		return err
+	}
+	got, err := e.Str(v)
+	if err != nil {
 		return err
 	}
 	const want = "hi from Go"
