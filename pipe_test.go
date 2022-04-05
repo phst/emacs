@@ -50,14 +50,8 @@ func pipe(e Env) error {
 	}
 	defer fd.Close()
 	go write(fd, "hi from Go")
-	for {
-		r, err := e.Call("accept-process-output", proc)
-		if err != nil {
-			return err
-		}
-		if e.IsNil(r) {
-			break
-		}
+	if _, err = e.Call("accept-process-output", proc); err != nil {
+		return err
 	}
 	var got String
 	if err := e.CallOut("buffer-string", &got, buffer); err != nil {
