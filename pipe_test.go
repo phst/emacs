@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2020, 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ func pipe(e Env) error {
 		Symbol(":buffer"), buffer,
 		Symbol(":coding"), Symbol("utf-8-unix"),
 		Symbol(":noquery"), T,
+		Symbol(":sentinel"), Nil,
 	)
 	if err != nil {
 		return err
