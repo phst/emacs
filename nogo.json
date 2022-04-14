@@ -1,0 +1,22 @@
+{
+    "composites": {
+        "exclude_files": {
+            "external": "errors in external repositories"
+        }
+    },
+    "copylocks": {
+        "exclude_files": {
+            "external": "errors in external repositories"
+        }
+    },
+    "shadow": {
+        "exclude_files": {
+            "external": "errors in external repositories"
+        }
+    },
+    "unreachable": {
+        "exclude_files": {
+            "external": "errors in external repositories"
+        }
+    }
+}
