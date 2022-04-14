@@ -76,6 +76,7 @@ buildifier(
 
 buildifier_test(
     name = "buildifier_test",
+    size = "small",
     srcs = [
         "BUILD",
         "WORKSPACE",
