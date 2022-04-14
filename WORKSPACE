@@ -39,12 +39,21 @@ bazel_skylib_workspace()
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "f2dcd210c7095febe54b804bb1cd3a58fe8435a909db2ec04e31542631cf715c",
+    sha256 = "93ca9e3becb5f41723a41cc669ece6bba89af2c0a18fa3bad0fe780c798b5b04",
+    strip_prefix = "rules_go-efd118d1b1091bc31309ba907e363ddf18811e8a/",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.31.0/rules_go-v0.31.0.zip",
-        "https://github.com/bazelbuild/rules_go/releases/download/v0.31.0/rules_go-v0.31.0.zip",
+        "https://github.com/fmeum/rules_go/archive/efd118d1b1091bc31309ba907e363ddf18811e8a.zip",  # 2022-04-11
     ],
 )
+
+# http_archive(
+#     name = "io_bazel_rules_go",
+#     sha256 = "f2dcd210c7095febe54b804bb1cd3a58fe8435a909db2ec04e31542631cf715c",
+#     urls = [
+#         "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.31.0/rules_go-v0.31.0.zip",
+#         "https://github.com/bazelbuild/rules_go/releases/download/v0.31.0/rules_go-v0.31.0.zip",
+#     ],
+# )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
