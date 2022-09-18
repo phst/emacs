@@ -79,10 +79,10 @@ http_archive(
 
 http_archive(
     name = "phst_rules_elisp",
-    sha256 = "8a22d6820ace1604c6e9f3c8fec1a821d71680d3c8d9f090804862f440b7567e",
-    strip_prefix = "rules_elisp-169e7babd93e26f2b7c2f5b9704a7c76fadaf598",
+    sha256 = "7e8e49d67b623dc088fea6f2f79cf1aba6539dc6013bca29bc5e515f591dab86",
+    strip_prefix = "rules_elisp-5eaf9fae01f65cdfe300f5402440c768cadd8f6f",
     urls = [
-        "https://github.com/phst/rules_elisp/archive/169e7babd93e26f2b7c2f5b9704a7c76fadaf598.zip",  # 2022-04-05
+        "https://github.com/phst/rules_elisp/archive/5eaf9fae01f65cdfe300f5402440c768cadd8f6f.zip",  # 2022-09-18
     ],
 )
 
