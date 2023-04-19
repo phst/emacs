@@ -26,7 +26,7 @@ import (
 )
 
 // The trampoline must be defined in a separate file.  See
-// https://golang.org/cmd/cgo/#hdr-C_references_to_Go.
+// https://pkg.go.dev/cmd/cgo#hdr-C_references_to_Go.
 
 //export phst_emacs_trampoline
 func phst_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) (r C.struct_phst_emacs_trampoline_result) {

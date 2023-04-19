@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -380,7 +380,7 @@ func lispName(fun reflect.Value) Name {
 	return Name(b.String())
 }
 
-// See https://golang.org/ref/spec#Identifiers.
+// See https://go.dev/ref/spec#Identifiers.
 var goIdentPattern = regexp.MustCompile(`[\p{L}_][\p{L}_\p{Nd}]*$`)
 
 var (
