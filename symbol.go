@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import (
 	"unicode/utf8"
 )
 
-// Symbol represents an Emacs symbol.  Call interns Symbol values instead of
-// converting them to an Emacs string.
+// Symbol represents an Emacs symbol.  [Env.Call] interns Symbol values instead
+// of converting them to an Emacs string.
 type Symbol string
 
 // Symbol returns the symbol name.
@@ -67,9 +67,9 @@ func (e Env) Symbol(v Value) (Symbol, error) {
 	return Symbol(n), err
 }
 
-// Name is a Symbol that names a definition such as a function or error symbol.
-// You can use a Name as an Option in Export and ERTTest to set the function or
-// test name.
+// Name is a [Symbol] that names a definition such as a function or error
+// symbol.  You can use a Name as an [Option] in [Export] and [ERTTest] to set
+// the function or test name.
 type Name Symbol
 
 // Name returns the symbol name.
@@ -110,8 +110,8 @@ func (e Env) Intern(s Symbol) (Value, error) {
 	return e.Call("intern", s)
 }
 
-// MaybeIntern returns nameOrValue as-is if it’s a Value and calls Intern if
-// it’s a Symbol, Name, or string.  Otherwise it returns an error.
+// MaybeIntern returns nameOrValue as-is if it’s a Value and calls [Env.Intern]
+// if it’s a [Symbol], [Name], or string.  Otherwise it returns an error.
 func (e Env) MaybeIntern(nameOrValue interface{}) (Value, error) {
 	switch v := nameOrValue.(type) {
 	case Value:

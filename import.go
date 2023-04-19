@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,8 +88,8 @@ func Import(name Name, fp interface{}) {
 }
 
 // ImportFunc imports an Emacs function as a Go function.  name must be the
-// Emacs symbol name of the function.  ImportFunc returns a new Func that calls
-// the Emacs function name.  Unlike ImportFunc, there is no type
+// Emacs symbol name of the function.  ImportFunc returns a new [Func] that
+// calls the Emacs function name.  Unlike [ImportFunc], there is no type
 // autoconversion.
 //
 // ImportFunc must be called before Emacs loads the module.  Typically you

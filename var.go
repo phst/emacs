@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ func Var(name Name, init In, doc Doc) Name {
 	return name
 }
 
-// Var is like the global Var function, except that it requires a live
+// Var is like the global [Var] function, except that it requires a live
 // environment, defines the variable immediately, and returns errors instead of
 // panicking.
 func (e Env) Var(name Name, init In, doc Doc) error {
@@ -65,7 +65,7 @@ func (e Env) LetMany(bindings []Binding, body func() (Value, error)) (Value, err
 	}, T)
 }
 
-// Binding describes a variable binding for LetMany.
+// Binding describes a variable binding for [LetMany].
 type Binding struct {
 	Variable Name
 	Value    In

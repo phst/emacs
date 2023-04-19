@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import (
 // data.  Signaling an error will evaluate symbol and data lazily.  The
 // evaluation is best-effort since it can itself fail.  If it fails the symbol
 // and/or data might be lost, but Emacs will signal some error in any case.  If
-// you already have an evaluated symbol and data value, use Signal instead.
-// ErrorSymbol.Error is a convenience factory function for Error values.
+// you already have an evaluated symbol and data value, use [Signal] instead.
+// [ErrorSymbol.Error] is a convenience factory function for Error values.
 type Error struct {
 	// The error symbol.
 	Symbol ErrorSymbol
@@ -47,7 +47,7 @@ func (x Error) Error() string {
 	return fmt.Sprintf("%s: %s", x.Symbol, strings.Join(parts, ", "))
 }
 
-// ErrorSymbol represents an error symbol.  Use DefineError to create
+// ErrorSymbol represents an error symbol.  Use [DefineError] to create
 // ErrorSymbol values.  The zero ErrorSymbol is not a valid error symbol.
 type ErrorSymbol struct {
 	name    Name
@@ -67,9 +67,9 @@ func DefineError(name Name, message string, parents ...ErrorSymbol) ErrorSymbol 
 	return ErrorSymbol{name, message}
 }
 
-// DefineError is like the global DefineError function, except that it requires
-// a live environment, defines the error symbol immediately, and returns errors
-// instead of panicking.
+// DefineError is like the global [DefineError] function, except that it
+// requires a live environment, defines the error symbol immediately, and
+// returns errors instead of panicking.
 func (e Env) DefineError(name Name, message string, parents ...ErrorSymbol) (ErrorSymbol, error) {
 	if message == "" {
 		return ErrorSymbol{}, fmt.Errorf("empty error message for error symbol %s", name)
@@ -87,11 +87,11 @@ func (s ErrorSymbol) String() string {
 }
 
 // Error returns an error that causes to signal an error with the given symbol
-// and data.  The return value is of type Error.  Signaling an error will
+// and data.  The return value is of type [Error].  Signaling an error will
 // evaluate symbol and data lazily.  The evaluation is best-effort since it can
 // itself fail.  If it fails the symbol and/or data might be lost, but Emacs
 // will signal some error in any case.  If you already have an evaluated symbol
-// and data value, use Signal instead.
+// and data value, use [Signal] instead.
 func (s ErrorSymbol) Error(data ...In) error {
 	return Error{s, data}
 }
@@ -117,12 +117,12 @@ func (s ErrorSymbol) match(e Env, err error) bool {
 }
 
 // Signal is an error that that causes Emacs to signal an error with the given
-// symbol and data.  This is the equivalent to Error if you already have an
+// symbol and data.  This is the equivalent to [Error] if you already have an
 // evaluated symbol and data value.
 type Signal struct{ Symbol, Data Value }
 
 // Error implements the error interface.  Error returns a static string.  Use
-// Message to return the actual Emacs error message.
+// [Signal.Message] to return the actual Emacs error message.
 func (Signal) Error() string {
 	return "Emacs signal"
 }
@@ -164,7 +164,7 @@ func WrongTypeArgument(pred Symbol, arg In) error {
 }
 
 // IsWrongTypeArgument returns whether err is an Emacs signal of type
-// wrong-type-argument.  This function detects both Error and Signal.
+// wrong-type-argument.  This function detects both [Error] and [Signal].
 func (e Env) IsWrongTypeArgument(err error) bool {
 	return wrongTypeArgument.match(e, err)
 }
@@ -181,7 +181,7 @@ func OverflowError(val string) error {
 }
 
 // IsOverflowError returns whether err is an Emacs signal of type
-// overflow-error.  This function detects both Error and Signal.
+// overflow-error.  This function detects both [Error] and [Signal].
 func (e Env) IsOverflowError(err error) bool {
 	return overflowError.match(e, err)
 }
@@ -231,8 +231,8 @@ func (e Env) signal(err error) C.struct_result_base_with_optional_error_info {
 
 // check converts a pending nonlocal exit to a Go error.  If no nonlocal exit
 // is set in r, check returns nil.  If a signal is set in r, check returns an
-// error of dynamic type Signal.  If a throw is set in r, check returns an
-// error of dynamic type Throw.
+// error of dynamic type [Signal].  If a throw is set in r, check returns an
+// error of dynamic type [Throw].
 func (e Env) check(r C.struct_phst_emacs_result_base) error {
 	switch r.exit {
 	case C.emacs_funcall_exit_return:

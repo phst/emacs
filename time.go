@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ import (
 // #include "wrappers.h"
 import "C"
 
-// Time is a type with underlying type time.Time that knows how to convert
+// Time is a type with underlying type [time.Time] that knows how to convert
 // itself from and to an Emacs time value.
 type Time time.Time
 
-// String formats the time as a string.  It calls time.Time.String.
+// String formats the time as a string.  It calls [time.Time.String].
 func (t Time) String() string { return time.Time(t).String() }
 
 // Emacs returns an Emacs timestamp as a pair (ticks . hz) or a quadruple
@@ -63,11 +63,11 @@ func (e Env) Time(v Value) (time.Time, error) {
 	return time.Unix(s, int64(ns)), err
 }
 
-// Duration is a type with underlying type time.Duration that knows how to
+// Duration is a type with underlying type [time.Duration] that knows how to
 // convert itself from and to an Emacs time value.
 type Duration time.Duration
 
-// String formats the duration as a string.  It calls time.Duration.String.
+// String formats the duration as a string.  It calls [time.Duration.String].
 func (d Duration) String() string { return time.Duration(d).String() }
 
 // Emacs returns an Emacs timestamp as a pair (ticks . hz) or a quadruple

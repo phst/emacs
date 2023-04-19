@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -72,8 +72,7 @@ func (s *String) FromEmacs(e Env, v Value) error {
 
 // Str returns the string stored in v.  It returns an error if v is not a
 // string, or if it’s not a valid Unicode scalar value sequence.  Str is not
-// named String to avoid confusion with the String method of the Stringer
-// interface.
+// named String to avoid confusion with the [fmt.Stringer.String] method.
 func (e Env) Str(v Value) (string, error) {
 	r := C.phst_emacs_copy_string_contents(e.raw(), v.r)
 	if err := e.check(r.base); err != nil {
@@ -98,7 +97,7 @@ func (e Env) makeString(s string) (Value, error) {
 // string and arguments.  If the call to format-message fails, FormatMessage
 // returns a descriptive error string.  Note that the syntax of the format
 // string for FormatMessage is similar but not identical to the format strings
-// for the fmt.Printf family.
+// for the [fmt.Printf] family.
 func (e Env) FormatMessage(format string, args ...In) string {
 	var s String
 	args = append([]In{String(format)}, args...)

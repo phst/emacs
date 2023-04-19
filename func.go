@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ import (
 // Doc contains a documentation string for a function or variable.  An empty
 // doc string becomes nil.  As described in
 // https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Documentation.html,
-// a documentation string can contain usage information.  Use SplitUsage to
-// extract the usage information from a documentation string.  Use WithUsage to
-// add usage information to a documentation string.  Documentation strings must
-// be valid UTF-8 strings without embedded null bytes.  You can use a Doc as an
-// Option in Export and ERTTest to set the function or test documentation
-// string.
+// a documentation string can contain usage information.  Use [Doc.SplitUsage]
+// to extract the usage information from a documentation string.  Use
+// [Doc.WithUsage] to add usage information to a documentation string.
+// Documentation strings must be valid UTF-8 strings without embedded null
+// bytes.  You can use a Doc as an [Option] in [Export] and [ERTTest] to set
+// the function or test documentation string.
 type Doc string
 
 // Emacs returns nil if d is empty and an Emacs string otherwise.
@@ -100,8 +100,8 @@ func (d Doc) WithUsage(u Usage) Doc {
 // without enclosing parentheses.  See
 // https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Documentation.html.
 // Usage strings must be valid UTF-8 strings without embedded null characters
-// or newlines.  You can use a Usage as an Option in Export to set the argument
-// list in the documentation string.
+// or newlines.  You can use a Usage as an [Option] in [Export] to set the
+// argument list in the documentation string.
 type Usage string
 
 func (u Usage) validate() error {
@@ -150,8 +150,8 @@ func (e Env) makeFunction(arity Arity, doc Doc, data uint64) (Value, error) {
 }
 
 // Funcall calls the Emacs function fun with the given arguments.  Both
-// function and arguments must be Emacs values.  Use Call or Invoke if you want
-// them to be autoconverted.
+// function and arguments must be Emacs values.  Use [Env.Call] or [Env.Invoke]
+// if you want them to be autoconverted.
 func (e Env) Funcall(fun Value, args []Value) (Value, error) {
 	nargs := len(args)
 	var ptr *C.emacs_value

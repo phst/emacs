@@ -31,15 +31,16 @@ import (
 // function.  The function fun can be any Go function.  When calling the
 // exported function from Emacs, arguments and return values are converted as
 // described in the package documentation.  If you don’t want this
-// autoconversion or need more control, use ExportFunc instead and convert
+// autoconversion or need more control, use [ExportFunc] instead and convert
 // arguments yourself.  If you want to export functions to Emacs after the
-// module has been initialized, use the Export method of Env instead.
+// module has been initialized, use the [Env.Export] method instead.
 //
 // The function may accept any number of arguments.  Optionally, the first
-// argument may be of type Env.  In this case, Emacs passes a live environment
-// value that you can use to interact with Emacs.  All other arguments are
-// converted from Emacs as described in the package documentation.  If not all
-// arguments are convertible from Emacs values, Export panics.
+// argument may be of type [Env].  In this case, Emacs passes a live
+// environment value that you can use to interact with Emacs.  All other
+// arguments are converted from Emacs as described in the package
+// documentation.  If not all arguments are convertible from Emacs values,
+// Export panics.
 //
 // The function must return either zero, one, or two results.  If the last or
 // only result is of type error, a non-nil value causes Emacs to trigger a
@@ -51,11 +52,11 @@ import (
 //
 // By default, Export derives the function’s name from its Go name by
 // Lisp-casing it.  For example, MyFunc becomes my-func.  To specify a
-// different name, pass a Name option.  If there’s no name or the name is
+// different name, pass a [Name] option.  If there’s no name or the name is
 // already registered, Export panics.
 //
 // By default, the function has no documentation string.  To add one, pass a
-// Doc option.
+// [Doc] option.
 //
 // You can call Export safely from multiple goroutines.
 func Export(fun interface{}, opts ...Option) {
@@ -64,11 +65,12 @@ func Export(fun interface{}, opts ...Option) {
 
 // ExportFunc arranges for a Go function to be exported to Emacs.  Call
 // ExportFunc in an init function.  Loading the dynamic module will then define
-// the Emacs function.  Unlike Export, functions registered by ExportFunc don’t
-// automatically convert their arguments and return values to and from Emacs.
-// If name is empty, ExportFunc panics.  If doc is empty, the function won’t
-// have a documentation string.  If you want to export functions to Emacs after
-// the module has been initialized, use the ExportFunc method of Env instead.
+// the Emacs function.  Unlike [Export], functions registered by ExportFunc
+// don’t automatically convert their arguments and return values to and from
+// Emacs.  If name is empty, ExportFunc panics.  If doc is empty, the function
+// won’t have a documentation string.  If you want to export functions to Emacs
+// after the module has been initialized, use the [Env.ExportFunc] method
+// instead.
 //
 // You can call ExportFunc safely from multiple goroutines.
 func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
@@ -78,19 +80,20 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 	funcs.mustEnqueue(&function{Lambda{fun, arity, doc}, name, 0})
 }
 
-// Export exports a Go function to Emacs.  Unlike the global Export function,
+// Export exports a Go function to Emacs.  Unlike the global [Export] function,
 // Env.Export requires a live environment and defines the Emacs function
 // immediately.  The function fun can be any Go function.  When calling the
 // exported function from Emacs, arguments and return values are converted as
 // described in the package documentation.  If you don’t want this
-// autoconversion or need more control, use ExportFunc instead and convert
-// arguments yourself.
+// autoconversion or need more control, use [Env.ExportFunc] instead and
+// convert arguments yourself.
 //
 // The function may accept any number of arguments.  Optionally, the first
-// argument may be of type Env.  In this case, Emacs passes a live environment
-// value that you can use to interact with Emacs.  All other arguments are
-// converted from Emacs as described in the package documentation.  If not all
-// arguments are convertible from Emacs values, Export panics.
+// argument may be of type [Env].  In this case, Emacs passes a live
+// environment value that you can use to interact with Emacs.  All other
+// arguments are converted from Emacs as described in the package
+// documentation.  If not all arguments are convertible from Emacs values,
+// Export panics.
 //
 // The function must return either zero, one, or two results.  If the last or
 // only result is of type error, a non-nil value causes Emacs to trigger a
@@ -102,25 +105,25 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 //
 // By default, Export derives the function’s name from its Go name by
 // Lisp-casing it.  For example, MyFunc becomes my-func.  To specify a
-// different name, pass a Name option.  To make the function anonymous, pass an
-// Anonymous option.  If there’s no name and the function isn’t anonymous,
+// different name, pass a [Name] option.  To make the function anonymous, pass
+// an [Anonymous] option.  If there’s no name and the function isn’t anonymous,
 // AutoFunc panics.  If the name of a non-anonymous function is already
 // registered, Export panics.
 //
 // By default, the function has no documentation string.  To add one, pass a
-// Doc option.
+// [Doc] option.
 func (e Env) Export(fun interface{}, opts ...Option) (Value, error) {
 	return e.ExportFunc(AutoFunc(fun, opts...))
 }
 
-// ExportFunc exports a Go function to Emacs.  Unlike the global ExportFunc
+// ExportFunc exports a Go function to Emacs.  Unlike the global [ExportFunc]
 // function, Env.ExportFunc requires a live environment and defines the Emacs
-// function immediately.  Unlike Export, functions defined by ExportFunc don’t
-// automatically convert their arguments and return values to and from Emacs.
-// ExportFunc returns the Emacs function object of the new function.  If name
-// is empty, the function is anonymous.  If name is not empty, it is bound to
-// the new function.  If doc is empty, the function won’t have a documentation
-// string.
+// function immediately.  Unlike [Env.Export], functions defined by ExportFunc
+// don’t automatically convert their arguments and return values to and from
+// Emacs.  ExportFunc returns the Emacs function object of the new function.
+// If name is empty, the function is anonymous.  If name is not empty, it is
+// bound to the new function.  If doc is empty, the function won’t have a
+// documentation string.
 func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error) {
 	f := &function{Lambda{fun, arity, doc}, name, 0}
 	if err := funcs.register(f); err != nil {
@@ -129,15 +132,16 @@ func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error
 	return f.define(e)
 }
 
-// AutoFunc converts an arbitrary Go function to a Func.  When calling the
+// AutoFunc converts an arbitrary Go function to a [Func].  When calling the
 // exported function from Emacs, arguments and return values are converted as
 // described in the package documentation.
 //
 // The function may accept any number of arguments.  Optionally, the first
-// argument may be of type Env.  In this case, Emacs passes a live environment
-// value that you can use to interact with Emacs.  All other arguments are
-// converted from Emacs as described in the package documentation.  If not all
-// arguments are convertible from Emacs values, AutoFunc panics.
+// argument may be of type [Env].  In this case, Emacs passes a live
+// environment value that you can use to interact with Emacs.  All other
+// arguments are converted from Emacs as described in the package
+// documentation.  If not all arguments are convertible from Emacs values,
+// AutoFunc panics.
 //
 // The function must return either zero, one, or two results.  If the last or
 // only result is of type error, a non-nil value causes Emacs to trigger a
@@ -149,12 +153,12 @@ func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error
 //
 // By default, Export derives the function’s name from its Go name by
 // Lisp-casing it.  For example, MyFunc becomes my-func.  To specify a
-// different name, pass a Name option.  To make the function anonymous, pass an
-// Anonymous option.  If there’s no name and the function isn’t anonymous,
+// different name, pass a [Name] option.  To make the function anonymous, pass
+// an Anonymous option.  If there’s no name and the function isn’t anonymous,
 // AutoFunc panics.
 //
 // By default, the function has no documentation string.  To add one, pass a
-// Doc option.
+// [Doc] option.
 //
 // You can call AutoFunc safely from multiple goroutines.
 func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
@@ -233,16 +237,17 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 	return d.name, d.call, arity, d.doc
 }
 
-// AutoLambda returns a Lambda object that exports the given function to Emacs
-// as an anonymous lambda function.  When calling the exported function from
-// Emacs, arguments and return values are converted as described in the package
-// documentation.
+// AutoLambda returns a [Lambda] object that exports the given function to
+// Emacs as an anonymous lambda function.  When calling the exported function
+// from Emacs, arguments and return values are converted as described in the
+// package documentation.
 //
 // The function may accept any number of arguments.  Optionally, the first
-// argument may be of type Env.  In this case, Emacs passes a live environment
-// value that you can use to interact with Emacs.  All other arguments are
-// converted from Emacs as described in the package documentation.  If not all
-// arguments are convertible from Emacs values, AutoLambda panics.
+// argument may be of type [Env].  In this case, Emacs passes a live
+// environment value that you can use to interact with Emacs.  All other
+// arguments are converted from Emacs as described in the package
+// documentation.  If not all arguments are convertible from Emacs values,
+// AutoLambda panics.
 //
 // The function must return either zero, one, or two results.  If the last or
 // only result is of type error, a non-nil value causes Emacs to trigger a
@@ -252,10 +257,10 @@ func AutoFunc(fun interface{}, opts ...Option) (Name, Func, Arity, Doc) {
 // Emacs value, AutoLambda panics.  If there are invalid result patterns,
 // AutoLambda panics.
 //
-// The function is always anonymous.  Any Name option in opts is ignored.
+// The function is always anonymous.  Any [Name] option in opts is ignored.
 //
 // By default, the function has no documentation string.  To add one, pass a
-// Doc option.
+// [Doc] option.
 //
 // You can call AutoLambda safely from multiple goroutines.
 func AutoLambda(f interface{}, opts ...Option) Lambda {
@@ -277,22 +282,22 @@ func (l Lambda) Emacs(e Env) (Value, error) {
 }
 
 // Lambda exports the given function to Emacs as an anonymous lambda function.
-// Unlike the global AutoLambda function, Env.Lambda requires a live
+// Unlike the global [AutoLambda] function, Env.Lambda requires a live
 // environment and defines the Emacs function immediately.  When calling the
 // exported function from Emacs, arguments and return values are converted as
 // described in the package documentation and the documentation for the
-// AutoLambda function.
+// [AutoLambda] function.
 //
 // When you don’t need the function any more, unregister it by calling the
-// returned DeleteFunc function (typically using defer).  If you don’t call the
-// delete function, the function will remain registered and require a bit of
-// memory.  After calling the delete function, calling the function from Emacs
-// panics.
+// returned [DeleteFunc] function (typically using defer).  If you don’t call
+// the delete function, the function will remain registered and require a bit
+// of memory.  After calling the delete function, calling the function from
+// Emacs panics.
 //
-// The function is always anonymous.  Any Name option in opts is ignored.
+// The function is always anonymous.  Any [Name] option in opts is ignored.
 //
 // By default, the function has no documentation string.  To add one, pass a
-// Doc option.
+// [Doc] option.
 //
 // You can call Lambda safely from multiple goroutines.
 func (e Env) Lambda(fun interface{}, opts ...Option) (Value, DeleteFunc, error) {
@@ -300,17 +305,17 @@ func (e Env) Lambda(fun interface{}, opts ...Option) (Value, DeleteFunc, error) 
 	return e.LambdaFunc(l.Fun, l.Arity, l.Doc)
 }
 
-// LambdaFunc exports the given function to Emacs as an anonymous lambda
-// function.  Unlike the global Lambda function, Env.LambdaFunc requires a live
-// environment and defines the Emacs function immediately.  Unlike Lambda,
-// functions registered by LambdaFunc don’t automatically convert their
-// arguments and return values to and from Emacs.
+// [LambdaFunc] exports the given function to Emacs as an anonymous lambda
+// function.  Unlike the global [Lambda] function, Env.LambdaFunc requires
+// a live environment and defines the Emacs function immediately.  Unlike
+// [Env.Lambda], functions registered by LambdaFunc don’t automatically convert
+// their arguments and return values to and from Emacs.
 //
 // When you don’t need the function any more, unregister it by calling the
-// returned DeleteFunc function (typically using defer).  If you don’t call the
-// delete function, the function will remain registered and require a bit of
-// memory.  After calling the delete function, calling the function from Emacs
-// panics.
+// returned [DeleteFunc] function (typically using defer).  If you don’t call
+// the delete function, the function will remain registered and require a bit
+// of memory.  After calling the delete function, calling the function from
+// Emacs panics.
 //
 // You can call LambdaFunc safely from multiple goroutines.
 func (e Env) LambdaFunc(fun Func, arity Arity, doc Doc) (Value, DeleteFunc, error) {
@@ -325,20 +330,20 @@ func (e Env) LambdaFunc(fun Func, arity Arity, doc Doc) (Value, DeleteFunc, erro
 	return v, func() { funcs.delete(f.index) }, nil
 }
 
-// DeleteFunc is a function returned by Env.Lambda and Env.LambdaFunc.  Call
-// this function to delete the created function.  After deletion the function
-// can’t be called any more from Emacs.
+// DeleteFunc is a function returned by [Env.Lambda] and [Env.LambdaFunc].
+// Call this function to delete the created function.  After deletion the
+// function can’t be called any more from Emacs.
 type DeleteFunc func()
 
-// Option is an option for Export, AutoFunc, AutoLambda, and ERTTest.  Its
-// implementations are Name, Anonymous, Doc, and Usage.
+// Option is an option for [Export], [AutoFunc], [AutoLambda], and [ERTTest].
+// Its implementations are [Name], [Anonymous], [Doc], and [Usage].
 type Option interface {
 	apply(*exportAuto)
 }
 
-// Anonymous is an Option that tells AutoFunc and friends that the new function
-// should be anonymous.  Anonymous is mutually exclusive with Name; if both are
-// given, AutoFunc panics.
+// Anonymous is an [Option] that tells [AutoFunc] and friends that the new
+// function should be anonymous.  Anonymous is mutually exclusive with [Name];
+// if both are given, [AutoFunc] panics.
 type Anonymous struct{}
 
 func (Anonymous) apply(o *exportAuto) { o.flag |= exportAnonymous }

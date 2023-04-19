@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import (
 
 // MajorVersion returns the major version of the Emacs instance in which the
 // module is loaded.  It can only be called after the module has been loaded.
-// Module functions and functions registered by OnInit can call MajorVersion if
-// they have been called from Emacs.  MajorVersion panics if the module isn’t
-// yet initialized.
+// Module functions and functions registered by [OnInit] can call MajorVersion
+// if they have been called from Emacs.  MajorVersion panics if the module
+// isn’t yet initialized.
 func MajorVersion() int {
 	v := majorVersion.load()
 	if v == 0 {

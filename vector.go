@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,13 +30,13 @@ func (v Vector) Emacs(e Env) (Value, error) {
 	return e.Call("vector", v...)
 }
 
-// VectorOut is an Out that converts an Emacs vector to the slice Data.  The
+// VectorOut is an [Out] that converts an Emacs vector to the slice Data.  The
 // concrete element type is determined by the return value of the New function.
 type VectorOut struct {
 	// New must return a new vector element each time it’s called.
 	New func() Out
 
-	// FromEmacs fills Data with the elements from the vector.
+	// [VectorOut.FromEmacs] fills Data with the elements from the vector.
 	Data []Out
 }
 

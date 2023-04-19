@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-// Reflect is a type with underlying type reflect.Value that knows how to
+// Reflect is a type with underlying type [reflect.Value] that knows how to
 // convert itself to and from an Emacs value.
 type Reflect reflect.Value
 
@@ -60,14 +60,14 @@ func (r Reflect) FromEmacs(e Env, v Value) error {
 }
 
 type (
-	// InFunc is a function that returns an In for the given value.
+	// InFunc is a function that returns an [In] for the given value.
 	InFunc func(reflect.Value) In
 
-	// OutFunc is a function that returns an Out for the given value.
+	// OutFunc is a function that returns an [Out] for the given value.
 	OutFunc func(reflect.Value) Out
 )
 
-// InFuncFor returns an InFunc for the given type.  If there’s no known
+// InFuncFor returns an [InFunc] for the given type.  If there’s no known
 // conversion from t to Emacs, InFuncFor returns an error.
 func InFuncFor(t reflect.Type) (InFunc, error) {
 	if t.Implements(inType) {
@@ -110,7 +110,7 @@ func InFuncFor(t reflect.Type) (InFunc, error) {
 	}
 }
 
-// OutFuncFor returns an OutFunc for the given type.  If there’s no known
+// OutFuncFor returns an [OutFunc] for the given type.  If there’s no known
 // conversion from Emacs to t, OutFuncFor returns an error.
 func OutFuncFor(t reflect.Type) (OutFunc, error) {
 	if t.Implements(outType) {
@@ -172,7 +172,7 @@ var (
 
 // Map basic types to aliases that support Emacs.  Each value has to be a
 // defined type with the corresponding key as underlying type.  The value types
-// have to implement In, and pointers to them have to implement Out.
+// have to implement [In], and pointers to them have to implement [Out].
 var valueTypes = map[reflect.Type]reflect.Type{
 	reflect.TypeOf(bool(false)):      reflect.TypeOf(Bool(false)),
 	reflect.TypeOf(""):               reflect.TypeOf(String("")),
@@ -183,8 +183,8 @@ var valueTypes = map[reflect.Type]reflect.Type{
 
 // Map basic types to aliases that support Emacs.  Each value type has to be
 // convertible to its corresponding key type.  The value types have to
-// implement both In and Out.  This is a variant of valueTypes for types that
-// are always used as pointers.
+// implement both [In] and [Out].  This is a variant of valueTypes for types
+// that are always used as pointers.
 var pointerTypes = map[reflect.Type]reflect.Type{
 	reflect.TypeOf((*big.Int)(nil)): reflect.TypeOf((*BigInt)(nil)),
 }

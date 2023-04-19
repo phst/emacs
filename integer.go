@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ func (e Env) Uint(v Value) (uint64, error) {
 	return z.Uint64(), nil
 }
 
-// BigInt is a type with underlying type big.Int that knows how to convert
+// BigInt is a type with underlying type [big.Int] that knows how to convert
 // itself to and from an Emacs value.
 type BigInt big.Int
 

@@ -1,4 +1,4 @@
-// Copyright 2019, 2022 Google LLC
+// Copyright 2019, 2022, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ func (l List) Emacs(e Env) (Value, error) {
 	return e.List(l...)
 }
 
-// ListOut is an Out that converts an Emacs list to the slice Data.  The
+// ListOut is an [Out] that converts an Emacs list to the slice Data.  The
 // concrete element type is determined by the return value of the New function.
 type ListOut struct {
 	// New must return a new list element each time it’s called.
@@ -97,7 +97,7 @@ func (e Env) List(os ...In) (Value, error) {
 	return e.Call("list", os...)
 }
 
-// Car is an In that represents the car of List.
+// Car is an [In] that represents the car of List.
 type Car struct{ List In }
 
 // Emacs returns the car of c.List.  It returns an error if c.List is not a
@@ -117,7 +117,7 @@ func (e Env) CarOut(list In, car Out) error {
 	return e.CallOut("car", car, list)
 }
 
-// Cdr is an In that represents the cdr of List.
+// Cdr is an [In] that represents the cdr of List.
 type Cdr struct{ List In }
 
 // Emacs returns the cdr of c.List.  It returns an error if c.List is not a
@@ -202,11 +202,11 @@ func (e Env) Length(seq Value) (int, error) {
 	return int64ToInt(i)
 }
 
-// Iter is an iterator over a list.  Use Env.Iter to create Iter values.  The
+// Iter is an iterator over a list.  Use [Env.Iter] to create Iter values.  The
 // zero Iter is not a valid iterator.  Iter values can’t outlive the
 // environment that created them.  Don’t pass Iter values to other goroutines.
 //
-// Typical use, with *T implementing the Out interface:
+// Typical use, with *T implementing the [Out] interface:
 //
 //	var elem T
 //	var err error
@@ -223,11 +223,12 @@ type Iter struct {
 	err  *error
 }
 
-// Iter creates an Iter value that iterates over list.  Iter.Next will set elem
-// to the elements of the list, and *err to any error.  Iter assumes that list
-// is a true list.  If list is circular, the iteration may never terminate.
+// Iter creates an [Iter] value that iterates over list.  [Iter.Next] will set
+// elem to the elements of the list, and *err to any error.  Iter assumes that
+// list is a true list.  If list is circular, the iteration may never
+// terminate.
 //
-// Typical use, with *T implementing the Out interface:
+// Typical use, with *T implementing the [Out] interface:
 //
 //	var elem T
 //	var err error
@@ -238,7 +239,7 @@ type Iter struct {
 //		return err
 //	}
 //
-// See Dolist for a simpler iteration method.
+// See [Dolist] for a simpler iteration method.
 func (e Env) Iter(list Value, elem Out, err *error) *Iter {
 	i := &Iter{e, list, elem, err}
 	i.setElem()
@@ -251,8 +252,9 @@ func (i *Iter) Ok() bool {
 	return *i.err == nil && i.env.IsNotNil(i.tail)
 }
 
-// Next sets the elem passed to Env.Iter to the next element in the list.  If
-// Next fails, it sets the error passed to Env.Iter, and Ok will return false.
+// Next sets the elem passed to [Env.Iter] to the next element in the list.  If
+// Next fails, it sets the error passed to [Env.Iter], and [Iter.Ok] will
+// return false.
 func (i *Iter) Next() {
 	i.tail, *i.err = i.env.Cdr(i.tail)
 	i.setElem()

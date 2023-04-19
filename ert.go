@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 package emacs
 
-// ERTTestFunc is a function that implements an ERT test.  Use ERTTest to
+// ERTTestFunc is a function that implements an ERT test.  Use [ERTTest] to
 // register ERTTestFunc functions.  If the function returns an error, the ERT
 // test fails.
 type ERTTestFunc func(Env) error
@@ -22,16 +22,16 @@ type ERTTestFunc func(Env) error
 // ERTTest arranges for a Go function to be exported as an ERT test.  Call
 // ERTTest in an init function.  Loading the dynamic module will then define
 // the ERT test.  If you want to define ERT tests after the module has been
-// initialized, use the ERTTest method of Env instead.  If the function returns
+// initialized, use the [Env.ERTTest] method instead.  If the function returns
 // an error, the ERT test fails.
 //
 // By default, ERTTest derives the test’s name from the function’s Go name by
 // Lisp-casing it.  For example, MyTest becomes my-test.  To specify a
-// different name, pass a Name option.  If there’s no name or the name is
+// different name, pass a [Name] option.  If there’s no name or the name is
 // already registered, ERTTest panics.
 //
 // By default, the ERT test has no documentation string.  To add one, pass a
-// Doc option.
+// [Doc] option.
 //
 // You can call ERTTest safely from multiple goroutines.
 func ERTTest(fun ERTTestFunc, opts ...Option) {
@@ -39,7 +39,7 @@ func ERTTest(fun ERTTestFunc, opts ...Option) {
 	ertTests.MustEnqueue(name, ertTest{name, fn, doc})
 }
 
-// ERTTest exports a Go function as an ERT test.  Unlike the global ERTTest
+// ERTTest exports a Go function as an ERT test.  Unlike the global [ERTTest]
 // function, Env.ERTTest requires a live environment and defines the ERT test
 // immediately.  If the function returns an error, the ERT test fails.
 //
@@ -49,7 +49,7 @@ func ERTTest(fun ERTTestFunc, opts ...Option) {
 // already registered, ERTTest panics.
 //
 // By default, the ERT test has no documentation string.  To add one, pass a
-// Doc option.
+// [Doc] option.
 func (e Env) ERTTest(fun ERTTestFunc, opts ...Option) error {
 	name, fn, _, doc := AutoFunc(fun, opts...)
 	t := ertTest{name, fn, doc}

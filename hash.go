@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,17 +30,18 @@ func (t HashTest) Emacs(e Env) (Value, error) {
 	return Symbol(t).Emacs(e)
 }
 
-// Predefined hashtable tests.  To define your own test, use RegisterHashTest.
+// Predefined hashtable tests.  To define your own test, use
+// [RegisterHashTest].
 const (
 	Eq    HashTest = "eq"
 	Eql   HashTest = "eql"
 	Equal HashTest = "equal"
 )
 
-// HashTestFor returns a hashtable test that is appropriate for the given type.
-// It returns Eq for integral types, Eql for floating-point types, and Equal
-// otherwise.  HashTestFor ignores custom hash tests registered with
-// RegisterHashTest.
+// HashTestFor returns a hashtable test that is appropriate for the given
+// type.  It returns [Eq] for integral types, [Eql] for floating-point types,
+// and [Equal] otherwise.  HashTestFor ignores custom hash tests registered
+// with [RegisterHashTest].
 func HashTestFor(t reflect.Type) HashTest {
 	switch t.Kind() {
 	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -61,7 +62,7 @@ func RegisterHashTest(name HashTest, hash CustomHasher) HashTest {
 }
 
 // CustomHasher defines the hashing and equality functions for a custom hash
-// test.  Use RegisterHashTest to register such a custom hash test.  The
+// test.  Use [RegisterHashTest] to register such a custom hash test.  The
 // hashing and equality functions must be compatible, i. e., if Equal(e, a, b)
 // is true, then Hash(e, a) = Hash(e, b) must be fulfilled.
 type CustomHasher interface {
@@ -93,9 +94,9 @@ func (h Hash) Emacs(e Env) (Value, error) {
 	return r, nil
 }
 
-// HashOut is an Out that converts an Emacs hashtable to the map Data.  The
-// concrete key and value types are determined by the return values of the New
-// function.
+// HashOut is an [Out] that converts an Emacs hashtable to the map Data.  The
+// concrete key and value types are determined by the return values of the
+// [HashOut.New] function.
 type HashOut struct {
 	// New must return a new key and value each time it’s called.
 	New func() (Out, Out)

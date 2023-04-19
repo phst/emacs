@@ -1,4 +1,4 @@
-// Copyright 2019, 2021 Google LLC
+// Copyright 2019, 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ func (e Env) CallOut(fun Name, out Out, in ...In) error {
 }
 
 // Invoke calls a named Emacs function or function value.  fun may be a string,
-// Symbol, Name, or Value.  If it’s not a value, Invoke interns it first.
+// [Symbol], [Name], or [Value].  If it’s not a value, Invoke interns it first.
 // Invoke then calls the Emacs functions with the given arguments and assigns
 // the result to out.  It converts arguments and the return value as described
 // in the package documentation.

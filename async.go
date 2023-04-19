@@ -1,4 +1,4 @@
-// Copyright 2021 Google LLC
+// Copyright 2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,15 +22,15 @@ import (
 )
 
 // Async manages asynchronous operations.  Create a new Async object using
-// NewAsync; the zero Async isn’t valid, and Async objects may not be copied
-// once created.  An asynchronous operation can use Start to allocation an
-// operation handle and a channel.  It can then start an operation in the
+// [NewAsync]; the zero Async isn’t valid, and Async objects may not be copied
+// once created.  An asynchronous operation can use [Async.Start] to allocation
+// an operation handle and a channel.  It can then start an operation in the
 // background and report its result asynchronously using the channel.
 //
 // Async requires a way to notify Emacs about pending asynchronous results; use
-// NotifyWriter or NotifyListener to create notification channels.  When
-// notified about asynchronous operations, Emacs should then use Flush to
-// return the pending results.
+// [NotifyWriter] or [NotifyListener] to create notification channels.  When
+// notified about asynchronous operations, Emacs should then use [Async.Flush]
+// to return the pending results.
 //
 // Async doesn’t prescribe any specific programming model on the Emacs side;
 // the example uses the “aio” package from https://github.com/skeeto/emacs-aio.
@@ -40,9 +40,9 @@ type Async struct {
 	nextPromise uint64
 }
 
-// NewAsync creates a new Async object.  It will use the given notification
+// NewAsync creates a new [Async] object.  It will use the given notification
 // channel to signal completion of an asynchronous operation to Emacs; use
-// NotifyWriter or NotifyListener to create usable channels.
+// [NotifyWriter] or [NotifyListener] to create usable channels.
 func NewAsync(notifyCh chan<- struct{}) *Async {
 	if notifyCh == nil {
 		panic("nil notification channel")
@@ -104,7 +104,7 @@ func (a *Async) Flush() []AsyncData {
 }
 
 // AsyncHandle is an opaque reference to a pending asynchronous operation.  Use
-// Async.Start to create AsyncHandle objects.
+// [Async.Start] to create AsyncHandle objects.
 type AsyncHandle uint64
 
 // Emacs implements In.Emacs.  It returns the handle as an integer.
@@ -120,13 +120,13 @@ type Result struct {
 }
 
 // AsyncData contains the result of an asynchronous operation, together with
-// the associated operation handle.  It is returned by Async.Flush.
+// the associated operation handle.  It is returned by [Async.Flush].
 type AsyncData struct {
 	Handle AsyncHandle
 	Result
 }
 
-// Emacs implements In.Emacs.  It returns a triple (handle value error).
+// Emacs implements [In.Emacs].  It returns a triple (handle value error).
 // If Err is set, the error element will be of the form (symbol . data).
 func (d AsyncData) Emacs(e Env) (Value, error) {
 	return e.List(d.Handle, d.Value, errorData(d.Err))
@@ -149,9 +149,9 @@ var asyncError = DefineError("go-async-error", "Generic asynchronous Go error", 
 
 // NotifyWriter returns a channel that causes some arbitrary content to be
 // written to the given writer whenever something is written to the channel.
-// The writer will typically be either a pipe created by Env.OpenPipe or a
-// socket connection to a Unix domain socket created by net.Dial or similar.
-// The return value of this function is useful as argument to NewAsync.
+// The writer will typically be either a pipe created by [Env.OpenPipe] or a
+// socket connection to a Unix domain socket created by [net.Dial] or similar.
+// The return value of this function is useful as argument to [NewAsync].
 func NotifyWriter(w io.Writer) chan<- struct{} {
 	if w == nil {
 		panic("nil writer")
@@ -165,10 +165,10 @@ func NotifyWriter(w io.Writer) chan<- struct{} {
 // to the client of the given listener whenever something is written to the
 // channel.  NotifyListener will wait (in the background) for exactly one
 // client to connect to the server and then close the listener.  You can create
-// the listener using net.Listen or similar.  A common use case is a Unix
+// the listener using [net.Listen] or similar.  A common use case is a Unix
 // domain socket server; the socket name should be reported to Emacs Lisp using
 // other means.  The return value of this function is useful as argument to
-// NewAsync.
+// [NewAsync].
 func NotifyListener(listener net.Listener) chan<- struct{} {
 	if listener == nil {
 		panic("nil listener")

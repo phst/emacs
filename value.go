@@ -49,7 +49,7 @@ type In interface {
 // Out is a value that knows how to convert itself from an Emacs object.  You
 // can implement In for your own types if you want this package to convert them
 // from Emacs values automatically.  Pointers to wrapper implementations for
-// In, such as *Int or *String, implement Out.
+// In, such as *Int or *String, implement [Out].
 type Out interface {
 	// FromEmacs sets the receiver to a Go value corresponding to the Emacs
 	// object.  Implementations should document whether FromEmacs modifies
@@ -68,11 +68,11 @@ func (v *Value) FromEmacs(e Env, u Value) error {
 	return nil
 }
 
-// NewIn returns an In value that converts the dynamic type of v to an Emacs
-// value.  If v already implements In, NewIn returns it directly.  Otherwise,
+// NewIn returns an [In] value that converts the dynamic type of v to an Emacs
+// value.  If v already implements [In], NewIn returns it directly.  Otherwise,
 // if the dynamic type of v is known, NewIn returns one of the predefined In
-// implementations (Int, Float, String, Reflect, …).  Otherwise, NewIn returns
-// an In instance that uses reflection to convert itself to Emacs.
+// implementations ([Int], [Float], [String], [Reflect], …).  Otherwise, NewIn
+// returns an [In] instance that uses reflection to convert itself to Emacs.
 func NewIn(v interface{}) In {
 	if i := newIn(v); i != nil {
 		return i
@@ -128,13 +128,13 @@ func newIn(v interface{}) In {
 	}
 }
 
-// NewOut returns an Out value that sets p to the Go representation of an Emacs
-// value.  Typically p is a pointer.  Only a few types such as reflect.Value
-// can be set without indirection.  If p already implements Out, NewOut returns
-// it directly.  Otherwise, if the dynamic type of v is known, NewOut returns
-// one of the predefined Out implementations (*Int, *Float, *String, Reflect,
-// …).  Otherwise, NewOut returns an Out instance that uses reflection to
-// convert Emacs values.
+// NewOut returns an [Out] value that sets p to the Go representation of an
+// Emacs value.  Typically p is a pointer.  Only a few types such as
+// [reflect.Value] can be set without indirection.  If p already implements
+// [Out], NewOut returns it directly.  Otherwise, if the dynamic type of v is
+// known, NewOut returns one of the predefined [Out] implementations (*Int,
+// *Float, *String, Reflect, …).  Otherwise, NewOut returns an [Out] instance
+// that uses reflection to convert Emacs values.
 func NewOut(p interface{}) Out {
 	if i := newOut(p); i != nil {
 		return i
@@ -174,7 +174,7 @@ func newOut(p interface{}) Out {
 	}
 }
 
-// Ignore is an Out that does nothing.
+// Ignore is an [Out] that does nothing.
 type Ignore struct{}
 
 // FromEmacs does nothing.
@@ -182,13 +182,13 @@ func (Ignore) FromEmacs(Env, Value) error {
 	return nil
 }
 
-// Emacs converts v to an Emacs value and returns the value.  See NewIn for
+// Emacs converts v to an Emacs value and returns the value.  See [NewIn] for
 // details of the conversion process.
 func (e Env) Emacs(v interface{}) (Value, error) {
 	return NewIn(v).Emacs(e)
 }
 
-// Go converts v to a Go value and stores it in p.  See NewOut for details of
+// Go converts v to a Go value and stores it in p.  See [NewOut] for details of
 // the conversion process.
 func (e Env) Go(v Value, p interface{}) error {
 	return NewOut(p).FromEmacs(e, v)

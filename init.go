@@ -21,7 +21,7 @@ import "C"
 import "runtime"
 
 // InitFunc is an initializer function that should be run during module
-// initialization.  Use OnInit to register InitFunc functions.  If an
+// initialization.  Use [OnInit] to register InitFunc functions.  If an
 // initialization function returns an error, the module loading itself will
 // fail.
 type InitFunc func(Env) error

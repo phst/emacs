@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ const (
 	T   Symbol = "t"
 )
 
-// Symbol returns Nil or T depending on the value of b.
+// Symbol returns [Nil] or [T] depending on the value of b.
 func (b Bool) Symbol() Symbol {
 	if b {
 		return T
