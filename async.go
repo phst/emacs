@@ -23,7 +23,7 @@ import (
 
 // Async manages asynchronous operations.  Create a new Async object using
 // [NewAsync]; the zero Async isn’t valid, and Async objects may not be copied
-// once created.  An asynchronous operation can use [Async.Start] to allocation
+// once created.  An asynchronous operation can use [Async.Start] to allocate
 // an operation handle and a channel.  It can then start an operation in the
 // background and report its result asynchronously using the channel.
 //
