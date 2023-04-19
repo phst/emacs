@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ import "C"
 // module initializer is active.  Env values are only valid in the same
 // goroutine as the exported function or module initializer.  So don’t store
 // them or pass them to other goroutines.  See
-// https://phst.eu/emacs-modules#environments for details.
+// https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Functions.html
+// for details.
 type Env struct{ ptr *C.emacs_env }
 
 // Eq returns true if and only if the two values represent the same Emacs

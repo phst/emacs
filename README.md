@@ -1,9 +1,11 @@
 # Go bindings for the Emacs module API
 
 This package implements [Go](https://golang.org/) bindings for the [GNU Emacs
-module API](https://phst.eu/emacs-modules).
+module API][].
 
 This is not an officially supported Google product.
+
+[GNU Emacs module API]: (https://www.gnu.org/software/emacs/manual/html_node/elisp/Writing-Dynamic-Modules.html)
 
 ## Usage
 

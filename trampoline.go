@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import (
 //export phst_emacs_trampoline
 func phst_emacs_trampoline(env *C.emacs_env, nargs C.int64_t, args *C.emacs_value, data C.uint64_t) (r C.struct_phst_emacs_trampoline_result) {
 	// We can’t use environments from other threads, so make sure that we
-	// don’t switch threads.  See https://phst.eu/emacs-modules#threads.
+	// don’t switch threads.  See
+	// https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Functions.html.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	e := Env{env}

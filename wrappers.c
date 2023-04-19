@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Google LLC
+// Copyright 2019-2021, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ int emacs_module_init(struct emacs_runtime *rt) {
   struct phst_emacs_init_result result = phst_emacs_init(env);
   handle_nonlocal_exit(env, result.base);
   // We return 0 even if phst_emacs_init exited nonlocally.  See
-  // https://phst.eu/emacs-modules#module-loading-and-initialization.
+  // https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Initialization.html.
   return 0;
 }
 
@@ -227,7 +227,8 @@ struct phst_emacs_value_result phst_emacs_make_float(emacs_env *env,
 
 struct phst_emacs_string_result phst_emacs_copy_string_contents(emacs_env *env,
                                                                 emacs_value value) {
-  // See https://phst.eu/emacs-modules#copy_string_contents.
+  // See
+  // https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Values.html#index-copy_005fstring_005fcontents.
   ptrdiff_t size;
   if (!env->copy_string_contents(env, value, NULL, &size)) {
     return (struct phst_emacs_string_result){check(env), NULL, 0};

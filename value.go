@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC
+// Copyright 2019, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ import (
 // them is valid.  Don’t pass Value values to other goroutines.  Two different
 // Value values may represent the same Emacs value.  Use Env.Eq instead of the
 // == operator to compare values.  See
-// https://phst.eu/emacs-modules#emacs-values for details.
+// https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Values.html
+// for details.
 type Value struct{ r C.emacs_value }
 
 // In is a value that knows how to convert itself into an Emacs object.  You
