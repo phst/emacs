@@ -46,8 +46,8 @@ Emacs integer values and vice versa.  Go floating-point values become Emacs
 floating-point values and vice versa.  Go strings become Emacs strings and vice
 versa.  Go []byte arrays and slices become Emacs unibyte strings.  Emacs
 unibyte strings become Go []byte slices.  Other Go arrays and slices become
-Emacs vectors.  Emacs vectors become Go slices.  Go maps become Emacs
-hashtables and vice versa.  All types that implement [In] can be converted to
+Emacs vectors.  Emacs vectors become Go slices.  Go maps become Emacs hash
+tables and vice versa.  All types that implement [In] can be converted to
 Emacs.  All types that implement [Out] can be converted from Emacs.  You can
 implement [In] or [Out] yourself to extend the type conversion machinery.  A
 [reflect.Value] behaves like its underlying value.

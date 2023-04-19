@@ -1,4 +1,4 @@
-// Copyright 2020 Google LLC
+// Copyright 2020, 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ func hashRoundtripEmpty(e Env) error {
 	a := Hash{Eq, nil}
 	v, err := a.Emacs(e)
 	if err != nil {
-		return fmt.Errorf("couldn’t convert hashtable %#v to Emacs: %s", a, e.Message(err))
+		return fmt.Errorf("couldn’t convert hash table %#v to Emacs: %s", a, e.Message(err))
 	}
 	b := &HashOut{New: nil} // never called
 	if err := b.FromEmacs(e, v); err != nil {
-		return fmt.Errorf("couldn’t convert hashtable from Emacs: %s", e.Message(err))
+		return fmt.Errorf("couldn’t convert hash table from Emacs: %s", e.Message(err))
 	}
 	if len(b.Data) != 0 {
 		return fmt.Errorf("got %#v, want an empty map", b.Data)
@@ -48,11 +48,11 @@ func hashRoundtripFloatString(e Env) error {
 	a := Hash{Eql, map[In]In{Float(1.0): String("foo"), Float(-0.7): String("bar")}}
 	v, err := a.Emacs(e)
 	if err != nil {
-		return fmt.Errorf("couldn’t convert hashtable %#v to Emacs: %s", a, e.Message(err))
+		return fmt.Errorf("couldn’t convert hash table %#v to Emacs: %s", a, e.Message(err))
 	}
 	b := &HashOut{New: func() (Out, Out) { return new(Float), new(String) }}
 	if err := b.FromEmacs(e, v); err != nil {
-		return fmt.Errorf("couldn’t convert hashtable from Emacs: %s", e.Message(err))
+		return fmt.Errorf("couldn’t convert hash table from Emacs: %s", e.Message(err))
 	}
 	got := make(map[Float]String)
 	for k, v := range b.Data {

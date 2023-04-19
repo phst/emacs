@@ -16,7 +16,7 @@ package emacs
 
 import "reflect"
 
-// HashTest represents a test function for an Emacs hashtable.
+// HashTest represents a test function for an Emacs hash table.
 type HashTest Symbol
 
 // String returns the hash test symbol name.
@@ -30,7 +30,7 @@ func (t HashTest) Emacs(e Env) (Value, error) {
 	return Symbol(t).Emacs(e)
 }
 
-// Predefined hashtable tests.  To define your own test, use
+// Predefined hash table tests.  To define your own test, use
 // [RegisterHashTest].
 const (
 	Eq    HashTest = "eq"
@@ -38,7 +38,7 @@ const (
 	Equal HashTest = "equal"
 )
 
-// HashTestFor returns a hashtable test that is appropriate for the given
+// HashTestFor returns a hash table test that is appropriate for the given
 // type.  It returns [Eq] for integral types, [Eql] for floating-point types,
 // and [Equal] otherwise.  HashTestFor ignores custom hash tests registered
 // with [RegisterHashTest].
@@ -74,13 +74,13 @@ type CustomHasher interface {
 	Equal(Env, Value, Value) (bool, error)
 }
 
-// Hash represents the data for an Emacs hashtable.
+// Hash represents the data for an Emacs hash table.
 type Hash struct {
 	Test HashTest
 	Data map[In]In
 }
 
-// Emacs creates a new hashtable using the test and data in h.
+// Emacs creates a new hash table using the test and data in h.
 func (h Hash) Emacs(e Env) (Value, error) {
 	r, err := e.MakeHash(h.Test, len(h.Data))
 	if err != nil {
@@ -94,26 +94,26 @@ func (h Hash) Emacs(e Env) (Value, error) {
 	return r, nil
 }
 
-// HashOut is an [Out] that converts an Emacs hashtable to the map Data.  The
+// HashOut is an [Out] that converts an Emacs hash table to the map Data.  The
 // concrete key and value types are determined by the return values of the
 // [HashOut.New] function.
 type HashOut struct {
 	// New must return a new key and value each time it’s called.
 	New func() (Out, Out)
 
-	// FromEmacs fills Data with the pairs from the hashtable.
+	// FromEmacs fills Data with the pairs from the hash table.
 	Data map[Out]Out
 }
 
 // FromEmacs sets h.Data to a new map containing the same key–value pairs as
-// the Emacs hashtable in v.  It returns an error if v is not a hashtable.
+// the Emacs hash table in v.  It returns an error if v is not a hash table.
 // FromEmacs calls h.New for each key–value pair in v.  h.New must return a new
 // pair of Out values for the pair’s key and value.  If FromEmacs returns an
 // error, h.Data is not modified.
 //
-// FromEmacs ignores the Emacs hashtable test for v.  This means that there may
+// FromEmacs ignores the Emacs hash table test for v.  This means that there may
 // be multiple Emacs keys mapping to a single Go key if the hash functions
-// aren’t consistent.  For example, an Emacs hashtable with string keys and
+// aren’t consistent.  For example, an Emacs hash table with string keys and
 // hash test eq may contain two keys that are equal when converted to Go
 // strings.  In such a case, FromEmacs returns an error.
 func (h *HashOut) FromEmacs(e Env, v Value) error {
