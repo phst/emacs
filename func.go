@@ -116,7 +116,7 @@ func (u Usage) validate() error {
 // or at least Min.
 type Arity struct{ Min, Max int }
 
-// Variadic returns whether the function is variadic, i.e., whether Max is
+// Variadic returns whether the function is variadic, i.e., whether a.Max is
 // negative.
 func (a Arity) Variadic() bool {
 	return a.Max < 0
