@@ -46,8 +46,8 @@ func (e Env) Let(variable Name, value In, body func() (Value, error)) (Value, er
 }
 
 // LetMany locally binds the given variables value within body.  This is like
-// the Emacs Lisp let special form.  Let returns the value and error returned
-// by body, unless some other error occurs.
+// the Emacs Lisp let special form.  LetMany returns the value and error
+// returned by body, unless some other error occurs.
 func (e Env) LetMany(bindings []Binding, body func() (Value, error)) (Value, error) {
 	fun, delete, err := e.Lambda(body)
 	if err != nil {

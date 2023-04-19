@@ -107,7 +107,7 @@ func ExportFunc(name Name, fun Func, arity Arity, doc Doc) {
 // Lisp-casing it.  For example, MyFunc becomes my-func.  To specify a
 // different name, pass a [Name] option.  To make the function anonymous, pass
 // an [Anonymous] option.  If there’s no name and the function isn’t anonymous,
-// AutoFunc panics.  If the name of a non-anonymous function is already
+// Export panics.  If the name of a non-anonymous function is already
 // registered, Export panics.
 //
 // By default, the function has no documentation string.  To add one, pass a
@@ -151,7 +151,7 @@ func (e Env) ExportFunc(name Name, fun Func, arity Arity, doc Doc) (Value, error
 // Emacs value, AutoFunc panics.  If there are invalid result patterns,
 // AutoFunc panics.
 //
-// By default, Export derives the function’s name from its Go name by
+// By default, AutoFunc derives the function’s name from its Go name by
 // Lisp-casing it.  For example, MyFunc becomes my-func.  To specify a
 // different name, pass a [Name] option.  To make the function anonymous, pass
 // an Anonymous option.  If there’s no name and the function isn’t anonymous,
@@ -306,7 +306,7 @@ func (e Env) Lambda(fun interface{}, opts ...Option) (Value, DeleteFunc, error) 
 }
 
 // [LambdaFunc] exports the given function to Emacs as an anonymous lambda
-// function.  Unlike the global [Lambda] function, Env.LambdaFunc requires
+// function.  Unlike the global [AutoLambda] function, Env.LambdaFunc requires
 // a live environment and defines the Emacs function immediately.  Unlike
 // [Env.Lambda], functions registered by LambdaFunc don’t automatically convert
 // their arguments and return values to and from Emacs.

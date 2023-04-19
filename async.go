@@ -161,9 +161,9 @@ func NotifyWriter(w io.Writer) chan<- struct{} {
 	return ch
 }
 
-// NotifyWriter returns a channel that causes some arbitrary content to be sent
-// to the client of the given listener whenever something is written to the
-// channel.  NotifyListener will wait (in the background) for exactly one
+// NotifyListener returns a channel that causes some arbitrary content to be
+// sent to the client of the given listener whenever something is written to
+// the channel.  NotifyListener will wait (in the background) for exactly one
 // client to connect to the server and then close the listener.  You can create
 // the listener using [net.Listen] or similar.  A common use case is a Unix
 // domain socket server; the socket name should be reported to Emacs Lisp using
