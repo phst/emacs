@@ -13,7 +13,6 @@
 // limitations under the License.
 
 /*
-
 Package emacs contains infrastructure to write dynamic modules for Emacs in Go.
 See
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Dynamic-Modules.html
@@ -30,7 +29,7 @@ high-level functions help reducing boilerplate when exporting functions to
 Emacs and calling Emacs functions from Go.  The lower-level functions are more
 type-safe, support more exotic use cases, and have less overhead.
 
-Export and Import
+# Export and Import
 
 At the highest level, use the [Export] function to export Go functions to
 Emacs, and the [Import] function to import Emacs functions so that they can be
@@ -83,7 +82,7 @@ At an even lower level, you can use [ExportFunc], [ImportFunc], and [Funcall]
 as alternatives to [Export], [Import], and [Call], respectively.  They have the
 same behavior, but don’t do any type conversion at all.
 
-Env and Value
+# Env and Value
 
 The fundamental types for interacting with Emacs are [Env] and [Value].  They
 represent Emacs module environments and values as described in
@@ -100,7 +99,7 @@ These rules are a bit subtle, but you are usually on the safe side if you don’
 store [Env] and [Value] values in struct fields or global variables, and don’t
 pass them to other goroutines.
 
-Error handling
+# Error handling
 
 All functions in this package translate between Go errors and Emacs nonlocal
 exits.  See
@@ -125,11 +124,11 @@ You can define your own error symbols using [DefineError].  There are also a
 couple of factory functions for builtin errors such as [WrongTypeArgument] and
 [OverflowError].
 
-Variables
+# Variables
 
 You can use [Var] to define a dynamic variable.
 
-User pointers and handles
+# User pointers and handles
 
 This package intentionally doesn’t support wrapping pointers to arbitrary Go
 values in Emacs user pointer objects.  Attempting to do that wouldn’t work well
@@ -137,7 +136,7 @@ with Go’s garbage collection and CGo’s pointer-passing rules; see
 https://pkg.go.dev/cmd/cgo#hdr-Passing_pointers.  Instead, prefer using
 handles, e.g. simple integers as map keys.  See the “Handles” example.
 
-Long-running operations
+# Long-running operations
 
 A long-running operation should periodically call [ProcessInput] to process
 pending input and to check whether the user wants to quit the operation.  If
@@ -150,16 +149,15 @@ can use the [Async] type to create and manage asynchronous operations.  [Async]
 requires a way to notify Emacs about a pending asynchronous result; this
 package supports notification using pipes or sockets.
 
-Initialization
+# Initialization
 
 If you want to run code while Emacs is loading the module, use [OnInit] to
 register initialization functions.  Loading the module will call all
 initialization functions in order.
 
-ERT tests
+# ERT tests
 
 You can use [ERTTest] to define ERT tests backed by Go functions.  This works
 similar to [Export], but defines ERT tests instead of functions.
-
 */
 package emacs

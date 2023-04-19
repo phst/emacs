@@ -64,11 +64,11 @@ func NewAsync(notifyCh chan<- struct{}) *Async {
 // value); any further writes or closes are ignored and will block.  The
 // typical usage pattern is:
 //
-//    func operation() AsyncHandle {
-//        h, ch := async.Start()
-//        go performOperation(ch)
-//        return h
-//    }
+//	func operation() AsyncHandle {
+//	    h, ch := async.Start()
+//	    go performOperation(ch)
+//	    return h
+//	}
 //
 // Here, performOperation should write the result to the channel once
 // available.
