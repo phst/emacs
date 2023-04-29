@@ -1,4 +1,4 @@
-# Copyright 2019, 2021, 2022 Google LLC
+# Copyright 2019, 2021, 2022, 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,10 +54,7 @@ emacs_module(
 go_binary(
     name = "genheader",
     srcs = ["genheader/main.go"],
-    visibility = [
-        "@emacs_module_header//:__pkg__",
-        "@emacs_module_header_master//:__pkg__",
-    ],
+    visibility = ["@emacs_module_header_master//:__pkg__"],
 )
 
 nogo(
