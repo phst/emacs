@@ -42,7 +42,7 @@ type VectorOut struct {
 
 // FromEmacs sets v.Data to a new slice containing the elements of the Emacs
 // vector u.  It returns an error if u is not a vector.  FromEmacs calls v.New
-// for each element in u.  v.New must return a new Out value for the element.
+// for each element in u.  v.New must return a new [Out] value for the element.
 // If FromEmacs returns an error, it doesn’t modify v.Data.
 func (v *VectorOut) FromEmacs(e Env, u Value) error {
 	n, err := e.VecSize(u)
