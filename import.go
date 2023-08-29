@@ -89,7 +89,7 @@ func Import(name Name, fp interface{}) {
 
 // ImportFunc imports an Emacs function as a Go function.  name must be the
 // Emacs symbol name of the function.  ImportFunc returns a new [Func] that
-// calls the Emacs function name.  Unlike [ImportFunc], there is no type
+// calls the Emacs function name.  Unlike [Import], there is no type
 // autoconversion.
 //
 // ImportFunc must be called before Emacs loads the module.  Typically you
