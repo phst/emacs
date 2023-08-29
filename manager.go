@@ -36,8 +36,8 @@ import (
 // they are initialized.
 //
 // Usually you’d create one global manager object per entity type.  All methods
-// of Manager are safe for concurrent use, assuming the QueueItems aren’t
-// modified after registering them, and [QueueItem.Define] is safe for
+// of Manager are safe for concurrent use, assuming the QueuedItems aren’t
+// modified after registering them, and [QueuedItem.Define] is safe for
 // concurrent use.
 type Manager struct {
 	mu    sync.Mutex
@@ -111,7 +111,7 @@ func (m *Manager) MustEnqueue(name Name, item QueuedItem) {
 	}
 }
 
-// RegisterAndDefine registers a [QueueItem] and defines it immediately.
+// RegisterAndDefine registers a [QueuedItem] and defines it immediately.
 // Unlike Enqueue and MustEnqueue, RegisterAndDefine requires a live [Env]
 // object and therefore only works after Emacs has loaded the module.  The name
 // may not be empty if the flag [RequireName] has been passed to [NewManager].
