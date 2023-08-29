@@ -57,30 +57,31 @@ To add one, pass a [Doc] value to [Export].  Since argument names aren’t
 available at runtime, the documentation by default lacks argument names.  Use
 [Usage] to add argument names.
 
-As an alternative to [Import], you can call functions directly using [Invoke].
-[Invoke] uses the same autoconversion rules as [Import], but allows you to
-specify an arbitrary function value.
+As an alternative to [Import], you can call functions directly using
+[Env.Invoke].  [Env.Invoke] uses the same autoconversion rules as [Import], but
+allows you to specify an arbitrary function value.
 
-At a slightly lower level, you can use [Call] and [CallOut] to call Emacs
-functions.  These functions use the [In] and [Out] interfaces to convert from
-and to Emacs values.  The primary disadvantage of this approach is that you
-can’t use primitive types like int or string directly.  Use wrapper types like
-[Int] and [String] instead.  On the other hand, [Call] and [CallOut] are more
-type-safe than [Invoke].  If you use [Call] or [CallOut], the compiler will
-detect unsupported types.  By contrast, when using [Export], [Import], or
-[Invoke], they will only be detected at runtime and cause runtime panics or
-errors.
+At a slightly lower level, you can use [Env.Call] and [Env.CallOut] to call
+Emacs functions.  These functions use the [In] and [Out] interfaces to convert
+from and to Emacs values.  The primary disadvantage of this approach is that
+you can’t use primitive types like int or string directly.  Use wrapper types
+like [Int] and [String] instead.  On the other hand, [Env.Call] and
+[Env.CallOut] are more type-safe than [Invoke].  If you use [Call] or
+[CallOut], the compiler will detect unsupported types.  By contrast, when using
+[Export], [Import], or [Invoke], they will only be detected at runtime and
+cause runtime panics or errors.
 
-To reduce boilerplate when using [Call] and [CallOut], this package contains
-several convenience types that implement [In] or [Out].  Most primitive types
-have corresponding wrapper types, such as [Int], [Float], or [String].  Types
-such as [List], [Cons], or [Hash] allow you to pass common Lisp structures
-without much boilerplate.  There are also some destructuring types such as
-[ListOut] or [Uncons].
+To reduce boilerplate when using [Env.Call] and [Env.CallOut], this package
+contains several convenience types that implement [In] or [Out].  Most
+primitive types have corresponding wrapper types, such as [Int], [Float], or
+[String].  Types such as [List], [Cons], or [Hash] allow you to pass common
+Lisp structures without much boilerplate.  There are also some destructuring
+types such as [ListOut] or [Uncons].
 
-At an even lower level, you can use [ExportFunc], [ImportFunc], and [Funcall]
-as alternatives to [Export], [Import], and [Call], respectively.  They have the
-same behavior, but don’t do any type conversion at all.
+At an even lower level, you can use [ExportFunc], [ImportFunc], and
+[Env.Funcall] as alternatives to [Export], [Import], and [Env.Call],
+respectively.  They have the same behavior, but don’t do any type conversion at
+all.
 
 # Env and Value
 
@@ -138,10 +139,10 @@ handles, e.g. simple integers as map keys.  See the “Handles” example.
 
 # Long-running operations
 
-A long-running operation should periodically call [ProcessInput] to process
+A long-running operation should periodically call [Env.ProcessInput] to process
 pending input and to check whether the user wants to quit the operation.  If
 so, you should cancel the operation as soon as possible.  See the documentation
-of [ProcessInput] for a concrete example.
+of [Env.ProcessInput] for a concrete example.
 
 As an alternative, this package provides limited support for asynchronous
 operations.  Such operations are represented using the [AsyncHandle] type.  You

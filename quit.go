@@ -22,7 +22,7 @@ import "C"
 // Emacs to process the quit.  Once Emacs regains control, it will quit and
 // ignore the return value.
 //
-// Deprecated: Use [ProcessInput] instead.
+// Deprecated: Use [Env.ProcessInput] instead.
 func (e Env) ShouldQuit() bool {
 	return bool(C.phst_emacs_should_quit(e.raw()))
 }
