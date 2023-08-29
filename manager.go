@@ -67,7 +67,7 @@ func NewManager(flags ManagerFlag) *Manager {
 	return m
 }
 
-// ManagerFlag defines flags for NewManager.
+// ManagerFlag defines flags for [NewManager].
 type ManagerFlag uint
 
 const (
