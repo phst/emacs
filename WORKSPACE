@@ -49,6 +49,25 @@ load("@rules_python//python:repositories.bzl", "py_repositories")
 py_repositories()
 
 http_archive(
+    name = "phst_rules_elisp",
+    sha256 = "432f8f9cd9bf921772602341cfef9a8e92ce76173ae74d723e907575a3839700",
+    strip_prefix = "rules_elisp-5ee6a13e09a2802a87c68fe90ce3a8d33760662b",
+    urls = [
+        "https://github.com/phst/rules_elisp/archive/5ee6a13e09a2802a87c68fe90ce3a8d33760662b.zip",  # 2023-04-16
+    ],
+)
+
+load(
+    "@phst_rules_elisp//elisp:repositories.bzl",
+    "rules_elisp_dependencies",
+    "rules_elisp_toolchains",
+)
+
+rules_elisp_dependencies()
+
+rules_elisp_toolchains()
+
+http_archive(
     name = "io_bazel_rules_go",
     sha256 = "6b65cb7917b4d1709f9410ffe00ecf3e160edf674b78c54a894471320862184f",
     urls = [
@@ -87,25 +106,6 @@ http_archive(
         "https://github.com/bazelbuild/buildtools/archive/refs/tags/5.1.0.tar.gz",  # 2022-04-13
     ],
 )
-
-http_archive(
-    name = "phst_rules_elisp",
-    sha256 = "432f8f9cd9bf921772602341cfef9a8e92ce76173ae74d723e907575a3839700",
-    strip_prefix = "rules_elisp-5ee6a13e09a2802a87c68fe90ce3a8d33760662b",
-    urls = [
-        "https://github.com/phst/rules_elisp/archive/5ee6a13e09a2802a87c68fe90ce3a8d33760662b.zip",  # 2023-04-16
-    ],
-)
-
-load(
-    "@phst_rules_elisp//elisp:repositories.bzl",
-    "rules_elisp_dependencies",
-    "rules_elisp_toolchains",
-)
-
-rules_elisp_dependencies()
-
-rules_elisp_toolchains()
 
 http_archive(
     name = "aio",
