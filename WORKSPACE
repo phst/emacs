@@ -98,18 +98,24 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 http_archive(
-    name = "com_github_bazelbuild_buildtools",
-    sha256 = "67e0d6b79724f413b98cebfa256db30cede6f9f14aae1ac50d0987da702f5054",
-    strip_prefix = "buildtools-6.3.3/",
+    name = "buildifier_prebuilt",
+    sha256 = "72b5bb0853aac597cce6482ee6c62513318e7f2c0050bc7c319d75d03d8a3875",
+    strip_prefix = "buildifier-prebuilt-6.3.3",
     urls = [
-        "https://github.com/bazelbuild/buildtools/archive/refs/tags/v6.3.3.zip",  # 2023-08-25
+        "http://github.com/keith/buildifier-prebuilt/archive/6.3.3.tar.gz",
     ],
 )
 
-load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
+load("@buildifier_prebuilt//:deps.bzl", "buildifier_prebuilt_deps")
 
-buildifier_dependencies()
+buildifier_prebuilt_deps()
+
+load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains")
+
+buildifier_prebuilt_register_toolchains()
 
 http_archive(
     name = "aio",
