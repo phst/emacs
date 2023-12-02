@@ -107,6 +107,10 @@ http_archive(
     ],
 )
 
+load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
+
+buildifier_dependencies()
+
 http_archive(
     name = "aio",
     build_file = "//:aio.BUILD",
@@ -116,10 +120,6 @@ http_archive(
         "https://github.com/skeeto/emacs-aio/archive/da93523e235529fa97d6f251319d9e1d6fc24a41.zip",  # 2020-06-10
     ],
 )
-
-load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
-
-buildifier_dependencies()
 
 # Local Variables:
 # mode: bazel-workspace
