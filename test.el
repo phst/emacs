@@ -1,6 +1,6 @@
 ;;; test.el --- unit tests -*- lexical-binding: t; -*-
 
-;; Copyright 2019, 2021 Google LLC
+;; Copyright 2019, 2021, 2023 Google LLC
 ;;
 ;; Licensed under the Apache License, Version 2.0 (the "License");
 ;; you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@
   (message "Received output %S for process %s" output process)
   (cl-loop with table = async-promises
            for (handle value error) across (async-flush)
-           for promise = (cl-the aio-promise (gethash handle table))
+           for promise = (gethash handle table)
            do
            (remhash handle table)
            (message "Resolving promise with handle %d" handle)
