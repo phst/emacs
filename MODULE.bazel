@@ -1,0 +1,42 @@
+# Copyright 2023 Philipp Stephani
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+module(name = "com_github_phst_emacs")
+
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+bazel_dep(name = "phst_rules_elisp")
+git_override(
+    module_name = "phst_rules_elisp",
+    commit = "4fae310464968ae451b3b172832233fe160dbc2f",
+    remote = "https://github.com/phst/rules_elisp.git",
+)
+
+bazel_dep(name = "rules_go", version = "0.44.0", repo_name = "io_bazel_rules_go")
+
+go_sdk = use_extension("@io_bazel_rules_go//go:extensions.bzl", "go_sdk")
+go_sdk.nogo(nogo = "//:nogo")
+
+bazel_dep(name = "buildifier_prebuilt", version = "6.3.3", dev_dependency = True)
+
+elisp = use_extension("@phst_rules_elisp//elisp:extensions.bzl", "elisp")
+elisp.http_archive(
+    name = "aio",
+    exclude = ["aio-contrib.el"],
+    integrity = "sha384-6IREOIs9cZ6Rm7qX+KdglTFRzhtu9T/clX/Qq6gb3Rivrsfr7Yoc8695qWTBVPcn",
+    strip_prefix = "emacs-aio-da93523e235529fa97d6f251319d9e1d6fc24a41/",
+    urls = [
+        "https://github.com/skeeto/emacs-aio/archive/da93523e235529fa97d6f251319d9e1d6fc24a41.zip",  # 2020-06-10
+    ],
+)
+use_repo(elisp, "aio")
