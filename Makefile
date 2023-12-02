@@ -23,20 +23,6 @@ BAZELFLAGS :=
 # All potentially supported Emacs versions.
 versions := 28.1
 
-kernel := $(shell uname -s)
-ifeq ($(kernel),Linux)
-  # GNU/Linux supports all Emacs versions.
-else ifeq ($(kernel),Darwin)
-  ifneq ($(shell uname -m),x86_64)
-    # Apple Silicon doesn’t support Emacs 27.1.
-    unsupported := 27.1
-  endif
-else
-  $(error Unsupported kernel $(kernel))
-endif
-
-versions := $(filter-out $(unsupported),$(versions))
-
 all: check $(versions)
 
 check:
