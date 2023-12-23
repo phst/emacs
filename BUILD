@@ -49,14 +49,14 @@ go_library(
     importpath = "github.com/phst/emacs",
 )
 
-bin_name = "_" + "stable" + "_example"
+bin_name = "_stable_example"
 
 lib_name = bin_name + "_lib"
 
 elisp_lib_name = bin_name + "_elisp_lib"
 
 go_test(
-    name = "stable" + "_go_test",
+    name = "stable_go_test",
     size = "medium",
     timeout = "short",
     srcs = TEST_SRCS,
@@ -71,16 +71,16 @@ mod_name = paths.join("stable", "example-module.so")
 
 # The Emacs Lisp Bazel rules don’t allow multiple libraries with
 # overlapping source files, so make a per-target copy of the test file.
-test_el = "_" + "stable" + "_test.el"
+test_el = "_stable_test.el"
 
 copy_file(
-    name = "_" + "stable" + "_copy",
+    name = "_stable_copy",
     src = "//:test.el",
     out = test_el,
 )
 
 elisp_test(
-    name = "stable" + "_elisp_test",
+    name = "stable_elisp_test",
     size = "medium",
     timeout = "short",
     srcs = [test_el],
