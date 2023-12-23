@@ -17,14 +17,6 @@ workspace(name = "com_github_phst_emacs")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
-    name = "emacs_module_header_master",
-    build_file = "@//:header_master.BUILD",
-    sha256 = "0ff2f2008b891943fe65193a15af57384f541ad92b01912fd37045c806a5b3f6",
-    strip_prefix = "emacs-1b2547de23ef6bcab9ec791878178f5ade99bd19/src",
-    urls = ["https://git.savannah.gnu.org/cgit/emacs.git/snapshot/emacs-1b2547de23ef6bcab9ec791878178f5ade99bd19.tar.gz"],
-)
-
-http_archive(
     name = "bazel_skylib",
     sha256 = "cd55a062e763b9349921f0f5db8c3933288dc8ba4f76dd9416aac68acee3cb94",
     urls = [

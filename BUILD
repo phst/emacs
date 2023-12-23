@@ -44,13 +44,6 @@ emacs_module(
     test_srcs = TEST_SRCS,
 )
 
-emacs_module(
-    name = "master",
-    srcs = SRCS,
-    header = "@emacs_module_header_master//:header",
-    test_srcs = TEST_SRCS,
-)
-
 go_binary(
     name = "genheader",
     srcs = ["genheader/main.go"],
