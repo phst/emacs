@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+common --noexperimental_enable_bzlmod
+
 # See
 # https://github.com/abseil/abseil-cpp/blob/master/FAQ.md#how-to-i-set-the-c-dialect-used-to-build-abseil
 # why we need to specify the -std option in .bazelrc.
