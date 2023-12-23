@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
-load("@io_bazel_rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "nogo")
-load(":def.bzl", "COPTS", "emacs_module")
+load("@io_bazel_rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
+load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
+load(":def.bzl", "COPTS")
 
 SRCS = glob(
     [
@@ -37,11 +40,84 @@ go_library(
     visibility = ["//visibility:public"],
 )
 
-emacs_module(
+go_library(
     name = "stable",
     srcs = SRCS,
-    header = "@phst_rules_elisp//emacs:module_header",
-    test_srcs = TEST_SRCS,
+    cdeps = ["@phst_rules_elisp//emacs:module_header"],
+    cgo = True,
+    copts = COPTS,
+    importpath = "github.com/phst/emacs",
+)
+
+bin_name = "_" + "stable" + "_example"
+
+lib_name = bin_name + "_lib"
+
+elisp_lib_name = bin_name + "_elisp_lib"
+
+go_test(
+    name = "stable" + "_go_test",
+    size = "medium",
+    timeout = "short",
+    srcs = TEST_SRCS,
+    embed = ["stable"],
+)
+
+# Output the module with a fixed name so that (require 'example-module)
+# works.  Note that we use the .so suffix on macOS as well due to
+# https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.  We can switch to
+# .dylib once we drop support for Emacs 27.
+mod_name = paths.join("stable", "example-module.so")
+
+# The Emacs Lisp Bazel rules don’t allow multiple libraries with
+# overlapping source files, so make a per-target copy of the test file.
+test_el = "_" + "stable" + "_test.el"
+
+copy_file(
+    name = "_" + "stable" + "_copy",
+    src = "//:test.el",
+    out = test_el,
+)
+
+elisp_test(
+    name = "stable" + "_elisp_test",
+    size = "medium",
+    timeout = "short",
+    srcs = [test_el],
+    deps = [
+        elisp_lib_name,
+        "@aio",
+    ],
+)
+
+elisp_library(
+    name = elisp_lib_name,
+    srcs = [mod_name],
+    load_path = ["stable"],
+)
+
+go_library(
+    name = lib_name,
+    srcs = TEST_SRCS,
+    embed = ["stable"],
+    importpath = "github.com/phst/emacs",
+)
+
+go_binary(
+    name = bin_name,
+    srcs = ["//:example/main.go"],
+    linkmode = "c-shared",
+    deps = [lib_name],
+)
+
+# We copy the module file so that it’s guaranteed to be in the “bin”
+# directory of the “elisp_library” rule.  “go_binary” seems to add a
+# configuration transition.  This should better be addressed in the
+# implementation of “elisp_library” itself.
+copy_file(
+    name = bin_name + "_copy",
+    src = bin_name,
+    out = mod_name,
 )
 
 go_binary(
