@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
 load("@io_bazel_rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
@@ -49,12 +48,6 @@ go_library(
     importpath = "github.com/phst/emacs",
 )
 
-bin_name = "_stable_example"
-
-lib_name = bin_name + "_lib"
-
-elisp_lib_name = bin_name + "_elisp_lib"
-
 go_test(
     name = "stable_go_test",
     size = "medium",
@@ -63,51 +56,43 @@ go_test(
     embed = ["stable"],
 )
 
-# Output the module with a fixed name so that (require 'example-module)
-# works.  Note that we use the .so suffix on macOS as well due to
-# https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.  We can switch to
-# .dylib once we drop support for Emacs 27.
-mod_name = paths.join("stable", "example-module.so")
-
 # The Emacs Lisp Bazel rules don’t allow multiple libraries with
 # overlapping source files, so make a per-target copy of the test file.
-test_el = "_stable_test.el"
-
 copy_file(
     name = "_stable_copy",
     src = "//:test.el",
-    out = test_el,
+    out = "_stable_test.el",
 )
 
 elisp_test(
     name = "stable_elisp_test",
     size = "medium",
     timeout = "short",
-    srcs = [test_el],
+    srcs = ["_stable_test.el"],
     deps = [
-        elisp_lib_name,
+        "_stable_example_elisp_lib",
         "@aio",
     ],
 )
 
 elisp_library(
-    name = elisp_lib_name,
-    srcs = [mod_name],
+    name = "_stable_example_elisp_lib",
+    srcs = ["stable/example-module.so"],
     load_path = ["stable"],
 )
 
 go_library(
-    name = lib_name,
+    name = "_stable_example_lib",
     srcs = TEST_SRCS,
     embed = ["stable"],
     importpath = "github.com/phst/emacs",
 )
 
 go_binary(
-    name = bin_name,
+    name = "_stable_example",
     srcs = ["//:example/main.go"],
     linkmode = "c-shared",
-    deps = [lib_name],
+    deps = ["_stable_example_lib"],
 )
 
 # We copy the module file so that it’s guaranteed to be in the “bin”
@@ -115,9 +100,13 @@ go_binary(
 # configuration transition.  This should better be addressed in the
 # implementation of “elisp_library” itself.
 copy_file(
-    name = bin_name + "_copy",
-    src = bin_name,
-    out = mod_name,
+    name = "_stable_example_copy",
+    src = "_stable_example",
+    # Output the module with a fixed name so that (require 'example-module)
+    # works.  Note that we use the .so suffix on macOS as well due to
+    # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.  We can switch to
+    # .dylib once we drop support for Emacs 27.
+    out = "stable/example-module.so",
 )
 
 go_binary(
