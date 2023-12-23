@@ -40,7 +40,7 @@ go_library(
 )
 
 go_test(
-    name = "stable_go_test",
+    name = "go_test",
     size = "medium",
     timeout = "short",
     srcs = TEST_SRCS,
@@ -50,40 +50,39 @@ go_test(
 # The Emacs Lisp Bazel rules don’t allow multiple libraries with
 # overlapping source files, so make a per-target copy of the test file.
 copy_file(
-    name = "_stable_copy",
+    name = "_copy",
     src = "//:test.el",
-    out = "_stable_test.el",
+    out = "_test.el",
 )
 
 elisp_test(
-    name = "stable_elisp_test",
+    name = "elisp_test",
     size = "medium",
     timeout = "short",
-    srcs = ["_stable_test.el"],
+    srcs = ["_test.el"],
     deps = [
-        "_stable_example_elisp_lib",
+        "_example_elisp_lib",
         "@aio",
     ],
 )
 
 elisp_library(
-    name = "_stable_example_elisp_lib",
-    srcs = ["stable/example-module.so"],
-    load_path = ["stable"],
+    name = "_example_elisp_lib",
+    srcs = ["example-module.so"],
 )
 
 go_library(
-    name = "_stable_example_lib",
+    name = "_example_lib",
     srcs = TEST_SRCS,
     embed = [":go_default_library"],
     importpath = "github.com/phst/emacs",
 )
 
 go_binary(
-    name = "_stable_example",
+    name = "_example",
     srcs = ["//:example/main.go"],
     linkmode = "c-shared",
-    deps = ["_stable_example_lib"],
+    deps = ["_example_lib"],
 )
 
 # We copy the module file so that it’s guaranteed to be in the “bin”
@@ -91,13 +90,13 @@ go_binary(
 # configuration transition.  This should better be addressed in the
 # implementation of “elisp_library” itself.
 copy_file(
-    name = "_stable_example_copy",
-    src = "_stable_example",
+    name = "_example_copy",
+    src = "_example",
     # Output the module with a fixed name so that (require 'example-module)
     # works.  Note that we use the .so suffix on macOS as well due to
     # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.  We can switch to
     # .dylib once we drop support for Emacs 27.
-    out = "stable/example-module.so",
+    out = "example-module.so",
 )
 
 go_binary(
