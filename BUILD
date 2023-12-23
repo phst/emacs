@@ -62,7 +62,7 @@ elisp_test(
     srcs = ["_test.el"],
     deps = [
         "_example_elisp_lib",
-        "@aio",
+        "@aio//:library",
     ],
 )
 

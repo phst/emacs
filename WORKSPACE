@@ -51,6 +51,7 @@ http_archive(
 
 load(
     "@phst_rules_elisp//elisp:repositories.bzl",
+    "elisp_http_archive",
     "rules_elisp_dependencies",
     "rules_elisp_toolchains",
 )
@@ -109,10 +110,10 @@ load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains
 
 buildifier_prebuilt_register_toolchains()
 
-http_archive(
+elisp_http_archive(
     name = "aio",
-    build_file = "//:aio.BUILD",
-    sha256 = "63e3170f2d720995b318bc1feb8414fca3dea16cb707f24a981f3f0cade3fcbf",
+    exclude = ["aio-contrib.el"],
+    integrity = "sha256-Y+MXDy1yCZWzGLwf64QU/KPeoWy3B/JKmB8/DK3j/L8=",
     strip_prefix = "emacs-aio-da93523e235529fa97d6f251319d9e1d6fc24a41/",
     urls = [
         "https://github.com/skeeto/emacs-aio/archive/da93523e235529fa97d6f251319d9e1d6fc24a41.zip",  # 2020-06-10
