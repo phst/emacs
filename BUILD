@@ -39,21 +39,12 @@ go_library(
     visibility = ["//visibility:public"],
 )
 
-go_library(
-    name = "stable",
-    srcs = SRCS,
-    cdeps = ["@phst_rules_elisp//emacs:module_header"],
-    cgo = True,
-    copts = COPTS,
-    importpath = "github.com/phst/emacs",
-)
-
 go_test(
     name = "stable_go_test",
     size = "medium",
     timeout = "short",
     srcs = TEST_SRCS,
-    embed = ["stable"],
+    embed = [":go_default_library"],
 )
 
 # The Emacs Lisp Bazel rules don’t allow multiple libraries with
@@ -84,7 +75,7 @@ elisp_library(
 go_library(
     name = "_stable_example_lib",
     srcs = TEST_SRCS,
-    embed = ["stable"],
+    embed = [":go_default_library"],
     importpath = "github.com/phst/emacs",
 )
 
