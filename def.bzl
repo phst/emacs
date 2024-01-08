@@ -1,4 +1,4 @@
-# Copyright 2019, 2021, 2023 Google LLC
+# Copyright 2019, 2021, 2023, 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,3 @@
 # limitations under the License.
 
 """Contains the macro emacs_module."""
-
-COPTS = [
-    "-Werror",
-    "-Wall",
-    "-Wconversion",
-    "-Wextra",
-    "-Wno-sign-conversion",
-    "-Wno-unused-parameter",
-    "-fvisibility=hidden",
-]
