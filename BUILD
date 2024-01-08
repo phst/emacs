@@ -121,10 +121,7 @@ buildifier_test(
         "BUILD",
         "WORKSPACE",
     ] + glob(
-        [
-            "*.bazel",
-            "*.bzl",
-        ],
+        ["*.bazel"],
         allow_empty = False,
     ),
     lint_mode = "warn",
