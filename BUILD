@@ -130,16 +130,6 @@ buildifier_test(
     mode = "check",
 )
 
-config_setting(
-    name = "linux",
-    constraint_values = ["@bazel_tools//platforms:linux"],
-)
-
-config_setting(
-    name = "macos",
-    constraint_values = ["@bazel_tools//platforms:osx"],
-)
-
 # Local Variables:
 # mode: bazel-build
 # End:
