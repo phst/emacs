@@ -122,8 +122,6 @@ buildifier_test(
         "WORKSPACE",
     ] + glob(
         [
-            "*.BUILD",
-            "*.WORKSPACE",
             "*.bazel",
             "*.bzl",
         ],
