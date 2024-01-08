@@ -17,33 +17,29 @@ load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
 load("@io_bazel_rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
 load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
 
-COPTS = [
-    "-Werror",
-    "-Wall",
-    "-Wconversion",
-    "-Wextra",
-    "-Wno-sign-conversion",
-    "-Wno-unused-parameter",
-    "-fvisibility=hidden",
-]
-
-SRCS = glob(
-    [
-        "*.go",
-        "*.h",
-        "*.c",
-    ],
-    exclude = ["*_test.go"],
-)
-
 TEST_SRCS = glob(["*_test.go"])
 
 go_library(
     name = "go_default_library",
-    srcs = SRCS,
+    srcs = glob(
+        [
+            "*.go",
+            "*.h",
+            "*.c",
+        ],
+        exclude = ["*_test.go"],
+    ),
     cdeps = ["@phst_rules_elisp//emacs:module_header"],
     cgo = True,
-    copts = COPTS,
+    copts = [
+        "-Werror",
+        "-Wall",
+        "-Wconversion",
+        "-Wextra",
+        "-Wno-sign-conversion",
+        "-Wno-unused-parameter",
+        "-fvisibility=hidden",
+    ],
     importpath = "github.com/phst/emacs",
     visibility = ["//visibility:public"],
 )
