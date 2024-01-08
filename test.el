@@ -1,6 +1,6 @@
 ;;; test.el --- unit tests -*- lexical-binding: t; -*-
 
-;; Copyright 2019, 2021, 2023 Google LLC
+;; Copyright 2019, 2021, 2023, 2024 Google LLC
 ;;
 ;; Licensed under the Apache License, Version 2.0 (the "License");
 ;; you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@
             (close-go-file handle)))
       (delete-file filename))))
 
-(defvar async-promises (make-hash-table))
+(defvar async-promises (make-hash-table :test #'eql))
 
 (ert-deftest async ()
   (let ((handle (mersenne-prime-async-p 4423))
