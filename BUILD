@@ -56,19 +56,11 @@ go_test(
     embed = [":go_default_library"],
 )
 
-# The Emacs Lisp Bazel rules don’t allow multiple libraries with
-# overlapping source files, so make a per-target copy of the test file.
-copy_file(
-    name = "_copy",
-    src = "//:test.el",
-    out = "_test.el",
-)
-
 elisp_test(
     name = "elisp_test",
     size = "medium",
     timeout = "short",
-    srcs = ["_test.el"],
+    srcs = ["test.el"],
     deps = [
         "_example_elisp_lib",
         "@aio//:library",
