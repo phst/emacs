@@ -78,8 +78,6 @@ go_register_toolchains(
     version = "1.21.5",
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 http_archive(
     name = "buildifier_prebuilt",
     sha256 = "72b5bb0853aac597cce6482ee6c62513318e7f2c0050bc7c319d75d03d8a3875",
