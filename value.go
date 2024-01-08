@@ -1,4 +1,4 @@
-// Copyright 2019, 2023 Google LLC
+// Copyright 2019, 2023, 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ import (
 // Value values are only valid (or “live”) as long as the Env used to create
 // them is valid.  Don’t pass Value values to other goroutines.  Two different
 // Value values may represent the same Emacs value.  Use Env.Eq instead of the
-// == operator to compare values.  See
-// https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Values.html
-// for details.
+// == operator to compare values.  See [Conversion Between Lisp and Module
+// Values] for details.
+//
+// [Conversion Between Lisp and Module Values]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Values.html
 type Value struct{ r C.emacs_value }
 
 // In is a value that knows how to convert itself into an Emacs object.  You

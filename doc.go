@@ -1,4 +1,4 @@
-// Copyright 2019, 2021, 2023 Google LLC
+// Copyright 2019, 2021, 2023, 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
 
 /*
 Package emacs contains infrastructure to write dynamic modules for Emacs in Go.
-See
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Dynamic-Modules.html
-and
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Writing-Dynamic-Modules.html
-for background on Emacs modules.
+See [Emacs Dynamic Modules] and [Writing Dynamically-Loaded Modules] for
+background on Emacs modules.
 
 To build an Emacs module, you have to build your Go code as a shared C library,
 e.g., using go build ‑buildmode=c‑shared.  If you import the emacs package, the
@@ -86,34 +83,27 @@ all.
 # Env and Value
 
 The fundamental types for interacting with Emacs are [Env] and [Value].  They
-represent Emacs module environments and values as described in
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Functions.html.
-These types are opaque, and their zero values are invalid.  You can’t use [Env]
-and [Value] values once they are no longer live.  This is described in
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Functions.html
-and
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Values.html.
-As a best practice, don’t let these values escape exported functions.  You also
-can’t interact with Emacs from other threads,
-cf. https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Functions.html.
-These rules are a bit subtle, but you are usually on the safe side if you don’t
-store [Env] and [Value] values in struct fields or global variables, and don’t
-pass them to other goroutines.
+represent Emacs module environments and values as described in [Writing Module
+Functions].  These types are opaque, and their zero values are invalid.  You
+can’t use [Env] and [Value] values once they are no longer live.  This is
+described in [Writing Module Functions] and [Conversion Between Lisp and Module
+Values].  As a best practice, don’t let these values escape exported functions.
+You also can’t interact with Emacs from other threads, cf. [Writing Module
+Functions].  These rules are a bit subtle, but you are usually on the safe side
+if you don’t store [Env] and [Value] values in struct fields or global
+variables, and don’t pass them to other goroutines.
 
 # Error handling
 
 All functions in this package translate between Go errors and Emacs nonlocal
-exits.  See
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Nonlocal.html.
-This package represents Emacs nonlocal exits as ordinary Go errors.
+exits.  See [Nonlocal Exits in Modules].  This package represents Emacs
+nonlocal exits as ordinary Go errors.
 
 Each call to a function fetches and clears nonlocal exit information after the
 actual call and converts it to an error of type [Signal] or [Throw].  This
 means that the Go bindings don’t exhibit the saturating error behavior
-described at
-https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Nonlocal.html.
-Instead, they behave like normal Go functions: an erroneous return doesn’t
-affect future function calls.
+described at [Nonlocal Exits in Modules].  Instead, they behave like normal Go
+functions: an erroneous return doesn’t affect future function calls.
 
 When returning from an exported function, this package converts errors back to
 Emacs nonlocal exits.  If you return a [Signal] or [Error], Emacs will raise a
@@ -133,9 +123,9 @@ You can use [Var] to define a dynamic variable.
 
 This package intentionally doesn’t support wrapping pointers to arbitrary Go
 values in Emacs user pointer objects.  Attempting to do that wouldn’t work well
-with Go’s garbage collection and CGo’s pointer-passing rules; see
-https://pkg.go.dev/cmd/cgo#hdr-Passing_pointers.  Instead, prefer using
-handles, e.g. simple integers as map keys.  See the “Handles” example.
+with Go’s garbage collection and CGo’s pointer-passing rules; see [Passing
+pointers].  Instead, prefer using handles, e.g. simple integers as map keys.
+See the “Handles” example.
 
 # Long-running operations
 
@@ -160,5 +150,12 @@ initialization functions in order.
 
 You can use [ERTTest] to define ERT tests backed by Go functions.  This works
 similar to [Export], but defines ERT tests instead of functions.
+
+[Emacs Dynamic Modules]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Dynamic-Modules.html
+[Writing Dynamically-Loaded Modules]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Writing-Dynamic-Modules.html
+[Writing Module Functions]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Functions.html
+[Conversion Between Lisp and Module Values]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Values.html
+[Nonlocal Exits in Modules]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Module-Nonlocal.html
+[Passing pointers]: https://pkg.go.dev/cmd/cgo#hdr-Passing_pointers
 */
 package emacs

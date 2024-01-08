@@ -1,4 +1,4 @@
-// Copyright 2019, 2021, 2023 Google LLC
+// Copyright 2019, 2021, 2023, 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,14 +34,15 @@ import (
 )
 
 // Doc contains a documentation string for a function or variable.  An empty
-// doc string becomes nil.  As described in
-// https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Documentation.html,
-// a documentation string can contain usage information.  Use [Doc.SplitUsage]
-// to extract the usage information from a documentation string.  Use
-// [Doc.WithUsage] to add usage information to a documentation string.
-// Documentation strings must be valid UTF-8 strings without embedded null
-// bytes.  You can use a Doc as an [Option] in [Export] and [ERTTest] to set
-// the function or test documentation string.
+// doc string becomes nil.  As described in [Documentation Strings of
+// Functions], a documentation string can contain usage information.  Use
+// [Doc.SplitUsage] to extract the usage information from a documentation
+// string.  Use [Doc.WithUsage] to add usage information to a documentation
+// string.  Documentation strings must be valid UTF-8 strings without embedded
+// null bytes.  You can use a Doc as an [Option] in [Export] and [ERTTest] to
+// set the function or test documentation string.
+//
+// [Documentation Strings of Functions]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Documentation.html
 type Doc string
 
 // Emacs returns nil if d is empty and an Emacs string otherwise.
@@ -97,11 +98,12 @@ func (d Doc) WithUsage(u Usage) Doc {
 
 // Usage contains a list of argument names to be added to a documentation
 // string.  It should contain a plain space-separated list of argument names
-// without enclosing parentheses.  See
-// https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Documentation.html.
+// without enclosing parentheses.  See [Documentation Strings of Functions].
 // Usage strings must be valid UTF-8 strings without embedded null characters
 // or newlines.  You can use a Usage as an [Option] in [Export] to set the
 // argument list in the documentation string.
+//
+// [Documentation Strings of Functions]: https://www.gnu.org/software/emacs/manual/html_node/elisp/Function-Documentation.html
 type Usage string
 
 func (u Usage) validate() error {

@@ -33,7 +33,9 @@ import (
 // to return the pending results.
 //
 // Async doesn’t prescribe any specific programming model on the Emacs side;
-// the example uses the “aio” package from https://github.com/skeeto/emacs-aio.
+// the example uses the [“aio” package].
+//
+// [“aio” package]: https://github.com/skeeto/emacs-aio
 type Async struct {
 	notifyCh    chan<- struct{}
 	promiseCh   chan AsyncData
