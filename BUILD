@@ -62,7 +62,7 @@ elisp_test(
     timeout = "short",
     srcs = ["test.el"],
     deps = [
-        "example_elisp_lib",
+        ":example_elisp_lib",
         "@aio//:library",
     ],
 )
@@ -81,9 +81,9 @@ go_library(
 
 go_binary(
     name = "example",
-    srcs = ["//:example/main.go"],
+    srcs = ["example/main.go"],
     linkmode = "c-shared",
-    deps = ["example_lib"],
+    deps = [":example_lib"],
 )
 
 # We copy the module file so that it’s guaranteed to be in the “bin”
