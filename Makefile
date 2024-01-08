@@ -18,7 +18,12 @@ SHELL := /bin/sh
 .SUFFIXES:
 
 BAZEL := bazel
+
+ifeq ($(USE_BAZEL_VERSION:6.%=6),6)
+BAZELFLAGS := --lockfile_mode=off
+else
 BAZELFLAGS :=
+endif
 
 # All potentially supported Emacs versions.
 versions := 28.1 28.2 29.1
