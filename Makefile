@@ -19,7 +19,10 @@ SHELL := /bin/sh
 
 BAZEL := bazel
 
-ifeq ($(USE_BAZEL_VERSION:6.%=6),6)
+bazel_version := $(lastword $(shell $(BAZEL) --version))
+bazel_major := $(firstword $(subst ., ,$(bazel_version)))
+
+ifeq ($(bazel_major),6)
 BAZELFLAGS := --lockfile_mode=off
 else ifeq ($(CI),true)
 BAZELFLAGS := --lockfile_mode=error
