@@ -1,4 +1,4 @@
-# Copyright 2019, 2021, 2022, 2023 Google LLC
+# Copyright 2019, 2021, 2022, 2023, 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -97,12 +97,6 @@ copy_file(
     # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.  We can switch to
     # .dylib once we drop support for Emacs 27.
     out = "example-module.so",
-)
-
-go_binary(
-    name = "genheader",
-    srcs = ["genheader/main.go"],
-    visibility = ["@emacs_module_header_master//:__pkg__"],
 )
 
 nogo(
