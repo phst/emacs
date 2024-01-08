@@ -21,6 +21,8 @@ BAZEL := bazel
 
 ifeq ($(USE_BAZEL_VERSION:6.%=6),6)
 BAZELFLAGS := --lockfile_mode=off
+else ifeq ($(CI),true)
+BAZELFLAGS := --lockfile_mode=error
 else
 BAZELFLAGS :=
 endif
