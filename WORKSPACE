@@ -42,10 +42,10 @@ py_repositories()
 
 http_archive(
     name = "phst_rules_elisp",
-    integrity = "sha384-3kUap/Otmo+KzD9hXkJdXnRCIHQI1sVcoO32QRZSKubaHy/RciPLq2dzV1L/M824",
-    strip_prefix = "rules_elisp-c90b4ab7805670689a65eee7ad13790aa7b4a111",
+    integrity = "sha384-bphZJnQMjhnW5mBvaW5q8UqmgS1C7H5pn8kam0jxKysi2MLmKUyf9j9Oj7cNZTeC",
+    strip_prefix = "rules_elisp-4fae310464968ae451b3b172832233fe160dbc2f",
     urls = [
-        "https://github.com/phst/rules_elisp/archive/c90b4ab7805670689a65eee7ad13790aa7b4a111.zip",  # 2023-12-23
+        "https://github.com/phst/rules_elisp/archive/4fae310464968ae451b3b172832233fe160dbc2f.zip",  # 2024-01-08
     ],
 )
 
