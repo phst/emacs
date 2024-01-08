@@ -17,7 +17,10 @@ load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
 load("@io_bazel_rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
 load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
 
-TEST_SRCS = glob(["*_test.go"])
+TEST_SRCS = glob(
+    ["*_test.go"],
+    allow_empty = False,
+)
 
 go_library(
     name = "go_default_library",
@@ -27,6 +30,7 @@ go_library(
             "*.h",
             "*.c",
         ],
+        allow_empty = False,
         exclude = ["*_test.go"],
     ),
     cdeps = ["@phst_rules_elisp//emacs:module_header"],
@@ -116,12 +120,15 @@ buildifier_test(
     srcs = [
         "BUILD",
         "WORKSPACE",
-    ] + glob([
-        "*.BUILD",
-        "*.WORKSPACE",
-        "*.bazel",
-        "*.bzl",
-    ]),
+    ] + glob(
+        [
+            "*.BUILD",
+            "*.WORKSPACE",
+            "*.bazel",
+            "*.bzl",
+        ],
+        allow_empty = False,
+    ),
     lint_mode = "warn",
     mode = "check",
 )
