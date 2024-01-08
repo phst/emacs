@@ -62,28 +62,28 @@ elisp_test(
     timeout = "short",
     srcs = ["test.el"],
     deps = [
-        "_example_elisp_lib",
+        "example_elisp_lib",
         "@aio//:library",
     ],
 )
 
 elisp_library(
-    name = "_example_elisp_lib",
+    name = "example_elisp_lib",
     srcs = ["example-module.so"],
 )
 
 go_library(
-    name = "_example_lib",
+    name = "example_lib",
     srcs = TEST_SRCS,
     embed = [":go_default_library"],
     importpath = "github.com/phst/emacs",
 )
 
 go_binary(
-    name = "_example",
+    name = "example",
     srcs = ["//:example/main.go"],
     linkmode = "c-shared",
-    deps = ["_example_lib"],
+    deps = ["example_lib"],
 )
 
 # We copy the module file so that it’s guaranteed to be in the “bin”
@@ -91,8 +91,8 @@ go_binary(
 # configuration transition.  This should better be addressed in the
 # implementation of “elisp_library” itself.
 copy_file(
-    name = "_example_copy",
-    src = "_example",
+    name = "example_copy",
+    src = "example",
     # Output the module with a fixed name so that (require 'example-module)
     # works.  Note that we use the .so suffix on macOS as well due to
     # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=36226.  We can switch to
