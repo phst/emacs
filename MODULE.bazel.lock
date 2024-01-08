@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 3,
-  "moduleFileHash": "7c04098f16f1173ab472940da36476943f9c0b825f4542bfe722a617637bd3db",
+  "moduleFileHash": "edccef6be64327c220a99766b0f7fc61558dd5cb5b06eb8e6860cdf1ae8d1933",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -41,7 +41,7 @@
               "attributeValues": {
                 "nogo": "//:nogo"
               },
-              "devDependency": false,
+              "devDependency": true,
               "location": {
                 "file": "@@//:MODULE.bazel",
                 "line": 28,
@@ -49,8 +49,8 @@
               }
             }
           ],
-          "hasDevUseExtension": false,
-          "hasNonDevUseExtension": true
+          "hasDevUseExtension": true,
+          "hasNonDevUseExtension": false
         },
         {
           "extensionBzlFile": "@phst_rules_elisp//elisp:extensions.bzl",
