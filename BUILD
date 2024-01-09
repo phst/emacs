@@ -14,8 +14,8 @@
 
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
-load("@io_bazel_rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
 load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
+load("@rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
 
 TEST_SRCS = glob(
     ["*_test.go"],
