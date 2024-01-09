@@ -35,7 +35,7 @@ versions := 28.1 28.2 29.1
 
 # All combinations of operating system and architecture that should show up in
 # MODULE.bazel.lock.
-lock_keys := Linux/x86_64 Mac.OS.X/aarch64 Mac.OS.X/x86_64
+lock_keys := Linux/x86_64 Linux/amd64 Mac.OS.X/aarch64 Mac.OS.X/x86_64
 
 all: check $(versions)
 
