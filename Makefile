@@ -33,6 +33,10 @@ endif
 # All potentially supported Emacs versions.
 versions := 28.1 28.2 29.1
 
+# All combinations of operating system and architecture that should show up in
+# MODULE.bazel.lock.
+lock_keys := Linux/x86_64 Mac.OS.X/aarch64 Mac.OS.X/x86_64
+
 all: check $(versions)
 
 check:
@@ -41,4 +45,9 @@ check:
 $(versions):
 	$(MAKE) check BAZELFLAGS='$(BAZELFLAGS) --extra_toolchains=@phst_rules_elisp//elisp:emacs_$@_toolchain'
 
-.PHONY: all check $(versions)
+lock: $(lock_keys)
+
+$(lock_keys):
+	$(BAZEL) --host_jvm_args='-Dblaze.os=$(subst ., ,$(@D))' --host_jvm_args='-Dos.arch=$(@F)' build --nobuild $(BAZELFLAGS) -- //...
+
+.PHONY: all check $(versions) lock $(lock_keys)
