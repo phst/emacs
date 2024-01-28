@@ -1,4 +1,4 @@
-// Copyright 2019, 2021, 2023 Google LLC
+// Copyright 2019, 2021, 2023, 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -110,8 +110,9 @@ func (e Env) Intern(s Symbol) (Value, error) {
 	return e.Call("intern", s)
 }
 
-// MaybeIntern returns nameOrValue as-is if it’s a Value and calls [Env.Intern]
-// if it’s a [Symbol], [Name], or string.  Otherwise it returns an error.
+// MaybeIntern returns nameOrValue as-is if it’s a [Value] and calls
+// [Env.Intern] if it’s a [Symbol], [Name], or string.  Otherwise it returns an
+// error.
 func (e Env) MaybeIntern(nameOrValue interface{}) (Value, error) {
 	switch v := nameOrValue.(type) {
 	case Value:
