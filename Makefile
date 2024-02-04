@@ -1,4 +1,4 @@
-# Copyright 2019, 2021, 2022, 2023 Google LLC
+# Copyright 2019, 2021, 2022, 2023, 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,10 +33,6 @@ endif
 # All potentially supported Emacs versions.
 versions := 28.1 28.2 29.1
 
-# All combinations of operating system and architecture that should show up in
-# MODULE.bazel.lock.
-lock_keys := Linux/x86_64 Linux/amd64 Mac.OS.X/aarch64 Mac.OS.X/x86_64
-
 all: check $(versions)
 
 check:
@@ -45,9 +41,8 @@ check:
 $(versions):
 	$(MAKE) check BAZELFLAGS='$(BAZELFLAGS) --extra_toolchains=@phst_rules_elisp//elisp:emacs_$@_toolchain'
 
-lock: $(lock_keys)
+lock:
+	branch="$$(git branch --show-current)" \
+	  && gh workflow run update-lockfiles.yaml --ref="$${branch:?}"
 
-$(lock_keys):
-	$(BAZEL) --host_jvm_args='-Dblaze.os=$(subst ., ,$(@D))' --host_jvm_args='-Dos.arch=$(@F)' build --nobuild $(BAZELFLAGS) -- //...
-
-.PHONY: all check $(versions) lock $(lock_keys)
+.PHONY: all check $(versions) lock

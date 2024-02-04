@@ -1,0 +1,74 @@
+# Copyright 2021, 2022, 2023, 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Update MODULE.bazel.lock files
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: Update lockfile
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Regenerate lockfile
+        shell: pwsh
+        run: bazelisk mod deps --lockfile_mode=update
+        env:
+          USE_BAZEL_VERSION: latest
+      - name: Upload lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: lockfiles-${{runner.os}}
+          path: MODULE.bazel.lock
+          if-no-files-found: error
+  merge:
+    name: Merge lockfiles
+    needs: update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download merge script
+        uses: actions/checkout@v4
+        with:
+          repository: phst/merge-bazel-lockfiles
+          ref: 0735ba33451558108723420098f13e0ece92bda2
+          sparse-checkout: /merge.py
+          sparse-checkout-cone-mode: false
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: lockfiles-*
+      - name: Merge lockfiles
+        shell: bash
+        run: |
+          set -euxC
+          ./merge.py \
+            --linux=lockfiles-Linux/MODULE.bazel.lock \
+            --macos=lockfiles-macOS/MODULE.bazel.lock \
+            --output=MODULE.bazel.lock
+          rm -v -- lockfiles-{Linux,macOS}/MODULE.bazel.lock
+          # This will fail if we forgot some OS above.
+          rmdir -v -- lockfiles-*
+      - name: Upload merged file
+        uses: actions/upload-artifact@v4
+        with:
+          name: lockfiles
+          path: MODULE.bazel.lock
+          if-no-files-found: error
