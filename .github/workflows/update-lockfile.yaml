@@ -39,32 +39,3 @@ jobs:
           name: lockfile-${{runner.os}}
           path: MODULE.bazel.lock
           if-no-files-found: error
-  merge:
-    name: Merge lockfiles
-    needs: update
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: lockfile-*
-      - name: Merge lockfiles
-        shell: bash
-        run: |
-          set -euxC
-          bazelisk run --lockfile_mode=off -- \
-            @phst_merge_bazel_lockfiles//:merge \
-            --linux="${PWD:?}/lockfile-Linux/MODULE.bazel.lock" \
-            --macos="${PWD:?}/lockfile-macOS/MODULE.bazel.lock" \
-            --output="${PWD:?}/MODULE.bazel.lock"
-          rm -v -- lockfile-{Linux,macOS}/MODULE.bazel.lock
-          # This will fail if we forgot some OS above.
-          rmdir -v -- lockfile-*
-      - name: Upload merged file
-        uses: actions/upload-artifact@v4
-        with:
-          name: lockfile
-          path: MODULE.bazel.lock
-          if-no-files-found: error

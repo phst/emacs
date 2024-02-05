@@ -40,6 +40,17 @@ done
 gh run watch "${id:?}"
 
 dir="$(mktemp -d)"
-gh run download "${id:?}" --dir="${dir:?}" --name=lockfile
+
+gh run download "${id:?}" --dir="${dir:?}"
+
+bazel run --lockfile_mode=off -- \
+  @phst_merge_bazel_lockfiles//:merge \
+  --linux="${dir:?}/lockfile-Linux/MODULE.bazel.lock" \
+  --macos="${dir:?}/lockfile-macOS/MODULE.bazel.lock" \
+  --output="${dir:?}/MODULE.bazel.lock"
+
 mv -i -v "${dir:?}/MODULE.bazel.lock" ./
-rmdir -v -- "${dir:?}"
+rm -v -- "${dir:?}"/lockfile-{Linux,macOS}/MODULE.bazel.lock
+
+# This will fail if we forgot some OS above.
+rmdir -v -- "${dir:?}"/lockfile-* "${dir:?}"
