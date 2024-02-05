@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SHELL := /bin/sh
-
-.DEFAULT: all
+.POSIX:
 .SUFFIXES:
 
-BAZEL := bazel
-BAZELFLAGS :=
+SHELL = /bin/sh
+BAZEL = bazel
+BAZELFLAGS =
 
 # All potentially supported Emacs versions.
-versions := 28.1 28.2 29.1
+versions = 28.1 28.2 29.1
 
 all: check $(versions)
 
@@ -36,5 +35,3 @@ $(versions):
 lock:
 	branch="$$(git branch --show-current)" \
 	  && gh workflow run update-lockfile.yaml --ref="$${branch:?}"
-
-.PHONY: all check $(versions) lock
