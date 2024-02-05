@@ -43,6 +43,6 @@ $(versions):
 
 lock:
 	branch="$$(git branch --show-current)" \
-	  && gh workflow run update-lockfiles.yaml --ref="$${branch:?}"
+	  && gh workflow run update-lockfile.yaml --ref="$${branch:?}"
 
 .PHONY: all check $(versions) lock
