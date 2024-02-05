@@ -39,7 +39,9 @@ check:
 	$(BAZEL) test $(BAZELFLAGS) -- //...
 
 $(versions):
-	$(MAKE) check BAZELFLAGS='$(BAZELFLAGS) --extra_toolchains=@phst_rules_elisp//elisp:emacs_$@_toolchain'
+	$(BAZEL) test $(BAZELFLAGS) \
+	  --extra_toolchains='@phst_rules_elisp//elisp:emacs_$@_toolchain' \
+	  -- //...
 
 lock:
 	branch="$$(git branch --show-current)" \
