@@ -33,4 +33,4 @@ $(versions):
 	  -- //...
 
 lock:
-	./update-lockfiles
+	./update-lockfile
