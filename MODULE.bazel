@@ -1,4 +1,4 @@
-# Copyright 2023 Philipp Stephani
+# Copyright 2023, 2024 Philipp Stephani
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ bazel_dep(name = "rules_go", version = "0.44.0")
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk", dev_dependency = True)
 go_sdk.nogo(nogo = "//:nogo")
 
-bazel_dep(name = "buildifier_prebuilt", version = "6.3.3", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "6.4.0", dev_dependency = True)
 
 elisp = use_extension("@phst_rules_elisp//elisp:extensions.bzl", "elisp")
 elisp.http_archive(
