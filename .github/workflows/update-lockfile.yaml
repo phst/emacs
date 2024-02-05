@@ -36,7 +36,7 @@ jobs:
       - name: Upload lockfile
         uses: actions/upload-artifact@v4
         with:
-          name: lockfiles-${{runner.os}}
+          name: lockfile-${{runner.os}}
           path: MODULE.bazel.lock
           if-no-files-found: error
   merge:
@@ -54,21 +54,21 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: lockfiles-*
+          pattern: lockfile-*
       - name: Merge lockfiles
         shell: bash
         run: |
           set -euxC
           ./merge.py \
-            --linux=lockfiles-Linux/MODULE.bazel.lock \
-            --macos=lockfiles-macOS/MODULE.bazel.lock \
+            --linux=lockfile-Linux/MODULE.bazel.lock \
+            --macos=lockfile-macOS/MODULE.bazel.lock \
             --output=MODULE.bazel.lock
-          rm -v -- lockfiles-{Linux,macOS}/MODULE.bazel.lock
+          rm -v -- lockfile-{Linux,macOS}/MODULE.bazel.lock
           # This will fail if we forgot some OS above.
-          rmdir -v -- lockfiles-*
+          rmdir -v -- lockfile-*
       - name: Upload merged file
         uses: actions/upload-artifact@v4
         with:
-          name: lockfiles
+          name: lockfile
           path: MODULE.bazel.lock
           if-no-files-found: error
