@@ -31,8 +31,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-      - name: Install Bazelisk
-        uses: bazelbuild/setup-bazelisk@v2
       - name: Run Bazel tests
         run: make
         env:
