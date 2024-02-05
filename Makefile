@@ -20,7 +20,7 @@ BAZEL = bazel
 BAZELFLAGS =
 
 # All potentially supported Emacs versions.
-versions = 28.1 28.2 29.1
+versions = 28.1 28.2 29.1 29.2
 
 all: check $(versions)
 
