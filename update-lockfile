@@ -43,14 +43,18 @@ dir="$(mktemp -d)"
 
 gh run download "${id:?}" --dir="${dir:?}"
 
+linux="${dir:?}/lockfile-Linux/MODULE.bazel.lock"
+macos="${dir:?}/lockfile-macOS/MODULE.bazel.lock"
+out="${dir:?}/MODULE.bazel.lock"
+
 bazel run --lockfile_mode=off -- \
   @phst_merge_bazel_lockfiles//:merge \
-  --linux="${dir:?}/lockfile-Linux/MODULE.bazel.lock" \
-  --macos="${dir:?}/lockfile-macOS/MODULE.bazel.lock" \
-  --output="${dir:?}/MODULE.bazel.lock"
+  --linux="${linux:?}" \
+  --macos="${macos:?}" \
+  --output="${out:?}"
 
-mv -i -v "${dir:?}/MODULE.bazel.lock" ./
-rm -v -- "${dir:?}"/lockfile-{Linux,macOS}/MODULE.bazel.lock
+mv -i -v "${out:?}" ./
+rm -v -- "${linux:?}" "${macos:?}"
 
 # This will fail if we forgot some OS above.
 rmdir -v -- "${dir:?}"/lockfile-* "${dir:?}"
