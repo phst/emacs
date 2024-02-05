@@ -44,13 +44,8 @@ jobs:
     needs: update
     runs-on: ubuntu-latest
     steps:
-      - name: Download merge script
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          repository: phst/merge-bazel-lockfiles
-          ref: 0735ba33451558108723420098f13e0ece92bda2
-          sparse-checkout: /merge.py
-          sparse-checkout-cone-mode: false
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -59,10 +54,11 @@ jobs:
         shell: bash
         run: |
           set -euxC
-          ./merge.py \
-            --linux=lockfile-Linux/MODULE.bazel.lock \
-            --macos=lockfile-macOS/MODULE.bazel.lock \
-            --output=MODULE.bazel.lock
+          bazelisk run --lockfile_mode=off -- \
+            @phst_merge_bazel_lockfiles//:merge \
+            --linux="${PWD:?}/lockfile-Linux/MODULE.bazel.lock" \
+            --macos="${PWD:?}/lockfile-macOS/MODULE.bazel.lock" \
+            --output="${PWD:?}/MODULE.bazel.lock"
           rm -v -- lockfile-{Linux,macOS}/MODULE.bazel.lock
           # This will fail if we forgot some OS above.
           rmdir -v -- lockfile-*
