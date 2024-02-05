@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Update MODULE.bazel.lock files
+name: Update MODULE.bazel.lock
 on: workflow_dispatch
 
 permissions:
