@@ -16,6 +16,30 @@
 
 set -euxC
 
+workflow=update-lockfile.yaml
 branch="$(git branch --show-current)"
+now="$(date -u -Iseconds)"
 
-gh workflow run update-lockfile.yaml --ref="${branch:?}"
+gh workflow run "${workflow:?}" --ref="${branch:?}"
+
+fetch_run_id() {
+  gh run list \
+    --workflow="${workflow:?}" \
+    --event=workflow_dispatch \
+    --branch="${branch:?}" \
+    --created=">=${now:?}" \
+    --limit=1 \
+    --json=databaseId \
+    --jq='.[].databaseId'
+}
+
+while id="$(fetch_run_id)" && [[ -z "${id}" ]]; do
+  sleep 1
+done
+
+gh run watch "${id:?}"
+
+dir="$(mktemp -d)"
+gh run download "${id:?}" --dir="${dir:?}" --name=lockfile
+mv -i -v "${dir:?}/MODULE.bazel.lock" ./
+rmdir -v -- "${dir:?}"
