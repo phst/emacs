@@ -36,7 +36,7 @@ versions := 28.1 28.2 29.1
 all: check $(versions)
 
 check:
-	$(BAZEL) test --test_output=errors $(BAZELFLAGS) -- //...
+	$(BAZEL) test $(BAZELFLAGS) -- //...
 
 $(versions):
 	$(MAKE) check BAZELFLAGS='$(BAZELFLAGS) --extra_toolchains=@phst_rules_elisp//elisp:emacs_$@_toolchain'
