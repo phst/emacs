@@ -17,25 +17,37 @@
 set -euC
 
 workflow=update-lockfile.yaml
-branch="$(git branch --show-current)"
-now="$(date -u -Iseconds)"
+stamp=lock.stamp
+run=lock.run
 
-gh workflow run "${workflow:?}" --ref="${branch:?}"
+if [[ -f "${stamp:?}" ]]; then
+  read -r branch time < "${stamp:?}"
+else
+  branch="$(git branch --show-current)"
+  time="$(date -u -Iseconds)"
+  gh workflow run "${workflow:?}" --ref="${branch:?}"
+  echo "${branch:?} ${time:?}" > "${stamp:?}"
+fi
 
 fetch_run_id() {
   gh run list \
     --workflow="${workflow:?}" \
     --event=workflow_dispatch \
     --branch="${branch:?}" \
-    --created=">=${now:?}" \
+    --created=">=${time:?}" \
     --limit=1 \
     --json=databaseId \
     --jq='.[].databaseId'
 }
 
-while id="$(fetch_run_id)" && [[ -z "${id}" ]]; do
-  sleep 1
-done
+if [[ -f "${run:?}" ]]; then
+  read -r id < "${run:?}"
+else
+  while id="$(fetch_run_id)" && [[ -z "${id}" ]]; do
+    sleep 1
+  done
+  echo "${id:?}" > "${run:?}"
+fi
 
 gh run watch "${id:?}"
 
@@ -56,3 +68,5 @@ rm -v -- "${linux:?}" "${macos:?}"
 
 # This will fail if we forgot some OS above.
 rmdir -v -- "${dir:?}"/lockfile-* "${dir:?}"
+
+rm -- "${stamp:?}" "${run:?}"
