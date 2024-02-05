@@ -45,15 +45,13 @@ gh run download "${id:?}" --dir="${dir:?}"
 
 linux="${dir:?}/lockfile-Linux/MODULE.bazel.lock"
 macos="${dir:?}/lockfile-macOS/MODULE.bazel.lock"
-out="${dir:?}/MODULE.bazel.lock"
 
 bazel run --lockfile_mode=off -- \
   @phst_merge_bazel_lockfiles//:merge \
   --linux="${linux:?}" \
   --macos="${macos:?}" \
-  --output="${out:?}"
+  --output="${PWD:?}/MODULE.bazel.lock"
 
-mv -i -v "${out:?}" ./
 rm -v -- "${linux:?}" "${macos:?}"
 
 # This will fail if we forgot some OS above.
