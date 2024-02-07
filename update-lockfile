@@ -57,8 +57,9 @@ macos="${PWD:?}/lockfile-macOS/MODULE.bazel.lock"
 
 bazel run --lockfile_mode=off -- \
   @phst_merge_bazel_lockfiles//:merge \
-  --linux="${linux:?}" \
-  --macos="${macos:?}" \
+  --linux-amd64="${linux:?}" \
+  --darwin-amd64="${macos:?}" \
+  --local="${PWD:?}/MODULE.bazel.lock" \
   --output="${PWD:?}/MODULE.bazel.lock"
 
 rm -v -- "${linux:?}" "${macos:?}"
