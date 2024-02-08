@@ -52,8 +52,8 @@ fi
 gh run watch "${id:?}"
 gh run download "${id:?}"
 
-linux="${PWD:?}/lockfile-Linux/MODULE.bazel.lock"
-macos="${PWD:?}/lockfile-macOS/MODULE.bazel.lock"
+linux="${PWD:?}/lockfile-Linux-X64/MODULE.bazel.lock"
+macos="${PWD:?}/lockfile-macOS-X64/MODULE.bazel.lock"
 
 bazel run --lockfile_mode=off -- \
   @phst_merge_bazel_lockfiles//:merge \
