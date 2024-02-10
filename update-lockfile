@@ -62,9 +62,9 @@ bazel run --lockfile_mode=off -- \
   --local=MODULE.bazel.lock \
   --output=MODULE.bazel.lock
 
-rm -v -- "${linux:?}" "${macos:?}"
+rm -- "${linux:?}" "${macos:?}"
 
 # This will fail if we forgot some OS above.
-rmdir -v -- lockfile-*
+rmdir -- lockfile-*
 
 rm -- "${stamp:?}" "${run:?}"
