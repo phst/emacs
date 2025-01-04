@@ -31,6 +31,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.10.0
+        with:
+          disk-cache: ${{matrix.version}}
+          repository-cache: true
       - name: Run Bazel tests
         shell: bash
         run: >-
