@@ -1,4 +1,4 @@
-# Copyright 2021, 2022, 2023, 2024 Google LLC
+# Copyright 2021, 2022, 2023, 2024, 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,10 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.10.0
+        with:
+          repository-cache: true
       - name: Regenerate lockfile
         shell: pwsh
         run: bazelisk mod deps --lockfile_mode=update
