@@ -1,4 +1,4 @@
-# Copyright 2023, 2024 Philipp Stephani
+# Copyright 2023, 2024, 2025 Philipp Stephani
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "phst_rules_elisp")
 git_override(
     module_name = "phst_rules_elisp",
-    commit = "30e571b6e69be2dcc782325834792d79c245d30d",
+    commit = "384b813a86658ddc4bef97f35235bd2e87447c11",
     remote = "https://github.com/phst/rules_elisp.git",
 )
 
