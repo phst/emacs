@@ -31,6 +31,9 @@ jobs:
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@0.10.0
         with:
+          bazelrc: |
+            common --announce_rc
+            common --show_progress_rate_limit=10
           repository-cache: true
       - name: Regenerate lockfile
         shell: pwsh

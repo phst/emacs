@@ -34,6 +34,16 @@ jobs:
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@0.10.0
         with:
+          bazelrc: |
+            common --announce_rc
+            common --show_progress_rate_limit=10
+            common --remote_download_minimal
+            build --verbose_failures
+            build --experimental_convenience_symlinks=ignore
+            build --show_result=0
+            build --nostamp
+            build --experimental_repository_cache_hardlinks
+            test --test_output=errors
           disk-cache: ${{matrix.version}}
           repository-cache: true
       - name: Run Bazel tests
