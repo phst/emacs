@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2024 Philipp Stephani
+# Copyright 2024, 2025 Philipp Stephani
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,12 +53,12 @@ gh run watch "${id:?}" --exit-status
 gh run download "${id:?}"
 
 linux=lockfile-Linux-X64/MODULE.bazel.lock
-macos=lockfile-macOS-X64/MODULE.bazel.lock
+macos=lockfile-macOS-ARM64/MODULE.bazel.lock
 
 bazel run --lockfile_mode=off -- \
   @phst_merge_bazel_lockfiles//:merge \
   --linux-amd64="${linux:?}" \
-  --darwin-amd64="${macos:?}" \
+  --darwin-arm64="${macos:?}" \
   --local=MODULE.bazel.lock \
   --output=MODULE.bazel.lock
 
