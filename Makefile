@@ -1,4 +1,4 @@
-# Copyright 2019, 2021, 2022, 2023, 2024 Google LLC
+# Copyright 2019, 2021, 2022, 2023, 2024, 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ BAZEL = bazel
 BAZELFLAGS =
 
 # All potentially supported Emacs versions.
-versions = 28.1 28.2 29.1 29.2
+versions = 28.2 29.4
 
 all: check $(versions)
 
