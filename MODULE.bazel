@@ -41,7 +41,10 @@ elisp.http_archive(
 )
 use_repo(elisp, "aio")
 
-bazel_dep(name = "phst_merge_bazel_lockfiles", dev_dependency = True)
+# Bogus versions added because of
+# https://github.com/renovatebot/renovate/discussions/33421.
+# FIXME: Remove them once Renovate issue is fixed.
+bazel_dep(name = "phst_merge_bazel_lockfiles", version = "0", dev_dependency = True)
 git_override(
     module_name = "phst_merge_bazel_lockfiles",
     commit = "95005999479dcac5d6a3399a9f58625e078db448",
