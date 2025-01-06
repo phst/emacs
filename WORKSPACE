@@ -1,4 +1,4 @@
-# Copyright 2019, 2021, 2022, 2023 Google LLC
+# Copyright 2019, 2021, 2022, 2023, 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Local Variables:
-# mode: bazel-workspace
-# End:
+# This file marks the root of the Bazel workspace.  See MODULE.bazel for
+# external dependencies setup.
