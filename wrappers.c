@@ -36,7 +36,6 @@ static void handle_nonlocal_exit(emacs_env *env,
 
 static struct phst_emacs_result_base out_of_memory(emacs_env *env);
 static struct phst_emacs_result_base overflow_error(emacs_env *env);
-static struct phst_emacs_result_base unimplemented(emacs_env *env);
 
 int emacs_module_init(struct emacs_runtime *rt) {
   if ((size_t)rt->size < sizeof *rt) {
@@ -79,11 +78,9 @@ static emacs_value trampoline(emacs_env *env, ptrdiff_t nargs,
   return result.value;
 }
 
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
 static void finalizer(void *data) {
   phst_emacs_function_finalizer((uintptr_t)data);
 }
-#endif
 
 struct phst_emacs_value_result phst_emacs_funcall(emacs_env *env,
                                                   emacs_value function,
@@ -100,10 +97,7 @@ struct phst_emacs_value_result phst_emacs_make_function_impl(emacs_env *env,
   emacs_value value =
       env->make_function(env, min_arity, max_arity, trampoline, documentation,
                          (void *)(uintptr_t)data);
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
-  if ((size_t)env->size > offsetof(emacs_env, set_function_finalizer))
-    env->set_function_finalizer(env, value, finalizer);
-#endif
+  env->set_function_finalizer(env, value, finalizer);
   return check_value(env, value);
 }
 
@@ -272,27 +266,8 @@ struct phst_emacs_value_result phst_emacs_make_unibyte_string(emacs_env *env,
   if (size > PTRDIFF_MAX) {
     return (struct phst_emacs_value_result){overflow_error(env), NULL};
   }
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
-  if ((size_t)env->size > offsetof(emacs_env, make_unibyte_string)) {
-    static_assert(CHAR_MAX - CHAR_MIN + 1 == 0x100, "unsupported architecture");
-    return check_value(env, env->make_unibyte_string(env, data, size));
-  }
-#endif
-  static_assert(UCHAR_MAX == 0xFF, "unsupported architecture");
-  const unsigned char *bytes = data;
-  emacs_value *args = calloc(size, sizeof *args);
-  if (args == NULL && size > 0) {
-    return (struct phst_emacs_value_result){out_of_memory(env), NULL};
-  }
-  for (ptrdiff_t i = 0; i < size; ++i) {
-    static_assert(INTMAX_MIN <= 0, "unsupported architecture");
-    static_assert(INTMAX_MAX >= UCHAR_MAX, "unsupported architecture");
-    args[i] = env->make_integer(env, bytes[i]);
-  }
-  emacs_value result = env->funcall(env, env->intern(env, "unibyte-string"),
-                                    size, args);
-  free(args);
-  return check_value(env, result);
+  static_assert(CHAR_MAX - CHAR_MIN + 1 == 0x100, "unsupported architecture");
+  return check_value(env, env->make_unibyte_string(env, data, size));
 }
 
 struct phst_emacs_value_result phst_emacs_intern_impl(emacs_env *env,
@@ -345,30 +320,19 @@ struct phst_emacs_void_result phst_emacs_process_input(emacs_env *env) {
 
 struct phst_emacs_integer_result phst_emacs_open_channel(emacs_env *env,
                                                          emacs_value value) {
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
   static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
-  if ((size_t)env->size > offsetof(emacs_env, open_channel)) {
-    static_assert(INT64_MIN <= INT_MIN, "unsupported architecture");
-    static_assert(INT64_MAX >= INT_MAX, "unsupported architecture");
-    return check_integer(env, env->open_channel(env, value));
-  }
-#endif
-  return (struct phst_emacs_integer_result){unimplemented(env), -1};
+  static_assert(INT64_MIN <= INT_MIN, "unsupported architecture");
+  static_assert(INT64_MAX >= INT_MAX, "unsupported architecture");
+  return check_integer(env, env->open_channel(env, value));
 }
 
 struct phst_emacs_void_result phst_emacs_make_interactive(emacs_env *env,
                                                           emacs_value function,
                                                           emacs_value spec) {
   struct phst_emacs_void_result result;
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 28
   static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
-  if ((size_t)env->size > offsetof(emacs_env, make_interactive)) {
-    env->make_interactive(env, function, spec);
-    result.base = check(env);
-    return result;
-  }
-#endif
-  result.base = unimplemented(env);
+  env->make_interactive(env, function, spec);
+  result.base = check(env);
   return result;
 }
 
@@ -408,12 +372,6 @@ static struct phst_emacs_result_base out_of_memory(emacs_env *env) {
 
 static struct phst_emacs_result_base overflow_error(emacs_env *env) {
   env->non_local_exit_signal(env, env->intern(env, "overflow-error"),
-                             env->intern(env, "nil"));
-  return check(env);
-}
-
-static struct phst_emacs_result_base unimplemented(emacs_env *env) {
-  env->non_local_exit_signal(env, env->intern(env, "go-unimplemented-error"),
                              env->intern(env, "nil"));
   return check(env);
 }
