@@ -38,6 +38,7 @@ jobs:
             common --announce_rc
             common --show_progress_rate_limit=10
             common --remote_download_minimal
+            common --lockfile_mode=${{matrix.version == 'latest' && 'error' || 'off'}}
             build --verbose_failures
             build --experimental_convenience_symlinks=ignore
             build --show_result=0
@@ -48,9 +49,7 @@ jobs:
           repository-cache: true
       - name: Run Bazel tests
         shell: bash
-        run: >-
-          make
-          BAZEL=bazelisk
-          BAZELFLAGS='--lockfile_mode=${{matrix.version == 'latest' && 'error' || 'off'}}'
+        run: |
+          make BAZEL=bazelisk
         env:
           USE_BAZEL_VERSION: ${{matrix.version}}
