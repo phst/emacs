@@ -14,6 +14,7 @@
 
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
+load("@phst_license_test//:def.bzl", "license_test")
 load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
 load("@rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
 
@@ -105,6 +106,12 @@ nogo(
     config = "nogo.json",
     visibility = ["//visibility:public"],
     deps = TOOLS_NOGO,
+)
+
+license_test(
+    name = "license_test",
+    timeout = "short",
+    marker = "MODULE.bazel",
 )
 
 buildifier(

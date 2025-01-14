@@ -31,6 +31,13 @@ bazel_dep(name = "rules_go", version = "0.52.0")
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk", dev_dependency = True)
 go_sdk.nogo(nogo = "//:nogo")
 
+bazel_dep(name = "phst_license_test", version = "0", dev_dependency = True)
+git_override(
+    module_name = "phst_license_test",
+    commit = "9df4c6d0889aa11c2941180ece8ab97ef06d7f56",
+    remote = "https://github.com/phst/license_test.git",
+)
+
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.0", dev_dependency = True)
 
 elisp = use_extension("@phst_rules_elisp//elisp:extensions.bzl", "elisp")
