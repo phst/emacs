@@ -1,4 +1,4 @@
-# Copyright 2019, 2021, 2022, 2023, 2024 Google LLC
+# Copyright 2019, 2021, 2022, 2023, 2024, 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -117,15 +117,10 @@ buildifier(
 buildifier_test(
     name = "buildifier_test",
     size = "small",
-    srcs = [
-        "BUILD",
-        "WORKSPACE",
-    ] + glob(
-        ["*.bazel"],
-        allow_empty = False,
-    ),
     lint_mode = "warn",
     mode = "check",
+    no_sandbox = True,
+    workspace = "WORKSPACE",
 )
 
 # Local Variables:
