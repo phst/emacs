@@ -34,7 +34,7 @@ go_sdk.nogo(nogo = "//:nogo")
 bazel_dep(name = "phst_license_test", version = "0", dev_dependency = True)
 git_override(
     module_name = "phst_license_test",
-    commit = "76d1028a1363135efcd18eb93f13f7a2babdd274",
+    commit = "b3d167fbeb29c43a1dd72ed588baa6472d56cdee",
     remote = "https://github.com/phst/license_test.git",
 )
 
