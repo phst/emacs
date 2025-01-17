@@ -13,10 +13,8 @@
 # limitations under the License.
 
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
-load("@phst_license_test//:def.bzl", "license_test")
 load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
-load("@rules_go//go:def.bzl", "TOOLS_NOGO", "go_binary", "go_library", "go_test", "nogo")
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 
 TEST_SRCS = glob(
     ["*_test.go"],
@@ -101,33 +99,13 @@ copy_file(
     out = "example-module.so",
 )
 
-nogo(
-    name = "nogo",
-    config = "nogo.json",
-    visibility = ["//visibility:public"],
-    deps = TOOLS_NOGO,
-)
-
-license_test(
-    name = "license_test",
-    timeout = "short",
-    marker = "MODULE.bazel",
-)
-
-buildifier(
-    name = "buildifier",
-    lint_mode = "warn",
-    lint_warnings = ["all"],
-    mode = "fix",
-)
-
-buildifier_test(
-    name = "buildifier_test",
-    size = "small",
-    lint_mode = "warn",
-    mode = "check",
-    no_sandbox = True,
-    workspace = "WORKSPACE",
+exports_files(
+    [
+        # keep sorted
+        "MODULE.bazel",
+        "WORKSPACE",
+    ],
+    visibility = ["//dev:__pkg__"],
 )
 
 # Local Variables:
