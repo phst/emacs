@@ -350,14 +350,14 @@
     },
     "@@phst_rules_elisp+//elisp:extensions.bzl%elisp": {
       "general": {
-        "bzlTransitiveDigest": "cBvDLFFnQbEadDiZxWUPlOP/eB4j9ZbjwKKG4v31EV8=",
+        "bzlTransitiveDigest": "AugoLFlsNPFTF+NPVIkU+rzVIHPq6DQc72l/usZQm5U=",
         "usagesDigest": "fL9UDRsBcPcTcTz+kB7ZZ0Vtx/Qav2xYWRu8KnubnnI=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
         "generatedRepoSpecs": {
           "aio": {
-            "repoRuleId": "@@phst_rules_elisp+//elisp:extensions.bzl%_elisp_http_archive",
+            "repoRuleId": "@@phst_rules_elisp+//elisp/extensions:elisp.bzl%_elisp_http_archive",
             "attributes": {
               "urls": [
                 "https://github.com/skeeto/emacs-aio/archive/da93523e235529fa97d6f251319d9e1d6fc24a41.zip"
