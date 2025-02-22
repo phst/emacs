@@ -50,6 +50,6 @@ jobs:
       - name: Run Bazel tests
         shell: bash
         run: |
-          make BAZEL=bazelisk
+          make check BAZEL=bazelisk
         env:
           USE_BAZEL_VERSION: ${{matrix.version}}
