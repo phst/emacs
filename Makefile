@@ -22,9 +22,10 @@ BAZELFLAGS =
 # All potentially supported Emacs versions.
 versions = 28.2 29.4
 
-all: check $(versions)
+all:
+	$(BAZEL) build $(BAZELFLAGS) -- //...
 
-check:
+check: all $(versions)
 	$(BAZEL) test $(BAZELFLAGS) -- //...
 
 $(versions):
