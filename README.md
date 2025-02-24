@@ -25,13 +25,13 @@ the same [representation](https://go.dev/ref/spec#Numeric_types).  This means
 that converting `int64_t` and `uint64_t` to and from the Go types can never lose
 data.
 
-The package requires at least Emacs 28.  It provides optional support for some
-Emacs 29 features.  Such optional features always require two additional
+The package requires at least Emacs 29.  It provides optional support for some
+Emacs 30 features.  Such optional features always require two additional
 checks:
 
 ```c
-// Check that emacs-module.h has static support for Emacs 29.
-#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 29
+// Check that emacs-module.h has static support for Emacs 30.
+#if defined EMACS_MAJOR_VERSION && EMACS_MAJOR_VERSION >= 30
 // Make sure the cast below doesn’t lose information.
 static_assert(SIZE_MAX >= PTRDIFF_MAX, "unsupported architecture");
 // Check that the Emacs that has loaded this module supports the function.
@@ -39,7 +39,7 @@ if ((size_t)env->size > offsetof(emacs_env, function)) {
   return env->function(env, …);
 }
 #endif
-// Some workaround in case Emacs 29 isn’t available.
+// Some workaround in case Emacs 30 isn’t available.
 ```
 
 CGo [doesn’t support calling C function
