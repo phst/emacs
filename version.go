@@ -44,7 +44,7 @@ func (m *versionManager) init(e Env) error {
 	if err := e.CallOut("symbol-value", &ver, Symbol("emacs-major-version")); err != nil {
 		return err
 	}
-	if ver < 28 || ver > math.MaxInt32 {
+	if ver < 29 || ver > math.MaxInt32 {
 		return fmt.Errorf("unsupported Emacs version %d", ver)
 	}
 	if ok := atomic.CompareAndSwapInt32(&m.version, 0, int32(ver)); !ok {
