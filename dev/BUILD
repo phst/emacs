@@ -39,6 +39,7 @@ buildifier_test(
     name = "buildifier_test",
     size = "small",
     lint_mode = "warn",
+    lint_warnings = ["all"],
     mode = "check",
     no_sandbox = True,
     workspace = "//:WORKSPACE",
