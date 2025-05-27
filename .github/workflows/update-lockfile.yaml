@@ -29,7 +29,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up Bazel
-        uses: bazel-contrib/setup-bazel@0.14.0
+        uses: bazel-contrib/setup-bazel@0.15.0
         with:
           bazelrc: |
             common --announce_rc
