@@ -55,6 +55,6 @@ use_repo(elisp, "aio")
 bazel_dep(name = "phst_merge_bazel_lockfiles", version = "0", dev_dependency = True)
 git_override(
     module_name = "phst_merge_bazel_lockfiles",
-    commit = "5e3893d6486d1956b09502f5508410e9e299891a",
+    commit = "e23bda239792a4bcf5569c7d56a279e8421356b1",
     remote = "https://github.com/phst/merge-bazel-lockfiles.git",
 )
