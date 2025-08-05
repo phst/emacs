@@ -22,7 +22,7 @@ bazel_dep(name = "bazel_skylib", version = "1.8.1")
 bazel_dep(name = "phst_rules_elisp", version = "0")
 git_override(
     module_name = "phst_rules_elisp",
-    commit = "9c4794b9e15c7b2ebfa26febd9b6413bc9c206ab",
+    commit = "8d4b6ace113363d4d83f8235632250e52b4fbff8",
     remote = "https://github.com/phst/rules_elisp.git",
 )
 
