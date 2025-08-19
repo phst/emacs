@@ -14,4 +14,4 @@
 
 module github.com/phst/emacs
 
-go 1.21
+go 1.23.6
