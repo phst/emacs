@@ -14,7 +14,7 @@
 
 module(name = "com_github_phst_emacs")
 
-bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
 
 # Bogus versions added because of
 # https://github.com/renovatebot/renovate/issues/33476.
