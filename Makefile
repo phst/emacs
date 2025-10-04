@@ -19,8 +19,8 @@ SHELL = /bin/sh
 BAZEL = bazel
 BAZELFLAGS =
 
-# All potentially supported Emacs versions.
-versions = 29.4 30.2
+# All supported Emacs major versions.
+versions = 29 30
 
 all:
 	$(BAZEL) build $(BAZELFLAGS) -- //...
