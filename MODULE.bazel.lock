@@ -211,7 +211,7 @@
     "@@phst_rules_elisp+//elisp:extensions.bzl%elisp": {
       "general": {
         "bzlTransitiveDigest": "ULHjocuTNff2OfqJykeYmjAV1B6ePVGxfV0xJ3TcwO0=",
-        "usagesDigest": "fL9UDRsBcPcTcTz+kB7ZZ0Vtx/Qav2xYWRu8KnubnnI=",
+        "usagesDigest": "2jvCN+LhyASVScFLckHlEBMkxSWATqcRw5VKOQrlnuc=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -220,10 +220,10 @@
             "repoRuleId": "@@phst_rules_elisp+//elisp/extensions:elisp.bzl%_elisp_http_archive",
             "attributes": {
               "urls": [
-                "https://github.com/skeeto/emacs-aio/archive/da93523e235529fa97d6f251319d9e1d6fc24a41.zip"
+                "https://github.com/skeeto/emacs-aio/archive/refs/tags/1.1.tar.gz"
               ],
-              "integrity": "sha384-6IREOIs9cZ6Rm7qX+KdglTFRzhtu9T/clX/Qq6gb3Rivrsfr7Yoc8695qWTBVPcn",
-              "strip_prefix": "emacs-aio-da93523e235529fa97d6f251319d9e1d6fc24a41/",
+              "integrity": "sha384-567fZ/RmnxQmSyVrlgYdidWBVzD7alwHVvVn41YEA9Bj92pHXRlViaSaVn3Imwd9",
+              "strip_prefix": "emacs-aio-1.1/",
               "target_name": "library",
               "exclude": [
                 "aio-contrib.el"
