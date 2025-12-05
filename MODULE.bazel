@@ -38,7 +38,7 @@ git_override(
     remote = "https://github.com/phst/license_test.git",
 )
 
-bazel_dep(name = "buildifier_prebuilt", version = "8.2.1", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.1", dev_dependency = True)
 
 elisp = use_extension("@phst_rules_elisp//elisp:extensions.bzl", "elisp")
 elisp.http_archive(
