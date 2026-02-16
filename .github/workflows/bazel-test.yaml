@@ -50,7 +50,7 @@ jobs:
       - name: Run Bazel tests
         shell: bash
         run: |
+          set -Cefu
+          readonly VER='${{matrix.version}}'
+          [[ "${VER:?}" != 'default' ]] && export USE_BAZEL_VERSION="${VER:?}"
           make check BAZEL=bazelisk
-        env:
-          USE_BAZEL_VERSION: >-
-            ${{matrix.version != 'default' && matrix.version || ''}}
