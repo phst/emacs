@@ -25,7 +25,7 @@ jobs:
       matrix:
         # We don’t use the GitHub matrix support for the Emacs toolchain to
         # allow Bazel to cache intermediate results between the test runs.
-        version: [7.4.0, 7.x, 8.x, 9.x, current]
+        version: [7.4.0, 7.x, 8.x, 9.x, default]
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{matrix.os}}
     steps:
@@ -38,7 +38,7 @@ jobs:
             common --announce_rc
             common --show_progress_rate_limit=10
             common --remote_download_minimal
-            common --lockfile_mode=${{matrix.version == 'current' && 'error' || 'off'}}
+            common --lockfile_mode=${{matrix.version == 'default' && 'error' || 'off'}}
             build --verbose_failures
             build --experimental_convenience_symlinks=ignore
             build --show_result=0
@@ -53,4 +53,4 @@ jobs:
           make check BAZEL=bazelisk
         env:
           USE_BAZEL_VERSION: >-
-            ${{matrix.version != 'current' && matrix.version || ''}}
+            ${{matrix.version != 'default' && matrix.version || ''}}
