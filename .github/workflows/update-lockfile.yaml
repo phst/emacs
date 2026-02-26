@@ -39,7 +39,7 @@ jobs:
         shell: pwsh
         run: bazelisk mod deps --lockfile_mode=update
       - name: Upload lockfile
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: lockfile-${{runner.os}}-${{runner.arch}}
           path: MODULE.bazel.lock
