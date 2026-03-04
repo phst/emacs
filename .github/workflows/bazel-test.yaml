@@ -25,7 +25,7 @@ jobs:
       matrix:
         # We don’t use the GitHub matrix support for the Emacs toolchain to
         # allow Bazel to cache intermediate results between the test runs.
-        version: [7.4.0, 7.x, 8.x, 9.x, default]
+        version: [8.0.0, 8.x, 9.x, default]
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{matrix.os}}
     steps:
