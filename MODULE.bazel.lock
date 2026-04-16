@@ -296,7 +296,7 @@
   "moduleExtensions": {
     "@@phst_rules_elisp+//elisp:extensions.bzl%elisp": {
       "general": {
-        "bzlTransitiveDigest": "ULHjocuTNff2OfqJykeYmjAV1B6ePVGxfV0xJ3TcwO0=",
+        "bzlTransitiveDigest": "8WQAxsdlS3Nxg+FCqJ4HkzoXceoCTWRgF8gQFD8NYnQ=",
         "usagesDigest": "2jvCN+LhyASVScFLckHlEBMkxSWATqcRw5VKOQrlnuc=",
         "recordedInputs": [
           "REPO_MAPPING:phst_rules_elisp+,bazel_skylib bazel_skylib+"
