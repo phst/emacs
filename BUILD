@@ -1,4 +1,4 @@
-# Copyright 2019, 2021-2025 Google LLC
+# Copyright 2019, 2021-2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,9 @@
 
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
-load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+load("@rules_go//go:go_binary.bzl", "go_binary")
+load("@rules_go//go:go_library.bzl", "go_library")
+load("@rules_go//go:go_test.bzl", "go_test")
 
 TEST_SRCS = glob(
     ["*_test.go"],
