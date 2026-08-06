@@ -1,4 +1,4 @@
-# Copyright 2023-2025 Philipp Stephani
+# Copyright 2023-2026 Philipp Stephani
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,18 +28,6 @@ git_override(
 
 bazel_dep(name = "rules_go", version = "0.62.0")
 
-go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk", dev_dependency = True)
-go_sdk.nogo(nogo = "//dev:nogo")
-
-bazel_dep(name = "phst_license_test", version = "0", dev_dependency = True)
-git_override(
-    module_name = "phst_license_test",
-    commit = "6c1ef186ecce537f0ce25f4cb43ab45628631c86",
-    remote = "https://github.com/phst/license_test.git",
-)
-
-bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.3", dev_dependency = True)
-
 elisp = use_extension("@phst_rules_elisp//elisp:extensions.bzl", "elisp")
 elisp.http_archive(
     name = "aio",
@@ -50,9 +38,4 @@ elisp.http_archive(
 )
 use_repo(elisp, "aio")
 
-bazel_dep(name = "phst_merge_bazel_lockfiles", version = "0", dev_dependency = True)
-git_override(
-    module_name = "phst_merge_bazel_lockfiles",
-    commit = "6d31c8cf28c180c3e5b00b819bbaa77e8ccd8a9a",
-    remote = "https://github.com/phst/merge-bazel-lockfiles.git",
-)
+include("//:dev.MODULE.bazel")
