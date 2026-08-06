@@ -18,9 +18,9 @@ go_sdk.nogo(nogo = "//dev:nogo")
 # Bogus versions added because of
 # https://github.com/renovatebot/renovate/issues/33476.
 # FIXME: Remove them once Renovate issue is fixed.
-bazel_dep(name = "phst_license_test", version = "0", dev_dependency = True)
+bazel_dep(name = "license_test", version = "0", dev_dependency = True)
 git_override(
-    module_name = "phst_license_test",
+    module_name = "license_test",
     commit = "85ea09a000d58a4c46a45f7b579790e977fef6c3",
     remote = "https://github.com/phst/license_test.git",
 )
