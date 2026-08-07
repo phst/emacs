@@ -55,9 +55,8 @@ jobs:
           disk-cache: ${{matrix.version}}
           repository-cache: true
       - name: Run Bazel tests
+        env:
+          USE_BAZEL_VERSION: ${{matrix.version}}
         shell: bash
         run: |
-          set -Cefu
-          readonly VER='${{matrix.version}}'
-          [[ "${VER:?}" != '' ]] && export USE_BAZEL_VERSION="${VER:?}"
           make check BAZEL=bazelisk
