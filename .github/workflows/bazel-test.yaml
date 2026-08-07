@@ -25,7 +25,7 @@ jobs:
       matrix:
         # We don’t use the GitHub matrix support for the Emacs toolchain to
         # allow Bazel to cache intermediate results between the test runs.
-        version:
+        bazel:
           - '8.0.0'
           - '8.x'
           - '9.x'
@@ -44,7 +44,7 @@ jobs:
             common --announce_rc
             common --show_progress_rate_limit=10
             common --remote_download_minimal
-            common --lockfile_mode=${{case(matrix.version == '', 'error', 'off')}}
+            common --lockfile_mode=${{case(matrix.bazel == '', 'error', 'off')}}
             build --verbose_failures
             build --experimental_convenience_symlinks=ignore
             build --show_result=0
@@ -52,11 +52,11 @@ jobs:
             build --experimental_repository_cache_hardlinks
             test --test_output=errors
             run --noomit_run_args
-          disk-cache: ${{matrix.version || 'default'}}
+          disk-cache: ${{matrix.bazel || 'default'}}
           repository-cache: true
       - name: Run Bazel tests
         env:
-          USE_BAZEL_VERSION: ${{matrix.version}}
+          USE_BAZEL_VERSION: ${{matrix.bazel}}
         shell: bash
         run: |
           make check BAZEL=bazelisk
