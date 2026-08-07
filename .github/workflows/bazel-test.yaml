@@ -51,7 +51,8 @@ jobs:
             build --nostamp
             build --experimental_repository_cache_hardlinks
             test --test_output=errors
-            run --noomit_run_args
+            # --omit_run_args requires Bazel 9.
+            ${{case(matrix.bazel == '', '', '# ')}}run --noomit_run_args
           disk-cache: ${{matrix.bazel || 'default'}}
           repository-cache: true
       - name: Run Bazel tests
