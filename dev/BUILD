@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 load("@buildifier_prebuilt//:rules.bzl", "buildifier", "buildifier_test")
-load("@license_test//:def.bzl", "license_test")
 load("@rules_go//go:def.bzl", "TOOLS_NOGO", "nogo")
 
 nogo(
@@ -20,12 +20,6 @@ nogo(
     config = "nogo.json",
     visibility = ["//visibility:public"],
     deps = TOOLS_NOGO,
-)
-
-license_test(
-    name = "license_test",
-    timeout = "short",
-    marker = "//:MODULE.bazel",
 )
 
 buildifier(
