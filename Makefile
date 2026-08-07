@@ -19,6 +19,8 @@
 SHELL = /bin/sh
 BAZEL = bazel
 BAZELFLAGS =
+GO = $(BAZEL) run $(BAZELFLAGS) -- @rules_go//go
+ADDLICENSE = $(GO) tool addlicense
 
 # All supported Emacs major versions.
 versions = 29 30
@@ -28,6 +30,7 @@ all:
 
 check: all $(versions)
 	$(BAZEL) test $(BAZELFLAGS) -- //...
+	$(ADDLICENSE) --check -- .
 
 $(versions):
 	$(BAZEL) test $(BAZELFLAGS) \
