@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Run Bazel tests
+name: Test
 on: push
 
 permissions:
   contents: read
 
 jobs:
-  bazel-versions:
-    name: All supported Bazel versions
+  test:
+    name: Test
     strategy:
       matrix:
         # We don’t use the GitHub matrix support for the Emacs toolchain to
