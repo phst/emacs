@@ -34,7 +34,7 @@ check: all $(versions)
 
 $(versions):
 	$(BAZEL) test $(BAZELFLAGS) \
-	  --extra_toolchains='@phst_rules_elisp//elisp:emacs_$@_toolchain' \
+	  --extra_toolchains='@rules_elisp//elisp:emacs_$@_toolchain' \
 	  -- //...
 
 lock:

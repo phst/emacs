@@ -15,20 +15,10 @@
 module(name = "com_github_phst_emacs")
 
 bazel_dep(name = "bazel_skylib", version = "1.9.2")
-
-# Bogus versions added because of
-# https://github.com/renovatebot/renovate/issues/33476.
-# FIXME: Remove them once Renovate issue is fixed.
-bazel_dep(name = "phst_rules_elisp", version = "0")
-git_override(
-    module_name = "phst_rules_elisp",
-    commit = "16644662015d962032990347a576f0f5a9700579",
-    remote = "https://github.com/phst/rules_elisp.git",
-)
-
+bazel_dep(name = "rules_elisp", version = "0.0.2")
 bazel_dep(name = "rules_go", version = "0.62.0")
 
-elisp = use_extension("@phst_rules_elisp//elisp:extensions.bzl", "elisp")
+elisp = use_extension("@rules_elisp//elisp:extensions.bzl", "elisp")
 elisp.http_archive(
     name = "aio",
     exclude = ["aio-contrib.el"],
