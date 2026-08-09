@@ -13,7 +13,7 @@
 # limitations under the License.
 
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load("@phst_rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
+load("@rules_elisp//elisp:defs.bzl", "elisp_library", "elisp_test")
 load("@rules_go//go:go_binary.bzl", "go_binary")
 load("@rules_go//go:go_library.bzl", "go_library")
 load("@rules_go//go:go_test.bzl", "go_test")
@@ -34,7 +34,7 @@ go_library(
         allow_empty = False,
         exclude = ["*_test.go"],
     ),
-    cdeps = ["@phst_rules_elisp//emacs:module_header"],
+    cdeps = ["@rules_elisp//emacs:module_header"],
     cgo = True,
     copts = [
         "-Werror",

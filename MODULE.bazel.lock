@@ -174,6 +174,8 @@
     "https://bcr.bazel.build/modules/rules_cc/0.2.4/MODULE.bazel": "1ff1223dfd24f3ecf8f028446d4a27608aa43c3f41e346d22838a4223980b8cc",
     "https://bcr.bazel.build/modules/rules_cc/0.2.8/MODULE.bazel": "f1df20f0bf22c28192a794f29b501ee2018fa37a3862a1a2132ae2940a23a642",
     "https://bcr.bazel.build/modules/rules_cc/0.2.9/MODULE.bazel": "34263f1dca62ea664265438cef714d7db124c03e1ed55ebb4f1dc860164308d1",
+    "https://bcr.bazel.build/modules/rules_elisp/0.0.2/MODULE.bazel": "1ca70e0fc92082927c409d90b93ca861523bc8a3298ec19a559b3bcf346eef76",
+    "https://bcr.bazel.build/modules/rules_elisp/0.0.2/source.json": "c60b254fd1d3952c6b2f0779301eda54a1ab9120b0748498a93375a57158651b",
     "https://bcr.bazel.build/modules/rules_foreign_cc/0.9.0/MODULE.bazel": "c9e8c682bf75b0e7c704166d79b599f93b72cfca5ad7477df596947891feeef6",
     "https://bcr.bazel.build/modules/rules_fuzzing/0.5.2/MODULE.bazel": "40c97d1144356f52905566c55811f13b299453a14ac7769dfba2ac38192337a8",
     "https://bcr.bazel.build/modules/rules_go/0.41.0/MODULE.bazel": "55861d8e8bb0e62cbd2896f60ff303f62ffcb0eddb74ecb0e5c0cbe36fc292c8",
@@ -277,35 +279,6 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
-    "@@phst_rules_elisp+//elisp:extensions.bzl%elisp": {
-      "general": {
-        "bzlTransitiveDigest": "8WQAxsdlS3Nxg+FCqJ4HkzoXceoCTWRgF8gQFD8NYnQ=",
-        "usagesDigest": "2jvCN+LhyASVScFLckHlEBMkxSWATqcRw5VKOQrlnuc=",
-        "recordedInputs": [
-          "REPO_MAPPING:phst_rules_elisp+,bazel_skylib bazel_skylib+"
-        ],
-        "generatedRepoSpecs": {
-          "aio": {
-            "repoRuleId": "@@phst_rules_elisp+//elisp/extensions:elisp.bzl%_elisp_http_archive",
-            "attributes": {
-              "urls": [
-                "https://github.com/skeeto/emacs-aio/archive/refs/tags/1.1.tar.gz"
-              ],
-              "integrity": "sha384-567fZ/RmnxQmSyVrlgYdidWBVzD7alwHVvVn41YEA9Bj92pHXRlViaSaVn3Imwd9",
-              "strip_prefix": "emacs-aio-1.1/",
-              "target_name": "library",
-              "exclude": [
-                "aio-contrib.el"
-              ]
-            }
-          }
-        },
-        "moduleExtensionMetadata": {
-          "useAllRepos": "REGULAR",
-          "reproducible": false
-        }
-      }
-    },
     "@@protobuf+//python/dist:system_python.bzl%system_python_extension": {
       "general": {
         "bzlTransitiveDigest": "qh0n9IrXU/xS94wxKQrG1J63zrLkA1Wy2Y3BQxptPcI=",
@@ -373,6 +346,35 @@
             "repoRuleId": "@@rules_android+//rules/android_sdk_repository:rule.bzl%_android_sdk_repository",
             "attributes": {}
           }
+        }
+      }
+    },
+    "@@rules_elisp+//elisp:extensions.bzl%elisp": {
+      "general": {
+        "bzlTransitiveDigest": "8WQAxsdlS3Nxg+FCqJ4HkzoXceoCTWRgF8gQFD8NYnQ=",
+        "usagesDigest": "u7C49NeqgE71oQtLhNEa2TTZrkWjOCKdZijT2bS8j5c=",
+        "recordedInputs": [
+          "REPO_MAPPING:rules_elisp+,bazel_skylib bazel_skylib+"
+        ],
+        "generatedRepoSpecs": {
+          "aio": {
+            "repoRuleId": "@@rules_elisp+//elisp/extensions:elisp.bzl%_elisp_http_archive",
+            "attributes": {
+              "urls": [
+                "https://github.com/skeeto/emacs-aio/archive/refs/tags/1.1.tar.gz"
+              ],
+              "integrity": "sha384-567fZ/RmnxQmSyVrlgYdidWBVzD7alwHVvVn41YEA9Bj92pHXRlViaSaVn3Imwd9",
+              "strip_prefix": "emacs-aio-1.1/",
+              "target_name": "library",
+              "exclude": [
+                "aio-contrib.el"
+              ]
+            }
+          }
+        },
+        "moduleExtensionMetadata": {
+          "useAllRepos": "REGULAR",
+          "reproducible": false
         }
       }
     },
