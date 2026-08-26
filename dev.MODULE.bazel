@@ -18,7 +18,7 @@ go_sdk.nogo(nogo = "//dev:nogo")
 # Bogus versions added because of
 # https://github.com/renovatebot/renovate/issues/33476.
 # FIXME: Remove them once Renovate issue is fixed.
-bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.3", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.4", dev_dependency = True)
 bazel_dep(name = "phst_merge_bazel_lockfiles", version = "0", dev_dependency = True)
 git_override(
     module_name = "phst_merge_bazel_lockfiles",
