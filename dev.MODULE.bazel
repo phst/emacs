@@ -22,6 +22,6 @@ bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.4", dev_dependency = Tr
 bazel_dep(name = "phst_merge_bazel_lockfiles", version = "0", dev_dependency = True)
 git_override(
     module_name = "phst_merge_bazel_lockfiles",
-    commit = "721649da728a66a86bdcf2865151f4f849725114",
+    commit = "0241f5f73ab42b66cea527ea8229967644466ead",
     remote = "https://github.com/phst/merge-bazel-lockfiles.git",
 )
