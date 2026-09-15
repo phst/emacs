@@ -15,7 +15,7 @@
 module(name = "com_github_phst_emacs")
 
 bazel_dep(name = "bazel_skylib", version = "1.9.2")
-bazel_dep(name = "rules_elisp", version = "0.0.2")
+bazel_dep(name = "rules_elisp", version = "0.2.0")
 bazel_dep(name = "rules_go", version = "0.62.0")
 
 elisp = use_extension("@rules_elisp//elisp:extensions.bzl", "elisp")
