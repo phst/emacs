@@ -23,7 +23,7 @@ GO = $(BAZEL) run $(BAZELFLAGS) -- @rules_go//go
 ADDLICENSE = $(GO) tool addlicense
 
 # All supported Emacs major versions.
-versions = 30
+versions = 30 31
 
 all:
 	$(BAZEL) build $(BAZELFLAGS) -- //...
