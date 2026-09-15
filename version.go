@@ -1,4 +1,4 @@
-// Copyright 2019, 2023, 2025 Google LLC
+// Copyright 2019, 2023, 2025, 2026 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ func (m *versionManager) init(e Env) error {
 	if err := e.CallOut("symbol-value", &ver, Symbol("emacs-major-version")); err != nil {
 		return err
 	}
-	if ver < 29 || ver > math.MaxInt32 {
+	if ver < 30 || ver > math.MaxInt32 {
 		return fmt.Errorf("unsupported Emacs version %d", ver)
 	}
 	if ok := atomic.CompareAndSwapInt32(&m.version, 0, int32(ver)); !ok {

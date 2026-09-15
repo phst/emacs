@@ -1,4 +1,4 @@
-// Copyright 2019-2021, 2023, 2025 Google LLC
+// Copyright 2019-2021, 2023, 2025, 2026 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ int emacs_module_init(struct emacs_runtime *rt) {
     return 1;
   }
   emacs_env *env = rt->get_environment(rt);
-  if ((size_t)env->size < sizeof(struct emacs_env_29)) {
+  if ((size_t)env->size < sizeof(struct emacs_env_30)) {
     return 2;
   }
   struct phst_emacs_init_result result = phst_emacs_init(env);
