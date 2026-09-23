@@ -13,7 +13,7 @@
 # limitations under the License.
 
 .POSIX:
-.PHONY: all check lock
+.PHONY: all check lock MODULE.bazel.lock
 .SUFFIXES:
 
 SHELL = /bin/sh
@@ -25,7 +25,7 @@ ADDLICENSE = $(GO) tool addlicense
 # All supported Emacs major versions.
 versions = 30 31
 
-all:
+all: MODULE.bazel.lock
 	$(BAZEL) build $(BAZELFLAGS) -- //...
 
 check: all $(versions)
@@ -39,3 +39,6 @@ $(versions):
 
 lock:
 	./update-lockfile
+
+MODULE.bazel.lock:
+	$(BAZEL) mod graph > /dev/null
