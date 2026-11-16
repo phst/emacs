@@ -15,7 +15,7 @@
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk", dev_dependency = True)
 go_sdk.nogo(nogo = "//dev:nogo")
 
-bazel_dep(name = "buildifier_prebuilt", version = "10.1.0", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "10.2.0", dev_dependency = True)
 bazel_dep(name = "phst_merge_bazel_lockfiles", dev_dependency = True)
 git_override(
     module_name = "phst_merge_bazel_lockfiles",
